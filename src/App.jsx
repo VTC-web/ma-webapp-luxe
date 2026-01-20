@@ -109,6 +109,24 @@ function App() {
     }
   }
 
+  // Confirmation Overlay - validation ultra simple (UX > validation)
+  const getMissingConfirmFields = () => {
+    const missing = []
+
+    const fullName = `${bookingState.passenger.firstName || ''} ${bookingState.passenger.lastName || ''}`.trim()
+    if (!fullName) missing.push('Nom')
+
+    const phone = (bookingState.passenger.phone || '').trim()
+    if (!phone) missing.push('Téléphone')
+
+    const paymentMethod = (bookingState.payment.method || '').trim()
+    if (!paymentMethod) missing.push('Mode de paiement')
+
+    return missing
+  }
+
+  const isConfirmEnabled = () => getMissingConfirmFields().length === 0
+
   // Scroll lock logic
   useEffect(() => {
     const container = scrollContainerRef.current
@@ -855,12 +873,17 @@ function App() {
               {/* Bouton de confirmation */}
               <div className="text-center">
                 <button 
-                  className={`btn btn--white btn--large ${!validateStep('details') ? 'btn--disabled' : ''}`}
-                  disabled={!validateStep('details')}
+                  className={`btn btn--white btn--large ${!isConfirmEnabled() ? 'btn--disabled' : ''}`}
+                  disabled={!isConfirmEnabled()}
                   onClick={handleConfirmBooking}
                 >
                   CONFIRMER LA RÉSERVATION
                 </button>
+                {!isConfirmEnabled() && (
+                  <div className="confirm-debug">
+                    Champs manquants : {getMissingConfirmFields().join(', ')}
+                  </div>
+                )}
               </div>
             </div>
           </div>

@@ -308,6 +308,12 @@ img {
   pointer-events: none;
 }
 
+.confirm-debug {
+  margin-top: var(--spacing-xs);
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
 .btn--large {
   padding: var(--spacing-lg) var(--spacing-2xl);
   font-size: 1.125rem;
