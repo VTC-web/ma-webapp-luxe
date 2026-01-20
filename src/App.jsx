@@ -17,6 +17,8 @@ function App() {
   const [openAccordion, setOpenAccordion] = useState(null)
   const [expandedVehicle, setExpandedVehicle] = useState(null)
   const [selectedVehicle, setSelectedVehicle] = useState(null)
+  const [expandedVehicleV2, setExpandedVehicleV2] = useState(null)
+  const [showDetailsV2, setShowDetailsV2] = useState(null)
   const [currentSection, setCurrentSection] = useState(0)
   const [showSummary, setShowSummary] = useState(false)
   const [showConfirmationOverlay, setShowConfirmationOverlay] = useState(false)
@@ -556,6 +558,319 @@ function App() {
           </div>
         </section>
 
+        {/* Section Flotte V2 - Design Premium avec Interaction Innovante */}
+        <section className="section section--fleet-v2" id="fleet-v2">
+          <div className="section__overlay"></div>
+          <div className="section__content">
+            <div className="fleet-v2">
+              <h2 className="fleet-v2__title">Notre Flotte d'Excellence</h2>
+              <p className="fleet-v2__subtitle">Découvrez nos véhicules premium</p>
+              
+              <div className="fleet-v2__grid">
+                {/* Mercedes Classe S */}
+                <div 
+                  className={`fleet-v2__card ${expandedVehicleV2 === 'mercedes-s680' ? 'is-expanded' : ''} ${selectedVehicle === 'mercedes-s680' ? 'is-selected' : ''}`}
+                  onClick={() => {
+                    const newExpanded = expandedVehicleV2 === 'mercedes-s680' ? null : 'mercedes-s680'
+                    setExpandedVehicleV2(newExpanded)
+                    if (newExpanded) {
+                      handleVehicleSelect('mercedes-s680')
+                      document.body.style.overflow = 'hidden'
+                    } else {
+                      document.body.style.overflow = ''
+                    }
+                  }}
+                >
+                  <div className="fleet-v2__card-image-wrapper">
+                    <img 
+                      src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" 
+                      alt="Mercedes Classe S" 
+                      className="fleet-v2__card-image"
+                    />
+                    <div className="fleet-v2__card-overlay"></div>
+                  </div>
+                  
+                  <div className="fleet-v2__card-content">
+                    <div className="fleet-v2__card-header">
+                      <h3 className="fleet-v2__card-title">Mercedes Classe S</h3>
+                      <p className="fleet-v2__card-tagline">L'EXCELLENCE POUR VOS MOMENTS PRESTIGIEUX</p>
+                      <div className="fleet-v2__card-specs">
+                        <div className="fleet-v2__spec-badge">
+                          <Zap size={12} />
+                          <span>250 KM/H</span>
+                        </div>
+                        <div className="fleet-v2__spec-badge">
+                          <Zap size={12} />
+                          <span>4 Passagers</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="fleet-v2__card-actions">
+                      <button 
+                        className="fleet-v2__reserve-btn"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleVehicleSelect('mercedes-s680')
+                          scrollToSection('booking-route')
+                        }}
+                      >
+                        RÉSERVER
+                      </button>
+                      <button 
+                        className="fleet-v2__details-trigger"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <span>Détails</span>
+                        <ChevronRight size={16} />
+                      </button>
+                    </div>
+                  </div>
+                  
+                  {/* Panneau de détails accordéon */}
+                  <div className={`fleet-v2__details-panel ${showDetailsV2 === 'mercedes-s680' ? 'is-open' : ''}`}>
+                    <div className="fleet-v2__details-content">
+                      <div className="fleet-v2__details-header">
+                        <h4 className="fleet-v2__details-title">Spécifications</h4>
+                      </div>
+                      <div className="fleet-v2__details-grid">
+                        <div className="fleet-v2__detail-item">
+                          <span className="fleet-v2__detail-label">Disponible</span>
+                          <span className="fleet-v2__detail-value">Paris / Milan / Amsterdam / Munich</span>
+                        </div>
+                        <div className="fleet-v2__detail-item">
+                          <span className="fleet-v2__detail-label">Puissance</span>
+                          <span className="fleet-v2__detail-value">450 HP</span>
+                        </div>
+                        <div className="fleet-v2__detail-item">
+                          <span className="fleet-v2__detail-label">Vitesse max</span>
+                          <span className="fleet-v2__detail-value">250 KM/H</span>
+                        </div>
+                        <div className="fleet-v2__detail-item">
+                          <span className="fleet-v2__detail-label">Passagers</span>
+                          <span className="fleet-v2__detail-value">4 personnes</span>
+                        </div>
+                        <div className="fleet-v2__detail-item">
+                          <span className="fleet-v2__detail-label">Bagages</span>
+                          <span className="fleet-v2__detail-value">3 valises</span>
+                        </div>
+                        <div className="fleet-v2__detail-item">
+                          <span className="fleet-v2__detail-label">Options</span>
+                          <span className="fleet-v2__detail-value">Champagne, WiFi, Sièges enfant</span>
+                        </div>
+                      </div>
+                      <div className="fleet-v2__details-price">
+                        <span className="fleet-v2__price-label">À partir de</span>
+                        <span className="fleet-v2__price-value">Sur devis</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mercedes Classe E */}
+                <div 
+                  className={`fleet-v2__card ${selectedVehicle === 'mercedes-e-class' ? 'is-selected' : ''}`}
+                  onClick={() => {
+                    handleVehicleSelect('mercedes-e-class')
+                    setTimeout(() => {
+                      scrollToSection('booking-route')
+                    }, 300)
+                  }}
+                >
+                  <div className="fleet-v2__card-image-wrapper">
+                    <img 
+                      src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" 
+                      alt="Mercedes Classe E" 
+                      className="fleet-v2__card-image"
+                    />
+                    <div className="fleet-v2__card-overlay"></div>
+                  </div>
+                  
+                  <div className="fleet-v2__card-content">
+                    <div className="fleet-v2__card-header">
+                      <h3 className="fleet-v2__card-title">Classe E / MERCEDES</h3>
+                      <p className="fleet-v2__card-tagline">ÉLÉGANCE ET PERFORMANCE POUR VOS DÉPLACEMENTS</p>
+                      <div className="fleet-v2__card-specs">
+                        <div className="fleet-v2__spec-badge">
+                          <Zap size={12} />
+                          <span>220 KM/H</span>
+                        </div>
+                        <div className="fleet-v2__spec-badge">
+                          <Zap size={12} />
+                          <span>4 Passagers</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="fleet-v2__card-actions">
+                      <button 
+                        className="fleet-v2__reserve-btn"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleVehicleSelect('mercedes-e-class')
+                          setTimeout(() => {
+                            scrollToSection('booking-route')
+                          }, 300)
+                        }}
+                      >
+                        RÉSERVER
+                      </button>
+                      <button 
+                        className="fleet-v2__details-trigger"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setShowDetailsV2(showDetailsV2 === 'mercedes-e-class' ? null : 'mercedes-e-class')
+                        }}
+                      >
+                        <span>Détails</span>
+                        <ChevronRight className={`fleet-v2__details-icon ${showDetailsV2 === 'mercedes-e-class' ? 'is-open' : ''}`} size={16} />
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div className={`fleet-v2__details-panel ${showDetailsV2 === 'mercedes-e-class' ? 'is-open' : ''}`}>
+                    <div className="fleet-v2__details-content">
+                      <div className="fleet-v2__details-header">
+                        <h4 className="fleet-v2__details-title">Spécifications</h4>
+                      </div>
+                      <div className="fleet-v2__details-grid">
+                        <div className="fleet-v2__detail-item">
+                          <span className="fleet-v2__detail-label">Disponible</span>
+                          <span className="fleet-v2__detail-value">Paris / Milan / Amsterdam / Munich</span>
+                        </div>
+                        <div className="fleet-v2__detail-item">
+                          <span className="fleet-v2__detail-label">Puissance</span>
+                          <span className="fleet-v2__detail-value">320 HP</span>
+                        </div>
+                        <div className="fleet-v2__detail-item">
+                          <span className="fleet-v2__detail-label">Vitesse max</span>
+                          <span className="fleet-v2__detail-value">220 KM/H</span>
+                        </div>
+                        <div className="fleet-v2__detail-item">
+                          <span className="fleet-v2__detail-label">Passagers</span>
+                          <span className="fleet-v2__detail-value">4 personnes</span>
+                        </div>
+                        <div className="fleet-v2__detail-item">
+                          <span className="fleet-v2__detail-label">Bagages</span>
+                          <span className="fleet-v2__detail-value">2 valises</span>
+                        </div>
+                        <div className="fleet-v2__detail-item">
+                          <span className="fleet-v2__detail-label">Options</span>
+                          <span className="fleet-v2__detail-value">WiFi, Sièges enfant</span>
+                        </div>
+                      </div>
+                      <div className="fleet-v2__details-price">
+                        <span className="fleet-v2__price-label">À partir de</span>
+                        <span className="fleet-v2__price-value">Sur devis</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Van Premium */}
+                <div 
+                  className={`fleet-v2__card ${selectedVehicle === 'van-luxe' ? 'is-selected' : ''}`}
+                  onClick={() => {
+                    handleVehicleSelect('van-luxe')
+                    setTimeout(() => {
+                      scrollToSection('booking-route')
+                    }, 300)
+                  }}
+                >
+                  <div className="fleet-v2__card-image-wrapper">
+                    <img 
+                      src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" 
+                      alt="Van Premium" 
+                      className="fleet-v2__card-image"
+                    />
+                    <div className="fleet-v2__card-overlay"></div>
+                  </div>
+                  
+                  <div className="fleet-v2__card-content">
+                    <div className="fleet-v2__card-header">
+                      <h3 className="fleet-v2__card-title">Van Premium</h3>
+                      <p className="fleet-v2__card-tagline">CONFORT MAXIMAL POUR VOS GROUPES</p>
+                      <div className="fleet-v2__card-specs">
+                        <div className="fleet-v2__spec-badge">
+                          <Zap size={12} />
+                          <span>180 KM/H</span>
+                        </div>
+                        <div className="fleet-v2__spec-badge">
+                          <Zap size={12} />
+                          <span>8 Passagers</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="fleet-v2__card-actions">
+                      <button 
+                        className="fleet-v2__reserve-btn"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleVehicleSelect('van-luxe')
+                          setTimeout(() => {
+                            scrollToSection('booking-route')
+                          }, 300)
+                        }}
+                      >
+                        RÉSERVER
+                      </button>
+                      <button 
+                        className="fleet-v2__details-trigger"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setShowDetailsV2(showDetailsV2 === 'van-luxe' ? null : 'van-luxe')
+                        }}
+                      >
+                        <span>Détails</span>
+                        <ChevronRight className={`fleet-v2__details-icon ${showDetailsV2 === 'van-luxe' ? 'is-open' : ''}`} size={16} />
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div className={`fleet-v2__details-panel ${showDetailsV2 === 'van-luxe' ? 'is-open' : ''}`}>
+                    <div className="fleet-v2__details-content">
+                      <div className="fleet-v2__details-header">
+                        <h4 className="fleet-v2__details-title">Spécifications</h4>
+                      </div>
+                      <div className="fleet-v2__details-grid">
+                        <div className="fleet-v2__detail-item">
+                          <span className="fleet-v2__detail-label">Disponible</span>
+                          <span className="fleet-v2__detail-value">Paris / Milan / Amsterdam / Munich</span>
+                        </div>
+                        <div className="fleet-v2__detail-item">
+                          <span className="fleet-v2__detail-label">Puissance</span>
+                          <span className="fleet-v2__detail-value">280 HP</span>
+                        </div>
+                        <div className="fleet-v2__detail-item">
+                          <span className="fleet-v2__detail-label">Vitesse max</span>
+                          <span className="fleet-v2__detail-value">180 KM/H</span>
+                        </div>
+                        <div className="fleet-v2__detail-item">
+                          <span className="fleet-v2__detail-label">Passagers</span>
+                          <span className="fleet-v2__detail-value">8 personnes</span>
+                        </div>
+                        <div className="fleet-v2__detail-item">
+                          <span className="fleet-v2__detail-label">Bagages</span>
+                          <span className="fleet-v2__detail-value">6 valises</span>
+                        </div>
+                        <div className="fleet-v2__detail-item">
+                          <span className="fleet-v2__detail-label">Options</span>
+                          <span className="fleet-v2__detail-value">Champagne, WiFi, Sièges enfant, Bar</span>
+                        </div>
+                      </div>
+                      <div className="fleet-v2__details-price">
+                        <span className="fleet-v2__price-label">À partir de</span>
+                        <span className="fleet-v2__price-value">Sur devis</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Section 4: Booking - Route Selection */}
         <section className="section" id="booking-route">
           <div className="section__overlay"></div>
@@ -947,7 +1262,7 @@ function App() {
 
               <div className={`accordion ${openAccordion === 'diff' ? 'is-open' : ''}`}>
                 <div className="accordion__header" onClick={() => setOpenAccordion(openAccordion === 'diff' ? null : 'diff')}>
-                  <h3 className="accordion__title">Comment se différencie autres Shuttle ?</h3>
+                  <h3 className="accordion__title">Qu'est-ce qui vous différencie des autres Shuttles ?</h3>
                   <ChevronRight className="accordion__icon" />
                 </div>
                 <div className="accordion__content">
