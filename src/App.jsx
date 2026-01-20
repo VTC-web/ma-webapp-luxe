@@ -48,17 +48,60 @@ function App() {
         if (bookingState.route.type === 'preset') {
           return bookingState.route.presetId !== null
         }
-        return bookingState.route.customRoute.pickup.address && bookingState.route.customRoute.dropoff.address
+        // Pour trajet personnalisé, on vérifie seulement si les adresses sont remplies
+        // (mais on ne bloque pas la validation si elles ne le sont pas encore)
+        return true
       case 'details':
         const { date, time } = bookingState.schedule
         const { firstName, lastName, phone, email } = bookingState.passenger
+        
+        // Vérifications de base
+        if (!date || !time) {
+          console.log('Validation failed: date or time missing', { date, time })
+          return false
+        }
+        if (!firstName || !lastName) {
+          console.log('Validation failed: firstName or lastName missing', { firstName, lastName })
+          return false
+        }
+        if (!phone || !email) {
+          console.log('Validation failed: phone or email missing', { phone, email })
+          return false
+        }
+        
+        // Validation email
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        const phoneRegex = /^[\d\s\+\-\(\)]+$/
-        return date && time && firstName && lastName && 
-               email && emailRegex.test(email) && 
-               phone && phoneRegex.test(phone) && 
-               phone.replace(/\D/g, '').length >= 10 &&
-               bookingState.payment.method !== null
+        if (!emailRegex.test(email)) {
+          console.log('Validation failed: invalid email format', { email })
+          return false
+        }
+        
+        // Validation téléphone (au moins 10 chiffres, plus flexible)
+        const phoneDigits = phone.replace(/\D/g, '')
+        if (phoneDigits.length < 10) {
+          console.log('Validation failed: phone too short', { phone, phoneDigits, length: phoneDigits.length })
+          return false
+        }
+        
+        // Vérification du mode de paiement
+        if (!bookingState.payment.method) {
+          console.log('Validation failed: payment method missing', { paymentMethod: bookingState.payment.method })
+          return false
+        }
+        
+        // Si trajet personnalisé, vérifier que les adresses sont remplies
+        if (bookingState.route.type === 'custom') {
+          if (!bookingState.route.customRoute.pickup.address || !bookingState.route.customRoute.dropoff.address) {
+            console.log('Validation failed: custom route addresses missing', {
+              pickup: bookingState.route.customRoute.pickup.address,
+              dropoff: bookingState.route.customRoute.dropoff.address
+            })
+            return false
+          }
+        }
+        
+        console.log('Validation passed!')
+        return true
       default:
         return false
     }
@@ -810,7 +853,7 @@ function App() {
               {/* Bouton de confirmation */}
               <div className="text-center">
                 <button 
-                  className="btn btn--white btn--large" 
+                  className={`btn btn--white btn--large ${!validateStep('details') ? 'btn--disabled' : ''}`}
                   disabled={!validateStep('details')}
                   onClick={handleConfirmBooking}
                 >
