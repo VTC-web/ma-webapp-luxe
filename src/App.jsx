@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { ChevronRight, Check, Menu, Zap } from 'lucide-react'
+import { ChevronRight, ChevronLeft, Check, Menu, Zap } from 'lucide-react'
 import './index.css'
 import './styles.css'
 import SlideToUnlock from './components/SlideToUnlock'
@@ -19,6 +19,7 @@ function App() {
   const [selectedVehicle, setSelectedVehicle] = useState(null)
   const [currentSection, setCurrentSection] = useState(0)
   const [showSummary, setShowSummary] = useState(false)
+  const [showConfirmationOverlay, setShowConfirmationOverlay] = useState(false)
 
   const scrollContainerRef = useRef(null)
 
@@ -90,6 +91,8 @@ function App() {
   const handleVehicleSelect = (vehicleId) => {
     setSelectedVehicle(vehicleId)
     updateBookingState('vehicle.id', vehicleId)
+    // La mise à jour de bookingState.vehicle.id déclenche automatiquement le re-render
+    // du panier et de l'overlay qui utilisent cette valeur
   }
 
   const handleRouteSelect = (type, presetId = null) => {
@@ -119,14 +122,14 @@ function App() {
 
   const handleConfirmDetails = () => {
     if (validateStep('details')) {
-      setShowSummary(true)
-      setTimeout(() => {
-        const summarySection = document.getElementById('bookingSummarySection')
-        if (summarySection) {
-          summarySection.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        }
-      }, 100)
+      setShowConfirmationOverlay(true)
+      document.body.style.overflow = 'hidden'
     }
+  }
+
+  const handleCloseOverlay = () => {
+    setShowConfirmationOverlay(false)
+    document.body.style.overflow = ''
   }
 
   const getVehicleName = (id) => {
@@ -138,11 +141,74 @@ function App() {
     return names[id] || 'Non sélectionné'
   }
 
+  const getRouteName = () => {
+    if (!bookingState.route.type) return 'Non sélectionné'
+    if (bookingState.route.type === 'preset') {
+      const names = {
+        'cdg_paris': 'Transfert aéroport',
+        'disneyland': 'Disneyland',
+        'orly_paris': 'Trajet rapide'
+      }
+      return names[bookingState.route.presetId] || 'Non sélectionné'
+    }
+    return 'Trajet Personnalisé'
+  }
+
+  // Liste des véhicules pour le sélecteur
+  const vehicles = [
+    { id: 'mercedes-s680', name: 'Mercedes Classe S' },
+    { id: 'mercedes-e-class', name: 'Mercedes Classe E' },
+    { id: 'van-luxe', name: 'Van Premium' }
+  ]
+
+  // Liste des services pour le sélecteur
+  const routes = [
+    { type: 'preset', presetId: 'cdg_paris', name: 'Transfert aéroport' },
+    { type: 'preset', presetId: 'disneyland', name: 'Disneyland' },
+    { type: 'preset', presetId: 'orly_paris', name: 'Trajet rapide' },
+    { type: 'custom', presetId: null, name: 'Trajet Personnalisé' }
+  ]
+
+  // Handlers pour changer le véhicule depuis l'overlay
+  const handleVehicleChangeInOverlay = (direction) => {
+    const currentIndex = vehicles.findIndex(v => v.id === bookingState.vehicle.id)
+    if (currentIndex === -1) return
+    
+    let newIndex
+    if (direction === 'next') {
+      newIndex = (currentIndex + 1) % vehicles.length
+    } else {
+      newIndex = (currentIndex - 1 + vehicles.length) % vehicles.length
+    }
+    
+    const newVehicle = vehicles[newIndex]
+    handleVehicleSelect(newVehicle.id)
+  }
+
+  // Handlers pour changer le service depuis l'overlay
+  const handleRouteChangeInOverlay = (direction) => {
+    const currentIndex = routes.findIndex(r => 
+      r.type === bookingState.route.type && 
+      r.presetId === bookingState.route.presetId
+    )
+    if (currentIndex === -1) return
+    
+    let newIndex
+    if (direction === 'next') {
+      newIndex = (currentIndex + 1) % routes.length
+    } else {
+      newIndex = (currentIndex - 1 + routes.length) % routes.length
+    }
+    
+    const newRoute = routes[newIndex]
+    handleRouteSelect(newRoute.type, newRoute.presetId)
+  }
+
   const handleUnlock = () => {
     scrollToSection('booking-vehicle')
   }
 
-  const sections = ['hero', 'about', 'booking-vehicle', 'booking-route', 'booking-details']
+  const sections = ['hero', 'about', 'booking-vehicle', 'booking-route']
 
   return (
     <>
@@ -499,9 +565,83 @@ function App() {
             </div>
 
             <div className="form-container">
+              <div className="text-center mt-xl">
+                <button 
+                  className="btn btn--primary btn--large" 
+                  disabled={!validateStep('route')}
+                  onClick={() => {
+                    setShowConfirmationOverlay(true)
+                    document.body.style.overflow = 'hidden'
+                  }}
+                >
+                  CONTINUER
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
 
+
+        {/* Overlay de Confirmation */}
+        {showConfirmationOverlay && (
+          <div className="confirmation-overlay">
+            <div className="confirmation-overlay__backdrop" onClick={handleCloseOverlay}></div>
+            <div className="confirmation-overlay__content">
+              <button className="confirmation-overlay__back-btn" onClick={handleCloseOverlay}>
+                ← Retour
+              </button>
+              
+              <h2 className="text-center mb-lg">Détails de votre réservation</h2>
+              
+              {/* Récapitulatif en haut - Interactif */}
+              <div className="summary-card mb-xl">
+                <div className="grid-gap-md">
+                  <div className="summary-selector">
+                    <strong className="label-text">Véhicule</strong>
+                    <div className="summary-selector__container">
+                      <button 
+                        className="summary-selector__arrow"
+                        onClick={() => handleVehicleChangeInOverlay('prev')}
+                        aria-label="Véhicule précédent"
+                      >
+                        <ChevronLeft size={18} strokeWidth={2.5} />
+                      </button>
+                      <p className="summary-value">{getVehicleName(bookingState.vehicle.id)}</p>
+                      <button 
+                        className="summary-selector__arrow"
+                        onClick={() => handleVehicleChangeInOverlay('next')}
+                        aria-label="Véhicule suivant"
+                      >
+                        <ChevronRight size={18} strokeWidth={2.5} />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="summary-selector">
+                    <strong className="label-text">Service</strong>
+                    <div className="summary-selector__container">
+                      <button 
+                        className="summary-selector__arrow"
+                        onClick={() => handleRouteChangeInOverlay('prev')}
+                        aria-label="Service précédent"
+                      >
+                        <ChevronLeft size={18} strokeWidth={2.5} />
+                      </button>
+                      <p className="summary-value">{getRouteName()}</p>
+                      <button 
+                        className="summary-selector__arrow"
+                        onClick={() => handleRouteChangeInOverlay('next')}
+                        aria-label="Service suivant"
+                      >
+                        <ChevronRight size={18} strokeWidth={2.5} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Champs d'adresse si Trajet Personnalisé */}
               {bookingState.route.type === 'custom' && (
-                <div id="customRouteForm">
+                <div className="form-container--small mb-xl">
                   <div className="form-group">
                     <label className="form-label" htmlFor="pickupAddress">Adresse de prise en charge</label>
                     <input 
@@ -537,183 +677,149 @@ function App() {
                 </div>
               )}
 
-              <div className="text-center mt-xl">
+              {/* Formulaire de détails */}
+              <div className="form-container--small mb-xl">
+                <div className="form-group">
+                  <label className="form-label" htmlFor="bookingDate">Date</label>
+                  <input 
+                    type="date" 
+                    id="bookingDate" 
+                    className="form-input" 
+                    required
+                    min={new Date().toISOString().split('T')[0]}
+                    value={bookingState.schedule.date || ''}
+                    onChange={(e) => handleDetailsChange('schedule.date', e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label" htmlFor="bookingTime">Heure</label>
+                  <input 
+                    type="time" 
+                    id="bookingTime" 
+                    className="form-input" 
+                    required
+                    value={bookingState.schedule.time || ''}
+                    onChange={(e) => handleDetailsChange('schedule.time', e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label" htmlFor="passengerName">Nom complet</label>
+                  <input 
+                    type="text" 
+                    id="passengerName" 
+                    className="form-input" 
+                    placeholder="Prénom et nom" 
+                    required
+                    onChange={(e) => handleDetailsChange('name', e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label" htmlFor="passengerPhone">Téléphone</label>
+                  <input 
+                    type="tel" 
+                    id="passengerPhone" 
+                    className="form-input" 
+                    placeholder="+33 6 12 34 56 78" 
+                    required
+                    value={bookingState.passenger.phone || ''}
+                    onChange={(e) => handleDetailsChange('passenger.phone', e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label" htmlFor="passengerEmail">Email</label>
+                  <input 
+                    type="email" 
+                    id="passengerEmail" 
+                    className="form-input" 
+                    placeholder="votre@email.com" 
+                    required
+                    value={bookingState.passenger.email || ''}
+                    onChange={(e) => handleDetailsChange('passenger.email', e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label" htmlFor="specialRequests">Demandes spéciales (optionnel)</label>
+                  <textarea 
+                    id="specialRequests" 
+                    className="form-input" 
+                    rows="3" 
+                    placeholder="Ex: Siège enfant, Champagne, etc."
+                    value={bookingState.passenger.specialRequests || ''}
+                    onChange={(e) => handleDetailsChange('passenger.specialRequests', e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Mode de paiement */}
+              <div className="form-group mb-xl">
+                <label className="form-label">Mode de paiement</label>
+                <div className="grid-auto-fit--small">
+                  <button 
+                    className={`btn btn--primary ${bookingState.payment.method === 'card' ? 'selected' : ''}`}
+                    onClick={() => handlePaymentSelect('card')}
+                  >
+                    Carte bancaire
+                  </button>
+                  <button 
+                    className={`btn btn--primary ${bookingState.payment.method === 'apple_pay' ? 'selected' : ''}`}
+                    onClick={() => handlePaymentSelect('apple_pay')}
+                  >
+                    Apple Pay
+                  </button>
+                  <button 
+                    className={`btn btn--primary ${bookingState.payment.method === 'invoice' ? 'selected' : ''}`}
+                    onClick={() => handlePaymentSelect('invoice')}
+                  >
+                    Facture
+                  </button>
+                </div>
+              </div>
+
+              {/* Bouton de confirmation */}
+              <div className="text-center">
                 <button 
-                  className="btn btn--primary btn--large" 
-                  disabled={!validateStep('route')}
-                  onClick={() => scrollToSection('booking-details')}
+                  className="btn btn--white btn--large" 
+                  disabled={!validateStep('details')}
+                  onClick={() => {
+                    console.log('Booking confirmed:', bookingState)
+                    alert('Réservation confirmée ! Vous recevrez un email de confirmation sous peu.')
+                    handleCloseOverlay()
+                  }}
                 >
-                  CONTINUER
+                  CONFIRMER LA RÉSERVATION
                 </button>
               </div>
             </div>
           </div>
-        </section>
+        )}
 
-        {/* Section 5: Booking - Details */}
-        <section className="section" id="booking-details">
-          <div className="section__overlay"></div>
-          <div className="section__content">
-            <h2 className="text-center mb-lg">Détails de votre réservation</h2>
-            <div className="form-container--small">
-              <div className="form-group">
-                <label className="form-label" htmlFor="bookingDate">Date</label>
-                <input 
-                  type="date" 
-                  id="bookingDate" 
-                  className="form-input" 
-                  required
-                  min={new Date().toISOString().split('T')[0]}
-                  value={bookingState.schedule.date || ''}
-                  onChange={(e) => handleDetailsChange('schedule.date', e.target.value)}
-                />
+        {/* Bouton Flottant (Le Panier) */}
+        {bookingState.vehicle.id && (
+          <div className="floating-booking-card">
+            <div className="floating-booking-card__content">
+              <div className="floating-booking-card__info">
+                <span className="floating-booking-card__label">Véhicule :</span>
+                <span className="floating-booking-card__value">{getVehicleName(bookingState.vehicle.id)}</span>
+                <span className="floating-booking-card__separator">|</span>
+                <span className="floating-booking-card__label">Service :</span>
+                <span className="floating-booking-card__value">
+                  {bookingState.route.type ? getRouteName() : 'En attente'}
+                </span>
               </div>
-              <div className="form-group">
-                <label className="form-label" htmlFor="bookingTime">Heure</label>
-                <input 
-                  type="time" 
-                  id="bookingTime" 
-                  className="form-input" 
-                  required
-                  value={bookingState.schedule.time || ''}
-                  onChange={(e) => handleDetailsChange('schedule.time', e.target.value)}
-                />
-              </div>
-              <div className="form-group">
-                <label className="form-label" htmlFor="passengerName">Nom complet</label>
-                <input 
-                  type="text" 
-                  id="passengerName" 
-                  className="form-input" 
-                  placeholder="Prénom et nom" 
-                  required
-                  onChange={(e) => handleDetailsChange('name', e.target.value)}
-                />
-              </div>
-              <div className="form-group">
-                <label className="form-label" htmlFor="passengerPhone">Téléphone</label>
-                <input 
-                  type="tel" 
-                  id="passengerPhone" 
-                  className="form-input" 
-                  placeholder="+33 6 12 34 56 78" 
-                  required
-                  value={bookingState.passenger.phone || ''}
-                  onChange={(e) => handleDetailsChange('passenger.phone', e.target.value)}
-                />
-              </div>
-              <div className="form-group">
-                <label className="form-label" htmlFor="passengerEmail">Email</label>
-                <input 
-                  type="email" 
-                  id="passengerEmail" 
-                  className="form-input" 
-                  placeholder="votre@email.com" 
-                  required
-                  value={bookingState.passenger.email || ''}
-                  onChange={(e) => handleDetailsChange('passenger.email', e.target.value)}
-                />
-              </div>
-              <div className="form-group">
-                <label className="form-label" htmlFor="specialRequests">Demandes spéciales (optionnel)</label>
-                <textarea 
-                  id="specialRequests" 
-                  className="form-input" 
-                  rows="3" 
-                  placeholder="Ex: Siège enfant, Champagne, etc."
-                  value={bookingState.passenger.specialRequests || ''}
-                  onChange={(e) => handleDetailsChange('passenger.specialRequests', e.target.value)}
-                />
-              </div>
-              <div className="text-center mt-xl">
+              {bookingState.route.type && (
                 <button 
-                  className="btn btn--primary btn--large" 
-                  disabled={!validateStep('details')}
-                  onClick={handleConfirmDetails}
+                  className="floating-booking-card__btn"
+                  onClick={() => {
+                    setShowConfirmationOverlay(true)
+                    document.body.style.overflow = 'hidden'
+                  }}
                 >
-                  CONTINUER
+                  Réserver
                 </button>
-              </div>
-
-              {/* Récapitulatif et Paiement */}
-              {showSummary && (
-                <div id="bookingSummarySection" className="mt-2xl">
-                  <h2 className="text-center mb-lg">Récapitulatif</h2>
-                  <div className="summary-card">
-                    <div className="grid-gap-md">
-                      <div>
-                        <strong className="label-text">Véhicule</strong>
-                        <p className="summary-value">{getVehicleName(bookingState.vehicle.id)}</p>
-                      </div>
-                      <div>
-                        <strong className="label-text">Itinéraire</strong>
-                        <p className="summary-value">
-                          {bookingState.route.type === 'preset' 
-                            ? bookingState.route.presetId.replace(/_/g, ' → ').replace(/\b\w/g, l => l.toUpperCase())
-                            : `${bookingState.route.customRoute.pickup.address || ''} → ${bookingState.route.customRoute.dropoff.address || ''}`
-                          }
-                        </p>
-                      </div>
-                      <div>
-                        <strong className="label-text">Date & Heure</strong>
-                        <p className="summary-value">
-                          {bookingState.schedule.date ? new Date(bookingState.schedule.date).toLocaleDateString('fr-FR') : ''} {bookingState.schedule.time || ''}
-                        </p>
-                      </div>
-                      <div>
-                        <strong className="label-text">Passager</strong>
-                        <p className="summary-value">
-                          {bookingState.passenger.firstName || ''} {bookingState.passenger.lastName || ''}
-                        </p>
-                        <p className="summary-meta">
-                          {bookingState.passenger.phone || ''}<br />
-                          {bookingState.passenger.email || ''}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Mode de paiement</label>
-                    <div className="grid-auto-fit--small">
-                      <button 
-                        className={`btn btn--primary ${bookingState.payment.method === 'card' ? 'selected' : ''}`}
-                        onClick={() => handlePaymentSelect('card')}
-                      >
-                        Carte bancaire
-                      </button>
-                      <button 
-                        className={`btn btn--primary ${bookingState.payment.method === 'apple_pay' ? 'selected' : ''}`}
-                        onClick={() => handlePaymentSelect('apple_pay')}
-                      >
-                        Apple Pay
-                      </button>
-                      <button 
-                        className={`btn btn--primary ${bookingState.payment.method === 'invoice' ? 'selected' : ''}`}
-                        onClick={() => handlePaymentSelect('invoice')}
-                      >
-                        Facture
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="text-center mt-xl">
-                    <button 
-                      className="btn btn--white btn--large" 
-                      disabled={!bookingState.payment.method}
-                      onClick={() => {
-                        console.log('Booking confirmed:', bookingState)
-                        alert('Réservation confirmée ! Vous recevrez un email de confirmation sous peu.')
-                      }}
-                    >
-                      CONFIRMER LA RÉSERVATION
-                    </button>
-                  </div>
-                </div>
               )}
             </div>
           </div>
-        </section>
+        )}
 
         {/* Section About - L'Excellence avec FleetPrivée */}
         <section className="section" id="about">
@@ -838,14 +944,6 @@ function App() {
             onClick={(e) => { e.preventDefault(); scrollToSection('booking-route'); }}
           >
             <span className="nav-indicator__number">2</span>
-            <Check className="nav-indicator__check" size={16} strokeWidth={2.5} />
-          </a>
-          <a 
-            href="#booking-details" 
-            className={`nav-indicator ${currentSection === 4 ? 'is-active' : ''} ${validateStep('details') ? 'is-validated' : ''}`}
-            onClick={(e) => { e.preventDefault(); scrollToSection('booking-details'); }}
-          >
-            <span className="nav-indicator__number">3</span>
             <Check className="nav-indicator__check" size={16} strokeWidth={2.5} />
           </a>
         </nav>
