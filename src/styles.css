@@ -323,6 +323,24 @@ img {
   border-color: rgba(255, 255, 255, 0.3);
 }
 
+.payment-btn {
+  transition: all var(--transition-fast);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.payment-btn:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+.payment-btn.selected {
+  background: var(--color-accent);
+  color: var(--color-text);
+  border: 2px solid var(--color-accent);
+  box-shadow: 0 4px 16px rgba(201, 169, 98, 0.3);
+  font-weight: 600;
+}
+
 .hero {
   text-align: left;
   padding-top: calc(var(--spacing-2xl) * 2.4);

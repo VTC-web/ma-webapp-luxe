@@ -11,7 +11,7 @@ function App() {
     route: { type: null, presetId: null, customRoute: { pickup: { address: null }, dropoff: { address: null } } },
     schedule: { date: null, time: null },
     passenger: { firstName: null, lastName: null, phone: null, email: null, specialRequests: null },
-    payment: { method: null }
+    payment: { method: 'onboard' } // Valeur par défaut : Paiement à bord
   })
 
   const [openAccordion, setOpenAccordion] = useState(null)
@@ -84,8 +84,10 @@ function App() {
         }
         
         // Vérification du mode de paiement
+        // La valeur par défaut 'onboard' est déjà définie dans l'état initial
+        // Donc cette vérification devrait toujours passer, mais on la garde pour sécurité
         if (!bookingState.payment.method) {
-          console.log('Validation failed: payment method missing', { paymentMethod: bookingState.payment.method })
+          console.log('Validation failed: payment method missing (should not happen with default)', { paymentMethod: bookingState.payment.method })
           return false
         }
         
@@ -830,22 +832,22 @@ function App() {
                 <label className="form-label">Mode de paiement</label>
                 <div className="grid-auto-fit--small">
                   <button 
-                    className={`btn btn--primary ${bookingState.payment.method === 'card' ? 'selected' : ''}`}
+                    className={`btn btn--primary payment-btn ${bookingState.payment.method === 'onboard' ? 'selected' : ''}`}
+                    onClick={() => handlePaymentSelect('onboard')}
+                  >
+                    Paiement à bord
+                  </button>
+                  <button 
+                    className={`btn btn--primary payment-btn ${bookingState.payment.method === 'link' ? 'selected' : ''}`}
+                    onClick={() => handlePaymentSelect('link')}
+                  >
+                    Lien de paiement
+                  </button>
+                  <button 
+                    className={`btn btn--primary payment-btn ${bookingState.payment.method === 'card' ? 'selected' : ''}`}
                     onClick={() => handlePaymentSelect('card')}
                   >
                     Carte bancaire
-                  </button>
-                  <button 
-                    className={`btn btn--primary ${bookingState.payment.method === 'apple_pay' ? 'selected' : ''}`}
-                    onClick={() => handlePaymentSelect('apple_pay')}
-                  >
-                    Apple Pay
-                  </button>
-                  <button 
-                    className={`btn btn--primary ${bookingState.payment.method === 'invoice' ? 'selected' : ''}`}
-                    onClick={() => handlePaymentSelect('invoice')}
-                  >
-                    Facture
                   </button>
                 </div>
               </div>
