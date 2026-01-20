@@ -132,6 +132,38 @@ function App() {
     document.body.style.overflow = ''
   }
 
+  // Fonction pour générer le message WhatsApp formaté
+  const generateWhatsAppMessage = () => {
+    const whatsappNumber = '33605998211' // REMPLACER PAR VOTRE NUMÉRO (format: 33612345678 sans espaces ni caractères spéciaux)
+    
+    // Construire le message avec des retours à la ligne normaux
+    let message = 'DEMANDE DE RÉSERVATION\n\n'
+    message += `Client : ${bookingState.passenger.firstName || ''} ${bookingState.passenger.lastName || ''}\n`
+    message += `Téléphone : ${bookingState.passenger.phone || ''}\n`
+    message += `Véhicule : ${getVehicleName(bookingState.vehicle.id)}\n`
+    message += `Service : ${getRouteName()}`
+    
+    // Ajouter les détails du trajet si c'est un trajet personnalisé
+    if (bookingState.route.type === 'custom') {
+      message += '\n\n'
+      message += 'Détails du trajet :\n'
+      message += `Départ : ${bookingState.route.customRoute.pickup.address || 'Non renseigné'}\n`
+      message += `Arrivée : ${bookingState.route.customRoute.dropoff.address || 'Non renseigné'}`
+    }
+    
+    message += '\n\n'
+    message += 'Information transmise via le formulaire en ligne.'
+    
+    // Encoder le message pour l'URL (les \n seront convertis en %0A automatiquement)
+    return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
+  }
+
+  const handleConfirmBooking = () => {
+    const whatsappUrl = generateWhatsAppMessage()
+    window.open(whatsappUrl, '_blank')
+    handleCloseOverlay()
+  }
+
   const getVehicleName = (id) => {
     const names = {
       'mercedes-s680': 'Mercedes Classe S',
@@ -780,11 +812,7 @@ function App() {
                 <button 
                   className="btn btn--white btn--large" 
                   disabled={!validateStep('details')}
-                  onClick={() => {
-                    console.log('Booking confirmed:', bookingState)
-                    alert('Réservation confirmée ! Vous recevrez un email de confirmation sous peu.')
-                    handleCloseOverlay()
-                  }}
+                  onClick={handleConfirmBooking}
                 >
                   CONFIRMER LA RÉSERVATION
                 </button>
