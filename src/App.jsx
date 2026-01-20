@@ -1019,6 +1019,21 @@ function App() {
                 RÉSERVER MAINTENANT
               </button>
             </div>
+            
+            {/* Footer intégré */}
+            <footer className="footer">
+              <div className="footer__content">
+                <div className="footer__links">
+                  <a href="#hero" className="footer__link">Accueil</a>
+                  <a href="#booking-vehicle" className="footer__link">Réservation</a>
+                  <a href="#about" className="footer__link">À propos</a>
+                  <a href="mailto:contact@fleetprivee.com" className="footer__link">Contact</a>
+                </div>
+                <div className="footer__copyright">
+                  © 2024 FleetPrivée. Tous droits réservés.
+                </div>
+              </div>
+            </footer>
           </div>
         </section>
       </main>
