@@ -23,6 +23,7 @@ function App() {
     'mercedes-e-class': 0,
     'van-luxe': 0
   })
+  const [routesV2Details, setRoutesV2Details] = useState(null)
   const [currentSection, setCurrentSection] = useState(0)
   const [showSummary, setShowSummary] = useState(false)
   const [showConfirmationOverlay, setShowConfirmationOverlay] = useState(false)
@@ -900,6 +901,336 @@ function App() {
                       >
                         <img src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" alt="Intérieur" />
                       </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Section Itinéraires V2 - Design Premium Ticket */}
+        <section className="section section--routes-v2" id="routes-v2">
+          <div className="section__overlay"></div>
+          <div className="section__content">
+            <div className="routes-v2">
+              <h2 className="routes-v2__title">Nos Itinéraires Premium</h2>
+              <p className="routes-v2__subtitle">Choisissez votre destination</p>
+              
+              <div className="routes-v2__grid">
+                {/* Transfert Aéroport */}
+                <div 
+                  className={`routes-v2__ticket ${(bookingState.route.type === 'preset' && bookingState.route.presetId === 'cdg_paris') ? 'is-selected' : ''} ${routesV2Details === 'cdg_paris' ? 'has-details' : ''}`}
+                  onClick={(e) => {
+                    if (!e.target.closest('.routes-v2__details-btn') && !e.target.closest('.routes-v2__services-panel')) {
+                      handleRouteSelect('preset', 'cdg_paris')
+                    }
+                  }}
+                >
+                  <div className="routes-v2__ticket-image-wrapper">
+                    <img src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" alt="Aéroport CDG" className="routes-v2__ticket-image" />
+                    <div className="routes-v2__ticket-overlay"></div>
+                    
+                    <div className="routes-v2__ticket-content">
+                      <div className="routes-v2__ticket-badge">
+                        <span>45 min</span>
+                      </div>
+                      
+                      <div className="routes-v2__ticket-header">
+                        <div className="routes-v2__route">
+                          <span className="routes-v2__route-point">Paris</span>
+                          <ChevronRight className="routes-v2__route-arrow" size={20} />
+                          <span className="routes-v2__route-point">CDG</span>
+                        </div>
+                        <div className="routes-v2__ticket-price">
+                          <span className="routes-v2__price-amount">À partir de</span>
+                          <span className="routes-v2__price-value">120€</span>
+                        </div>
+                      </div>
+                      
+                      <div className="routes-v2__ticket-actions">
+                        <button 
+                          className="routes-v2__select-btn"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleRouteSelect('preset', 'cdg_paris')
+                          }}
+                        >
+                          Sélectionner
+                        </button>
+                        <button 
+                          className="routes-v2__details-btn"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setRoutesV2Details(routesV2Details === 'cdg_paris' ? null : 'cdg_paris')
+                          }}
+                        >
+                          <span>Infos</span>
+                          <ChevronRight className={`routes-v2__details-icon ${routesV2Details === 'cdg_paris' ? 'is-open' : ''}`} size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Panel Services Inclus */}
+                  <div className={`routes-v2__services-panel ${routesV2Details === 'cdg_paris' ? 'is-open' : ''}`}>
+                    <div className="routes-v2__services-content">
+                      <h4 className="routes-v2__services-title">Services inclus</h4>
+                      <ul className="routes-v2__services-list">
+                        <li className="routes-v2__service-item">
+                          <Check size={16} />
+                          <span>Accueil avec pancarte nominative</span>
+                        </li>
+                        <li className="routes-v2__service-item">
+                          <Check size={16} />
+                          <span>Attente gratuite 30 minutes</span>
+                        </li>
+                        <li className="routes-v2__service-item">
+                          <Check size={16} />
+                          <span>Rafraîchissements à bord</span>
+                        </li>
+                        <li className="routes-v2__service-item">
+                          <Check size={16} />
+                          <span>Suivi en temps réel</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Disneyland */}
+                <div 
+                  className={`routes-v2__ticket ${(bookingState.route.type === 'preset' && bookingState.route.presetId === 'disneyland') ? 'is-selected' : ''} ${routesV2Details === 'disneyland' ? 'has-details' : ''}`}
+                  onClick={(e) => {
+                    if (!e.target.closest('.routes-v2__details-btn') && !e.target.closest('.routes-v2__services-panel')) {
+                      handleRouteSelect('preset', 'disneyland')
+                    }
+                  }}
+                >
+                  <div className="routes-v2__ticket-image-wrapper">
+                    <img src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" alt="Disneyland" className="routes-v2__ticket-image" />
+                    <div className="routes-v2__ticket-overlay"></div>
+                    
+                    <div className="routes-v2__ticket-content">
+                      <div className="routes-v2__ticket-badge">
+                        <span>50 min</span>
+                      </div>
+                      
+                      <div className="routes-v2__ticket-header">
+                        <div className="routes-v2__route">
+                          <span className="routes-v2__route-point">Paris</span>
+                          <ChevronRight className="routes-v2__route-arrow" size={20} />
+                          <span className="routes-v2__route-point">Disneyland</span>
+                        </div>
+                        <div className="routes-v2__ticket-price">
+                          <span className="routes-v2__price-amount">À partir de</span>
+                          <span className="routes-v2__price-value">150€</span>
+                        </div>
+                      </div>
+                      
+                      <div className="routes-v2__ticket-actions">
+                        <button 
+                          className="routes-v2__select-btn"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleRouteSelect('preset', 'disneyland')
+                          }}
+                        >
+                          Sélectionner
+                        </button>
+                        <button 
+                          className="routes-v2__details-btn"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setRoutesV2Details(routesV2Details === 'disneyland' ? null : 'disneyland')
+                          }}
+                        >
+                          <span>Infos</span>
+                          <ChevronRight className={`routes-v2__details-icon ${routesV2Details === 'disneyland' ? 'is-open' : ''}`} size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className={`routes-v2__services-panel ${routesV2Details === 'disneyland' ? 'is-open' : ''}`}>
+                    <div className="routes-v2__services-content">
+                      <h4 className="routes-v2__services-title">Services inclus</h4>
+                      <ul className="routes-v2__services-list">
+                        <li className="routes-v2__service-item">
+                          <Check size={16} />
+                          <span>Accueil avec pancarte nominative</span>
+                        </li>
+                        <li className="routes-v2__service-item">
+                          <Check size={16} />
+                          <span>Attente gratuite 45 minutes</span>
+                        </li>
+                        <li className="routes-v2__service-item">
+                          <Check size={16} />
+                          <span>Rafraîchissements à bord</span>
+                        </li>
+                        <li className="routes-v2__service-item">
+                          <Check size={16} />
+                          <span>WiFi haut débit</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Trajet Rapide */}
+                <div 
+                  className={`routes-v2__ticket ${(bookingState.route.type === 'preset' && bookingState.route.presetId === 'orly_paris') ? 'is-selected' : ''} ${routesV2Details === 'orly_paris' ? 'has-details' : ''}`}
+                  onClick={(e) => {
+                    if (!e.target.closest('.routes-v2__details-btn') && !e.target.closest('.routes-v2__services-panel')) {
+                      handleRouteSelect('preset', 'orly_paris')
+                    }
+                  }}
+                >
+                  <div className="routes-v2__ticket-image-wrapper">
+                    <img src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" alt="Trajet rapide" className="routes-v2__ticket-image" />
+                    <div className="routes-v2__ticket-overlay"></div>
+                    
+                    <div className="routes-v2__ticket-content">
+                      <div className="routes-v2__ticket-badge">
+                        <span>30 min</span>
+                      </div>
+                      
+                      <div className="routes-v2__ticket-header">
+                        <div className="routes-v2__route">
+                          <span className="routes-v2__route-point">Paris</span>
+                          <ChevronRight className="routes-v2__route-arrow" size={20} />
+                          <span className="routes-v2__route-point">Orly</span>
+                        </div>
+                        <div className="routes-v2__ticket-price">
+                          <span className="routes-v2__price-amount">À partir de</span>
+                          <span className="routes-v2__price-value">100€</span>
+                        </div>
+                      </div>
+                      
+                      <div className="routes-v2__ticket-actions">
+                        <button 
+                          className="routes-v2__select-btn"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleRouteSelect('preset', 'orly_paris')
+                          }}
+                        >
+                          Sélectionner
+                        </button>
+                        <button 
+                          className="routes-v2__details-btn"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setRoutesV2Details(routesV2Details === 'orly_paris' ? null : 'orly_paris')
+                          }}
+                        >
+                          <span>Infos</span>
+                          <ChevronRight className={`routes-v2__details-icon ${routesV2Details === 'orly_paris' ? 'is-open' : ''}`} size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className={`routes-v2__services-panel ${routesV2Details === 'orly_paris' ? 'is-open' : ''}`}>
+                    <div className="routes-v2__services-content">
+                      <h4 className="routes-v2__services-title">Services inclus</h4>
+                      <ul className="routes-v2__services-list">
+                        <li className="routes-v2__service-item">
+                          <Check size={16} />
+                          <span>Accueil avec pancarte nominative</span>
+                        </li>
+                        <li className="routes-v2__service-item">
+                          <Check size={16} />
+                          <span>Attente gratuite 20 minutes</span>
+                        </li>
+                        <li className="routes-v2__service-item">
+                          <Check size={16} />
+                          <span>Rafraîchissements à bord</span>
+                        </li>
+                        <li className="routes-v2__service-item">
+                          <Check size={16} />
+                          <span>Service express</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Itinéraire Personnalisé */}
+                <div 
+                  className={`routes-v2__ticket routes-v2__ticket--custom ${bookingState.route.type === 'custom' ? 'is-selected' : ''} ${routesV2Details === 'custom' ? 'has-details' : ''}`}
+                  onClick={(e) => {
+                    if (!e.target.closest('.routes-v2__details-btn') && !e.target.closest('.routes-v2__services-panel')) {
+                      handleRouteSelect('custom')
+                    }
+                  }}
+                >
+                  <div className="routes-v2__ticket-image-wrapper">
+                    <img src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" alt="Itinéraire personnalisé" className="routes-v2__ticket-image" />
+                    <div className="routes-v2__ticket-overlay"></div>
+                    
+                    <div className="routes-v2__ticket-content">
+                      <div className="routes-v2__ticket-badge routes-v2__ticket-badge--custom">
+                        <span>Sur mesure</span>
+                      </div>
+                      
+                      <div className="routes-v2__ticket-header">
+                        <div className="routes-v2__route">
+                          <span className="routes-v2__route-point">Départ</span>
+                          <ChevronRight className="routes-v2__route-arrow" size={20} />
+                          <span className="routes-v2__route-point">Destination</span>
+                        </div>
+                        <div className="routes-v2__ticket-price">
+                          <span className="routes-v2__price-amount">Sur devis</span>
+                          <span className="routes-v2__price-value">Personnalisé</span>
+                        </div>
+                      </div>
+                      
+                      <div className="routes-v2__ticket-actions">
+                        <button 
+                          className="routes-v2__select-btn"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            handleRouteSelect('custom')
+                          }}
+                        >
+                          Sélectionner
+                        </button>
+                        <button 
+                          className="routes-v2__details-btn"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setRoutesV2Details(routesV2Details === 'custom' ? null : 'custom')
+                          }}
+                        >
+                          <span>Infos</span>
+                          <ChevronRight className={`routes-v2__details-icon ${routesV2Details === 'custom' ? 'is-open' : ''}`} size={16} />
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className={`routes-v2__services-panel ${routesV2Details === 'custom' ? 'is-open' : ''}`}>
+                    <div className="routes-v2__services-content">
+                      <h4 className="routes-v2__services-title">Avantages</h4>
+                      <ul className="routes-v2__services-list">
+                        <li className="routes-v2__service-item">
+                          <Check size={16} />
+                          <span>Itinéraire 100% personnalisé</span>
+                        </li>
+                        <li className="routes-v2__service-item">
+                          <Check size={16} />
+                          <span>Arrêts multiples possibles</span>
+                        </li>
+                        <li className="routes-v2__service-item">
+                          <Check size={16} />
+                          <span>Service premium complet</span>
+                        </li>
+                        <li className="routes-v2__service-item">
+                          <Check size={16} />
+                          <span>Devis gratuit et rapide</span>
+                        </li>
+                      </ul>
                     </div>
                   </div>
                 </div>
