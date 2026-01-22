@@ -1,1748 +1,984 @@
 import { useState, useEffect, useRef } from 'react'
-import { ChevronRight, ChevronLeft, Check, Menu, Zap } from 'lucide-react'
+import { ChevronRight, ChevronLeft, ArrowRight, Play, Pause, X, Plus, Minus, Plane, Star, ChevronDown } from 'lucide-react'
 import './index.css'
 import './styles.css'
-import SlideToUnlock from './components/SlideToUnlock'
 
 function App() {
-  // State Management
-  const [bookingState, setBookingState] = useState({
-    vehicle: { id: null },
-    route: { type: null, presetId: null, customRoute: { pickup: { address: null }, dropoff: { address: null } } },
-    schedule: { date: null, time: null },
-    passenger: { firstName: null, lastName: null, phone: null, email: null, specialRequests: null },
-    payment: { method: 'onboard' } // Valeur par défaut : Paiement à bord
+  // State Management - Simplifié pour le panier uniquement
+  const [cart, setCart] = useState({
+    vehicle: null,
+    route: null
   })
 
-  const [openAccordion, setOpenAccordion] = useState(null)
-  const [expandedVehicle, setExpandedVehicle] = useState(null)
-  const [selectedVehicle, setSelectedVehicle] = useState(null)
-  const [fleetV2Details, setFleetV2Details] = useState(null)
-  const [fleetV2ActiveImage, setFleetV2ActiveImage] = useState({
-    'mercedes-s680': 0,
-    'mercedes-e-class': 0,
-    'van-luxe': 0
-  })
-  const [routesV2Details, setRoutesV2Details] = useState(null)
-  const [currentSection, setCurrentSection] = useState(0)
-  const [showSummary, setShowSummary] = useState(false)
-  const [showConfirmationOverlay, setShowConfirmationOverlay] = useState(false)
-
-  const scrollContainerRef = useRef(null)
-
-  // Update nested state
-  const updateBookingState = (path, value) => {
-    setBookingState(prev => {
-      const keys = path.split('.')
-      const newState = { ...prev }
-      let current = newState
-      for (let i = 0; i < keys.length - 1; i++) {
-        current[keys[i]] = { ...current[keys[i]] }
-        current = current[keys[i]]
-      }
-      current[keys[keys.length - 1]] = value
-      return newState
-    })
-  }
-
-  // Validators
-  const validateStep = (step) => {
-    switch (step) {
-      case 'vehicle':
-        return bookingState.vehicle.id !== null
-      case 'route':
-        if (!bookingState.route.type) return false
-        if (bookingState.route.type === 'preset') {
-          return bookingState.route.presetId !== null
-        }
-        // Pour trajet personnalisé, on vérifie seulement si les adresses sont remplies
-        // (mais on ne bloque pas la validation si elles ne le sont pas encore)
-        return true
-      case 'details':
-        const { date, time } = bookingState.schedule
-        const { firstName, lastName, phone, email } = bookingState.passenger
-        
-        // Vérifications de base
-        if (!date || !time) {
-          console.log('Validation failed: date or time missing', { date, time })
-          return false
-        }
-        if (!firstName || !lastName) {
-          console.log('Validation failed: firstName or lastName missing', { firstName, lastName })
-          return false
-        }
-        if (!phone || !email) {
-          console.log('Validation failed: phone or email missing', { phone, email })
-          return false
-        }
-        
-        // Validation email
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        if (!emailRegex.test(email)) {
-          console.log('Validation failed: invalid email format', { email })
-          return false
-        }
-        
-        // Validation téléphone (au moins 10 chiffres, plus flexible)
-        const phoneDigits = phone.replace(/\D/g, '')
-        if (phoneDigits.length < 10) {
-          console.log('Validation failed: phone too short', { phone, phoneDigits, length: phoneDigits.length })
-          return false
-        }
-        
-        // Vérification du mode de paiement
-        // La valeur par défaut 'onboard' est déjà définie dans l'état initial
-        // Donc cette vérification devrait toujours passer, mais on la garde pour sécurité
-        if (!bookingState.payment.method) {
-          console.log('Validation failed: payment method missing (should not happen with default)', { paymentMethod: bookingState.payment.method })
-          return false
-        }
-        
-        // Si trajet personnalisé, vérifier que les adresses sont remplies
-        if (bookingState.route.type === 'custom') {
-          if (!bookingState.route.customRoute.pickup.address || !bookingState.route.customRoute.dropoff.address) {
-            console.log('Validation failed: custom route addresses missing', {
-              pickup: bookingState.route.customRoute.pickup.address,
-              dropoff: bookingState.route.customRoute.dropoff.address
-            })
-            return false
-          }
-        }
-        
-        console.log('Validation passed!')
-        return true
-      default:
-        return false
+  // BookingWizard State
+  const [wizardOpen, setWizardOpen] = useState(false)
+  const [currentStep, setCurrentStep] = useState(1) // 1-5
+  const [bookingData, setBookingData] = useState({
+    vehicle: null,
+    luggage: 0,
+    route: null,
+    date: '',
+    time: '',
+    passenger: {
+      firstName: '',
+      lastName: '',
+      phone: '',
+      email: '',
+      specialRequests: ''
     }
+  })
+
+  const [activeFleetSlide, setActiveFleetSlide] = useState({})
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [hoveredCard, setHoveredCard] = useState(null)
+  const [scrollY, setScrollY] = useState(0)
+  const [expandedDetails, setExpandedDetails] = useState({}) // { vehicleId: true/false }
+  const [openFAQ, setOpenFAQ] = useState(null) // FAQ accordion
+  const [testimonialIndex, setTestimonialIndex] = useState(0) // Pour le slider d'avis
+  const heroVideoRef = useRef(null)
+
+  // Données
+  const vehicles = [
+    {
+      id: 'mercedes-e-class',
+      name: 'Mercedes Classe E',
+      tagline: 'ÉLÉGANCE ET PERFORMANCE',
+      category: 'berline',
+      specs: { passengers: 4, luggage: 2, power: '320 HP', speed: '220 KM/H' },
+      images: [
+        'https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg',
+        'https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg'
+      ],
+      price: 'À partir de 100€'
+    },
+    {
+      id: 'mercedes-s680',
+      name: 'Mercedes Classe S',
+      tagline: 'L\'EXCELLENCE ABSOLUE',
+      category: 'suv',
+      specs: { passengers: 4, luggage: 3, power: '450 HP', speed: '250 KM/H' },
+      images: [
+        'https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg',
+        'https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg',
+        'https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg'
+      ],
+      price: 'À partir de 120€'
+    },
+    {
+      id: 'van-luxe',
+      name: 'Van Premium',
+      tagline: 'CONFORT MAXIMAL POUR GROUPES',
+      category: 'van',
+      specs: { passengers: 8, luggage: 6, power: '280 HP', speed: '180 KM/H' },
+      images: [
+        'https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg',
+        'https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg'
+      ],
+      price: 'À partir de 150€'
+    }
+  ]
+
+  const routes = [
+    {
+      id: 'cdg_paris',
+      from: 'Paris',
+      to: 'CDG',
+      duration: '45 min',
+      price: '120€',
+      image: 'https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg',
+      services: ['Accueil pancarte', 'Attente 30min', 'Rafraîchissements', 'Suivi temps réel']
+    },
+    {
+      id: 'disneyland',
+      from: 'Paris',
+      to: 'Disneyland',
+      duration: '50 min',
+      price: '150€',
+      image: 'https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg',
+      services: ['Accueil pancarte', 'Attente 45min', 'Rafraîchissements', 'WiFi haut débit']
+    },
+    {
+      id: 'orly_paris',
+      from: 'Paris',
+      to: 'Orly',
+      duration: '30 min',
+      price: '100€',
+      image: 'https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg',
+      services: ['Accueil pancarte', 'Attente 20min', 'Rafraîchissements', 'Service express']
+    },
+    {
+      id: 'custom',
+      from: 'Départ',
+      to: 'Destination',
+      duration: 'Sur mesure',
+      price: 'Sur devis',
+      image: 'https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg',
+      services: ['Itinéraire personnalisé', 'Arrêts multiples', 'Service premium', 'Devis gratuit']
+    }
+  ]
+
+  // Données Transferts Aéroport
+  const airports = [
+    { id: 'cdg', name: 'CDG', code: 'CDG', duration: '45 min' },
+    { id: 'orly', name: 'Orly', code: 'ORY', duration: '30 min' },
+    { id: 'le-bourget', name: 'Le Bourget', code: 'LBG', duration: '25 min' }
+  ]
+
+  // Données Avis Clients
+  const testimonials = [
+    {
+      id: 1,
+      name: 'Sophie M.',
+      role: 'CEO, TechCorp',
+      text: 'Service exceptionnel. Ponctualité parfaite et véhicule impeccable. Je recommande sans hésitation.',
+      rating: 5
+    },
+    {
+      id: 2,
+      name: 'Marc D.',
+      role: 'Investisseur',
+      text: 'Le niveau de service est au-delà de mes attentes. Chauffeur professionnel et discret.',
+      rating: 5
+    },
+    {
+      id: 3,
+      name: 'Isabelle L.',
+      role: 'Directrice Artistique',
+      text: 'Expérience premium de bout en bout. Un must pour les déplacements professionnels.',
+      rating: 5
+    }
+  ]
+
+  // Données FAQ
+  const faqs = [
+    {
+      id: 1,
+      question: 'Comment réserver un véhicule ?',
+      answer: 'Utilisez notre formulaire de réservation en ligne. Sélectionnez votre véhicule, votre itinéraire, date et heure, puis complétez vos informations. La confirmation se fait via WhatsApp.'
+    },
+    {
+      id: 2,
+      question: 'Quels sont les modes de paiement acceptés ?',
+      answer: 'Nous acceptons le paiement à bord, par lien de paiement sécurisé, ou par carte bancaire. Tous les détails vous seront communiqués lors de la confirmation.'
+    },
+    {
+      id: 3,
+      question: 'Peut-on modifier une réservation ?',
+      answer: 'Oui, contactez-nous au moins 24h avant votre trajet pour toute modification. Nous ferons notre maximum pour répondre à votre demande.'
+    },
+    {
+      id: 4,
+      question: 'Les véhicules sont-ils disponibles 24/7 ?',
+      answer: 'Oui, notre service est disponible 24h/24 et 7j/7 pour répondre à tous vos besoins de transport premium.'
+    }
+  ]
+
+  // Handlers
+  const addToCart = (type, item) => {
+    setCart(prev => ({
+      ...prev,
+      [type]: item
+    }))
   }
 
-  // Confirmation Overlay - validation ultra simple (UX > validation)
-  const getMissingConfirmFields = () => {
-    const missing = []
-
-    const fullName = `${bookingState.passenger.firstName || ''} ${bookingState.passenger.lastName || ''}`.trim()
-    if (!fullName) missing.push('Nom')
-
-    const phone = (bookingState.passenger.phone || '').trim()
-    if (!phone) missing.push('Téléphone')
-
-    const paymentMethod = (bookingState.payment.method || '').trim()
-    if (!paymentMethod) missing.push('Mode de paiement')
-
-    return missing
+  const removeFromCart = (type) => {
+    setCart(prev => ({
+      ...prev,
+      [type]: null
+    }))
   }
 
-  const isConfirmEnabled = () => getMissingConfirmFields().length === 0
+  const handleFleetSlideChange = (vehicleId, direction) => {
+    const vehicle = vehicles.find(v => v.id === vehicleId)
+    if (!vehicle) return
+    
+    const currentIndex = activeFleetSlide[vehicleId] || 0
+    let newIndex
+    
+    if (direction === 'next') {
+      newIndex = (currentIndex + 1) % vehicle.images.length
+    } else {
+      newIndex = (currentIndex - 1 + vehicle.images.length) % vehicle.images.length
+    }
+    
+    setActiveFleetSlide(prev => ({
+      ...prev,
+      [vehicleId]: newIndex
+    }))
+  }
 
-  // Scroll lock logic
+  // Scroll tracking
   useEffect(() => {
-    const container = scrollContainerRef.current
-    if (!container) return
-
     const handleScroll = () => {
-      const scrollTop = container.scrollTop
-      const sectionHeight = window.innerHeight
-      const newIndex = Math.round(scrollTop / sectionHeight)
-      setCurrentSection(newIndex)
+      setScrollY(window.scrollY)
     }
-
-    container.addEventListener('scroll', handleScroll)
-    return () => container.removeEventListener('scroll', handleScroll)
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  const scrollToSection = (sectionId) => {
-    const section = document.getElementById(sectionId)
-    if (section) {
-      section.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  // Auto-play hero video
+  useEffect(() => {
+    if (heroVideoRef.current) {
+      heroVideoRef.current.play().catch(() => {
+        // Auto-play blocked, user interaction required
+      })
+    }
+  }, [])
+
+  const scrollToSection = (id) => {
+    const element = document.getElementById(id)
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' })
     }
   }
 
-  // Vehicle selection handlers
-  const handleVehicleSelect = (vehicleId) => {
-    setSelectedVehicle(vehicleId)
-    updateBookingState('vehicle.id', vehicleId)
-    // La mise à jour de bookingState.vehicle.id déclenche automatiquement le re-render
-    // du panier et de l'overlay qui utilisent cette valeur
-  }
-
-  const handleRouteSelect = (type, presetId = null) => {
-    updateBookingState('route.type', type)
-    if (presetId) {
-      updateBookingState('route.presetId', presetId)
-    }
-  }
-
-  const handleCustomRouteChange = (field, value) => {
-    updateBookingState(`route.customRoute.${field}`, value)
-  }
-
-  const handleDetailsChange = (field, value) => {
-    if (field === 'name') {
-      const parts = value.trim().split(/\s+/)
-      updateBookingState('passenger.firstName', parts[0] || '')
-      updateBookingState('passenger.lastName', parts.slice(1).join(' ') || '')
+  // Logique de Recommandation Intelligente
+  const getRecommendedVehicle = (luggageCount) => {
+    if (luggageCount <= 2) {
+      return 'mercedes-e-class' // Berline
+    } else if (luggageCount >= 3 && luggageCount <= 4) {
+      return 'mercedes-s680' // SUV
     } else {
-      updateBookingState(field, value)
+      return 'van-luxe' // Van
     }
   }
 
-  const handlePaymentSelect = (method) => {
-    updateBookingState('payment.method', method)
+  const isRecommended = (vehicleId) => {
+    if (bookingData.luggage === 0) return false
+    return getRecommendedVehicle(bookingData.luggage) === vehicleId
   }
 
-  const handleConfirmDetails = () => {
-    if (validateStep('details')) {
-      setShowConfirmationOverlay(true)
-      document.body.style.overflow = 'hidden'
-    }
+  // Handlers BookingWizard
+  const openWizard = () => {
+    setWizardOpen(true)
+    setCurrentStep(1)
+    document.body.style.overflow = 'hidden'
   }
 
-  const handleCloseOverlay = () => {
-    setShowConfirmationOverlay(false)
+  const closeWizard = () => {
+    setWizardOpen(false)
     document.body.style.overflow = ''
   }
 
-  // Fonction pour générer le message WhatsApp formaté
-  const generateWhatsAppMessage = () => {
-    const whatsappNumber = '33605998211' // REMPLACER PAR VOTRE NUMÉRO (format: 33612345678 sans espaces ni caractères spéciaux)
-    
-    // Construire le message avec des retours à la ligne normaux
-    let message = 'DEMANDE DE RÉSERVATION\n\n'
-    message += `Client : ${bookingState.passenger.firstName || ''} ${bookingState.passenger.lastName || ''}\n`
-    message += `Téléphone : ${bookingState.passenger.phone || ''}\n`
-    message += `Véhicule : ${getVehicleName(bookingState.vehicle.id)}\n`
-    message += `Service : ${getRouteName()}`
-    
-    // Ajouter les détails du trajet si c'est un trajet personnalisé
-    if (bookingState.route.type === 'custom') {
-      message += '\n\n'
-      message += 'Détails du trajet :\n'
-      message += `Départ : ${bookingState.route.customRoute.pickup.address || 'Non renseigné'}\n`
-      message += `Arrivée : ${bookingState.route.customRoute.dropoff.address || 'Non renseigné'}`
+  const nextStep = () => {
+    if (currentStep < 5) {
+      setCurrentStep(currentStep + 1)
     }
-    
-    message += '\n\n'
-    message += 'Information transmise via le formulaire en ligne.'
-    
-    // Encoder le message pour l'URL (les \n seront convertis en %0A automatiquement)
-    return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
+  }
+
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1)
+    }
+  }
+
+  const updateBookingData = (field, value) => {
+    if (field.includes('.')) {
+      const [parent, child] = field.split('.')
+      setBookingData(prev => ({
+        ...prev,
+        [parent]: {
+          ...prev[parent],
+          [child]: value
+        }
+      }))
+    } else {
+      setBookingData(prev => ({
+        ...prev,
+        [field]: value
+      }))
+    }
   }
 
   const handleConfirmBooking = () => {
-    const whatsappUrl = generateWhatsAppMessage()
+    // Générer message WhatsApp
+    const whatsappNumber = '33605998211'
+    let message = 'RÉSERVATION\n\n'
+    message += `Véhicule : ${bookingData.vehicle?.name || 'Non sélectionné'}\n`
+    message += `Itinéraire : ${bookingData.route ? `${bookingData.route.from} → ${bookingData.route.to}` : 'Non sélectionné'}\n`
+    message += `Date : ${bookingData.date || 'Non renseigné'}\n`
+    message += `Heure : ${bookingData.time || 'Non renseigné'}\n`
+    message += `Bagages : ${bookingData.luggage || 0}\n\n`
+    message += `Client : ${bookingData.passenger.firstName} ${bookingData.passenger.lastName}\n`
+    message += `Téléphone : ${bookingData.passenger.phone}\n`
+    message += `Email : ${bookingData.passenger.email}\n`
+    if (bookingData.passenger.specialRequests) {
+      message += `Demandes spéciales : ${bookingData.passenger.specialRequests}\n`
+    }
+    
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
     window.open(whatsappUrl, '_blank')
-    handleCloseOverlay()
+    closeWizard()
   }
-
-  const getVehicleName = (id) => {
-    const names = {
-      'mercedes-s680': 'Mercedes Classe S',
-      'mercedes-e-class': 'Mercedes Classe E',
-      'van-luxe': 'Van Premium'
-    }
-    return names[id] || 'Non sélectionné'
-  }
-
-  const getRouteName = () => {
-    if (!bookingState.route.type) return 'Non sélectionné'
-    if (bookingState.route.type === 'preset') {
-      const names = {
-        'cdg_paris': 'Transfert aéroport',
-        'disneyland': 'Disneyland',
-        'orly_paris': 'Trajet rapide'
-      }
-      return names[bookingState.route.presetId] || 'Non sélectionné'
-    }
-    return 'Trajet Personnalisé'
-  }
-
-  // Liste des véhicules pour le sélecteur
-  const vehicles = [
-    { id: 'mercedes-s680', name: 'Mercedes Classe S' },
-    { id: 'mercedes-e-class', name: 'Mercedes Classe E' },
-    { id: 'van-luxe', name: 'Van Premium' }
-  ]
-
-  // Liste des services pour le sélecteur
-  const routes = [
-    { type: 'preset', presetId: 'cdg_paris', name: 'Transfert aéroport' },
-    { type: 'preset', presetId: 'disneyland', name: 'Disneyland' },
-    { type: 'preset', presetId: 'orly_paris', name: 'Trajet rapide' },
-    { type: 'custom', presetId: null, name: 'Trajet Personnalisé' }
-  ]
-
-  // Handlers pour changer le véhicule depuis l'overlay
-  const handleVehicleChangeInOverlay = (direction) => {
-    const currentIndex = vehicles.findIndex(v => v.id === bookingState.vehicle.id)
-    if (currentIndex === -1) return
-    
-    let newIndex
-    if (direction === 'next') {
-      newIndex = (currentIndex + 1) % vehicles.length
-    } else {
-      newIndex = (currentIndex - 1 + vehicles.length) % vehicles.length
-    }
-    
-    const newVehicle = vehicles[newIndex]
-    handleVehicleSelect(newVehicle.id)
-  }
-
-  // Handlers pour changer le service depuis l'overlay
-  const handleRouteChangeInOverlay = (direction) => {
-    const currentIndex = routes.findIndex(r => 
-      r.type === bookingState.route.type && 
-      r.presetId === bookingState.route.presetId
-    )
-    if (currentIndex === -1) return
-    
-    let newIndex
-    if (direction === 'next') {
-      newIndex = (currentIndex + 1) % routes.length
-    } else {
-      newIndex = (currentIndex - 1 + routes.length) % routes.length
-    }
-    
-    const newRoute = routes[newIndex]
-    handleRouteSelect(newRoute.type, newRoute.presetId)
-  }
-
-  const handleUnlock = () => {
-    scrollToSection('booking-vehicle')
-  }
-
-  const sections = ['hero', 'about', 'booking-vehicle', 'booking-route']
 
   return (
-    <>
-      <button className="header__menu-btn" aria-label="Menu">
-        <span>MENU</span>
-        <Menu className="header__menu-icon" size={18} />
-      </button>
+    <div className="app">
+      {/* Navigation Minimaliste */}
+      <nav className="nav">
+        <div className="nav__logo">FleetPrivée</div>
+        <button 
+          className="nav__menu"
+          onClick={() => scrollToSection('hero')}
+        >
+          Menu
+        </button>
+      </nav>
 
-      <main className="scroll-container" ref={scrollContainerRef}>
-        <div className="header__logo">
-          <Zap className="header__logo-icon" />
-          <span>FleetPrivée</span>
+      {/* Hero Section - Cinématographique */}
+      <section id="hero" className="hero">
+        <div className="hero__media">
+          <div className="hero__image-wrapper">
+            <img 
+              src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg"
+              alt="Luxury Vehicle"
+              className="hero__image"
+            />
+          </div>
+          <div className="hero__overlay"></div>
         </div>
-        {/* Section 1: Hero */}
-        <section className="section section--hero" id="hero">
-          <img 
-            src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" 
-            alt="Mercedes S-Class" 
-            className="section__bg"
-          />
-          <div className="section__overlay"></div>
-          <div className="section__content">
-            <div className="hero">
-              <span className="hero__badge">DEPUIS 2018</span>
-              <h1 className="hero__title">
-                Profitez d'un Confort Ultime avec<br />SafenessDrive Chauffeurs privés.
-              </h1>
-              <div className="hero__cta">
-                <SlideToUnlock onComplete={handleUnlock} />
+        
+        <div className="hero__content">
+          <div className="hero__badge">DEPUIS 2018</div>
+          <h1 className="hero__title">
+            <span className="hero__title-line">Transport</span>
+            <span className="hero__title-line">d'Excellence</span>
+          </h1>
+          <p className="hero__subtitle">
+            Expérience premium avec chauffeur privé
+          </p>
+          <button 
+            className="hero__cta"
+            onClick={openWizard}
+          >
+            Réserver maintenant
+            <ArrowRight size={20} />
+          </button>
+        </div>
+
+        <div className="hero__scroll-indicator">
+          <div className="hero__scroll-line"></div>
+          <span>Scroll</span>
+        </div>
+      </section>
+
+      {/* Section Flotte - Style Rimac Automobili */}
+      <section id="fleet" className="fleet">
+        <div className="fleet__header">
+          <div className="fleet__header-content">
+            <span className="fleet__number">01</span>
+            <h2 className="fleet__title">Notre Flotte</h2>
+          </div>
+          <p className="fleet__description">
+            Sélection de véhicules premium pour chaque occasion
+          </p>
+        </div>
+
+        <div className="fleet__grid">
+          {vehicles.map((vehicle, index) => {
+            const currentSlide = activeFleetSlide[vehicle.id] || 0
+            
+            return (
+              <div 
+                key={vehicle.id}
+                className="fleet__card-showcase"
+                onClick={() => {
+                  updateBookingData('vehicle', vehicle)
+                  openWizard()
+                }}
+              >
+                {/* Image Slider - 100% de la carte */}
+                <div className="fleet__card-showcase-media">
+                  <div className="fleet__card-showcase-slider">
+                    {vehicle.images.map((img, imgIndex) => (
+                      <div
+                        key={imgIndex}
+                        className={`fleet__card-showcase-slide ${imgIndex === currentSlide ? 'is-active' : ''}`}
+                        style={{ backgroundImage: `url(${img})` }}
+                      />
+                    ))}
+                  </div>
+                  
+                  {/* Indicateurs visuels seulement */}
+                  {vehicle.images.length > 1 && (
+                    <div className="fleet__card-showcase-indicators">
+                      {vehicle.images.map((_, dotIndex) => (
+                        <button
+                          key={dotIndex}
+                          className={`fleet__card-showcase-dot ${dotIndex === currentSlide ? 'is-active' : ''}`}
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setActiveFleetSlide(prev => ({
+                              ...prev,
+                              [vehicle.id]: dotIndex
+                            }))
+                          }}
+                          aria-label={`Image ${dotIndex + 1}`}
+                        />
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Overlay avec nom et prix */}
+                  <div className="fleet__card-showcase-overlay">
+                    <div className="fleet__card-showcase-info">
+                      <h3 className="fleet__card-showcase-name">{vehicle.name}</h3>
+                      <div className="fleet__card-showcase-price">{vehicle.price}</div>
+                    </div>
+                    <button 
+                      className="fleet__card-showcase-btn"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        updateBookingData('vehicle', vehicle)
+                        openWizard()
+                      }}
+                    >
+                      Réserver
+                      <ArrowRight size={18} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </section>
+
+      {/* Section Transferts Aéroport */}
+      <section id="airports" className="airports">
+        <div className="airports__header">
+          <div className="airports__header-content">
+            <span className="airports__number">02</span>
+            <h2 className="airports__title">Transferts Aéroport</h2>
+          </div>
+          <p className="airports__description">
+            Service premium vers tous les aéroports parisiens
+          </p>
+        </div>
+
+        <div className="airports__grid">
+          {airports.map((airport) => (
+            <div 
+              key={airport.id}
+              className="airports__card"
+              onClick={() => {
+                const route = routes.find(r => r.to === airport.code || r.id === airport.id.toLowerCase().replace('-', '_'))
+                if (route) {
+                  updateBookingData('route', route)
+                  openWizard()
+                }
+              }}
+            >
+              <div className="airports__icon">
+                <Plane size={32} />
+              </div>
+              <div className="airports__content">
+                <h3 className="airports__name">{airport.name}</h3>
+                <p className="airports__code">{airport.code}</p>
+                <p className="airports__duration">{airport.duration}</p>
               </div>
             </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Section Avis Clients */}
+      <section id="testimonials" className="testimonials">
+        <div className="testimonials__header">
+          <div className="testimonials__header-content">
+            <span className="testimonials__number">03</span>
+            <h2 className="testimonials__title">Avis Clients</h2>
           </div>
-        </section>
+          <p className="testimonials__description">
+            Ce que nos clients VIP disent de notre service
+          </p>
+        </div>
 
-        {/* Section 3: Booking - Vehicle Selection */}
-        <section className="section" id="booking-vehicle">
-          <div className="section__overlay"></div>
-          <div className="section__content">
-            <div className="vehicle-selection">
-              <h2 className="vehicle-selection__title">Réservez une expérience unique</h2>
-              <p className="vehicle-selection__subtitle">Choisissez votre véhicule</p>
-              
-              <div className="vehicle-list">
-                <div 
-                  className={`vehicle-card ${expandedVehicle === 'mercedes-s680' ? 'is-expanded' : ''} ${selectedVehicle === 'mercedes-s680' ? 'selected' : ''}`}
-                  onClick={() => {
-                    handleVehicleSelect('mercedes-s680')
-                    setExpandedVehicle(expandedVehicle === 'mercedes-s680' ? null : 'mercedes-s680')
-                  }}
-                >
-                  <div className="vehicle-card__image-wrapper">
-                    <img src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" alt="Mercedes Classe S" className="vehicle-card__image" />
-                    <div className="vehicle-card__overlay"></div>
-                    <div className="vehicle-card__content">
-                      <div className="vehicle-card__info">
-                        <h3 className="vehicle-card__title">Mercedes Classe S</h3>
-                        <p className="vehicle-card__tagline">L'EXCELLENCE POUR VOS MOMENTS PRESTIGIEUX.</p>
-                        <div className="vehicle-card__specs">
-                          <div className="vehicle-card__spec-badge">
-                            <Zap className="vehicle-card__spec-icon" />
-                            <span>250KM/H</span>
-                          </div>
-                          <div className="vehicle-card__spec-badge">
-                            <Zap className="vehicle-card__spec-icon" />
-                            <span>250KM/H</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="vehicle-card__actions">
-                        <button className="vehicle-card__reserve-btn" onClick={(e) => { e.stopPropagation(); handleVehicleSelect('mercedes-s680'); scrollToSection('booking-route'); }}>
-                          RÉSERVER
-                        </button>
-                      </div>
-                      <button className="vehicle-card__details-btn" onClick={(e) => e.stopPropagation()}>
-                        +
-                      </button>
-                    </div>
-                  </div>
-                  <div className="vehicle-card__expand">
-                    <div className="vehicle-card__expand-content">
-                      <div className="vehicle-card__expand-item">
-                        <span className="vehicle-card__expand-label">Disponible</span>
-                        <span className="vehicle-card__expand-value">Paris / Milan / Amsterdam / Munich</span>
-                      </div>
-                      <div className="vehicle-card__expand-item">
-                        <span className="vehicle-card__expand-label">Nombre chevaux</span>
-                        <span className="vehicle-card__expand-value">450 HP</span>
-                      </div>
-                      <div className="vehicle-card__expand-item">
-                        <span className="vehicle-card__expand-label">Vitesse max</span>
-                        <span className="vehicle-card__expand-value">250 KM/H</span>
-                      </div>
-                      <div className="vehicle-card__expand-item">
-                        <span className="vehicle-card__expand-label">Passagers</span>
-                        <span className="vehicle-card__expand-value">4 personnes</span>
-                      </div>
-                      <div className="vehicle-card__expand-item">
-                        <span className="vehicle-card__expand-label">Bagages</span>
-                        <span className="vehicle-card__expand-value">3 valises</span>
-                      </div>
-                      <div className="vehicle-card__expand-item">
-                        <span className="vehicle-card__expand-label">Options</span>
-                        <span className="vehicle-card__expand-value">Champagne, WiFi, Sièges enfant</span>
-                      </div>
-                    </div>
-                  </div>
+        <div className="testimonials__container">
+          <div className="testimonials__slider">
+            {testimonials.map((testimonial, index) => (
+              <div
+                key={testimonial.id}
+                className={`testimonial__card ${index === testimonialIndex ? 'is-active' : ''}`}
+              >
+                <div className="testimonial__rating">
+                  {[...Array(testimonial.rating)].map((_, i) => (
+                    <Star key={i} size={16} fill="currentColor" />
+                  ))}
                 </div>
-
-                <div 
-                  className={`vehicle-card ${expandedVehicle === 'mercedes-e-class' ? 'is-expanded' : ''} ${selectedVehicle === 'mercedes-e-class' ? 'selected' : ''}`}
-                  onClick={() => {
-                    handleVehicleSelect('mercedes-e-class')
-                    setExpandedVehicle(expandedVehicle === 'mercedes-e-class' ? null : 'mercedes-e-class')
-                  }}
-                >
-                  <div className="vehicle-card__image-wrapper">
-                    <img src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" alt="Mercedes Classe E" className="vehicle-card__image" />
-                    <div className="vehicle-card__overlay"></div>
-                    <div className="vehicle-card__content">
-                      <div className="vehicle-card__info">
-                        <h3 className="vehicle-card__title">Classe E / MERCEDES</h3>
-                        <p className="vehicle-card__tagline">ÉLÉGANCE ET PERFORMANCE POUR VOS DÉPLACEMENTS.</p>
-                        <div className="vehicle-card__specs">
-                          <div className="vehicle-card__spec-badge">
-                            <Zap className="vehicle-card__spec-icon" />
-                            <span>220KM/H</span>
-                          </div>
-                          <div className="vehicle-card__spec-badge">
-                            <Zap className="vehicle-card__spec-icon" />
-                            <span>220KM/H</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="vehicle-card__actions">
-                        <button className="vehicle-card__reserve-btn" onClick={(e) => { e.stopPropagation(); handleVehicleSelect('mercedes-e-class'); scrollToSection('booking-route'); }}>
-                          RÉSERVER
-                        </button>
-                        <button className="vehicle-card__details-btn" onClick={(e) => e.stopPropagation()}>
-                          +
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="vehicle-card__expand">
-                    <div className="vehicle-card__expand-content">
-                      <div className="vehicle-card__expand-item">
-                        <span className="vehicle-card__expand-label">Disponible</span>
-                        <span className="vehicle-card__expand-value">Paris / Milan / Amsterdam / Munich</span>
-                      </div>
-                      <div className="vehicle-card__expand-item">
-                        <span className="vehicle-card__expand-label">Nombre chevaux</span>
-                        <span className="vehicle-card__expand-value">320 HP</span>
-                      </div>
-                      <div className="vehicle-card__expand-item">
-                        <span className="vehicle-card__expand-label">Vitesse max</span>
-                        <span className="vehicle-card__expand-value">220 KM/H</span>
-                      </div>
-                      <div className="vehicle-card__expand-item">
-                        <span className="vehicle-card__expand-label">Passagers</span>
-                        <span className="vehicle-card__expand-value">4 personnes</span>
-                      </div>
-                      <div className="vehicle-card__expand-item">
-                        <span className="vehicle-card__expand-label">Bagages</span>
-                        <span className="vehicle-card__expand-value">2 valises</span>
-                      </div>
-                      <div className="vehicle-card__expand-item">
-                        <span className="vehicle-card__expand-label">Options</span>
-                        <span className="vehicle-card__expand-value">WiFi, Sièges enfant</span>
-                      </div>
-                    </div>
-                  </div>
+                <p className="testimonial__text">"{testimonial.text}"</p>
+                <div className="testimonial__author">
+                  <div className="testimonial__name">{testimonial.name}</div>
+                  <div className="testimonial__role">{testimonial.role}</div>
                 </div>
+              </div>
+            ))}
+          </div>
+          <div className="testimonials__nav">
+            {testimonials.map((_, index) => (
+              <button
+                key={index}
+                className={`testimonials__nav-dot ${index === testimonialIndex ? 'is-active' : ''}`}
+                onClick={() => setTestimonialIndex(index)}
+                aria-label={`Avis ${index + 1}`}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
 
+      {/* Section Itinéraires - Catalogue de Voyage Privé */}
+      <section id="routes" className="routes">
+        <div className="routes__header">
+          <div className="routes__header-content">
+            <span className="routes__number">02</span>
+            <h2 className="routes__title">Itinéraires</h2>
+          </div>
+          <p className="routes__description">
+            Destinations premium sélectionnées pour votre confort
+          </p>
+        </div>
+
+        <div className="routes__catalog">
+          {routes.map((route) => {
+            const isSelected = cart.route?.id === route.id
+            
+            return (
+              <div
+                key={route.id}
+                className={`routes__item ${isSelected ? 'is-selected' : ''}`}
+                onClick={() => {
+                  if (isSelected) {
+                    removeFromCart('route')
+                  } else {
+                    addToCart('route', route)
+                  }
+                }}
+              >
                 <div 
-                  className={`vehicle-card ${expandedVehicle === 'van-luxe' ? 'is-expanded' : ''} ${selectedVehicle === 'van-luxe' ? 'selected' : ''}`}
-                  onClick={() => {
-                    handleVehicleSelect('van-luxe')
-                    setExpandedVehicle(expandedVehicle === 'van-luxe' ? null : 'van-luxe')
-                  }}
+                  className="routes__item-image"
+                  style={{ backgroundImage: `url(${route.image})` }}
                 >
-                  <div className="vehicle-card__image-wrapper">
-                    <img src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" alt="Van de Luxe" className="vehicle-card__image" />
-                    <div className="vehicle-card__overlay"></div>
-                    <div className="vehicle-card__content">
-                      <div className="vehicle-card__info">
-                        <h3 className="vehicle-card__title">Van Premium</h3>
-                        <p className="vehicle-card__tagline">CONFORT MAXIMAL POUR LES GROUPES ET FAMILLES.</p>
-                        <div className="vehicle-card__specs">
-                          <div className="vehicle-card__spec-badge">
-                            <Zap className="vehicle-card__spec-icon" />
-                            <span>180KM/H</span>
-                          </div>
-                          <div className="vehicle-card__spec-badge">
-                            <Zap className="vehicle-card__spec-icon" />
-                            <span>180KM/H</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="vehicle-card__actions">
-                        <button className="vehicle-card__reserve-btn" onClick={(e) => { e.stopPropagation(); handleVehicleSelect('van-luxe'); scrollToSection('booking-route'); }}>
-                          RÉSERVER
-                        </button>
-                        <button className="vehicle-card__details-btn" onClick={(e) => e.stopPropagation()}>
-                          +
-                        </button>
-                      </div>
-                    </div>
+                  <div className="routes__item-overlay"></div>
+                  <div className="routes__item-badge">{route.duration}</div>
+                </div>
+                
+                <div className="routes__item-content">
+                  <div className="routes__item-route">
+                    <span className="routes__item-from">{route.from}</span>
+                    <ArrowRight className="routes__item-arrow" size={20} />
+                    <span className="routes__item-to">{route.to}</span>
                   </div>
-                  <div className="vehicle-card__expand">
-                    <div className="vehicle-card__expand-content">
-                      <div className="vehicle-card__expand-item">
-                        <span className="vehicle-card__expand-label">Disponible</span>
-                        <span className="vehicle-card__expand-value">Paris / Milan / Amsterdam / Munich</span>
-                      </div>
-                      <div className="vehicle-card__expand-item">
-                        <span className="vehicle-card__expand-label">Nombre chevaux</span>
-                        <span className="vehicle-card__expand-value">280 HP</span>
-                      </div>
-                      <div className="vehicle-card__expand-item">
-                        <span className="vehicle-card__expand-label">Vitesse max</span>
-                        <span className="vehicle-card__expand-value">180 KM/H</span>
-                      </div>
-                      <div className="vehicle-card__expand-item">
-                        <span className="vehicle-card__expand-label">Passagers</span>
-                        <span className="vehicle-card__expand-value">8 personnes</span>
-                      </div>
-                      <div className="vehicle-card__expand-item">
-                        <span className="vehicle-card__expand-label">Bagages</span>
-                        <span className="vehicle-card__expand-value">6 valises</span>
-                      </div>
-                      <div className="vehicle-card__expand-item">
-                        <span className="vehicle-card__expand-label">Options</span>
-                        <span className="vehicle-card__expand-value">Champagne, WiFi, Sièges enfant, Bar</span>
-                      </div>
+                  
+                  <div className="routes__item-services">
+                    {route.services.slice(0, 2).map((service, idx) => (
+                      <span key={idx} className="routes__item-service">{service}</span>
+                    ))}
+                  </div>
+                  
+                  <div className="routes__item-footer">
+                    <span className="routes__item-price">{route.price}</span>
+                    <div className={`routes__item-check ${isSelected ? 'is-checked' : ''}`}>
+                      {isSelected ? <X size={16} /> : <Plus size={16} />}
                     </div>
                   </div>
                 </div>
               </div>
+            )
+          })}
+        </div>
+      </section>
 
-              <div className="text-center mt-xl">
-                <button 
-                  className="btn btn--primary btn--large" 
-                  disabled={!validateStep('vehicle')}
-                  onClick={() => scrollToSection('booking-route')}
+      {/* Panier Flottant Minimaliste */}
+      {(cart.vehicle || cart.route) && (
+        <div className="cart">
+          <div className="cart__content">
+            {cart.vehicle && (
+              <div className="cart__item">
+                <span className="cart__item-label">Véhicule</span>
+                <span className="cart__item-value">{cart.vehicle.name}</span>
+                <button
+                  className="cart__item-remove"
+                  onClick={() => removeFromCart('vehicle')}
+                  aria-label="Retirer le véhicule"
                 >
-                  CHOISIR
+                  <X size={14} />
                 </button>
               </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Section Flotte V2 - Design Premium avec Peek & Reveal */}
-        <section className="section section--fleet-v2" id="fleet-v2">
-          <div className="section__overlay"></div>
-          <div className="section__content">
-            <div className="fleet-v2">
-              <h2 className="fleet-v2__title">Notre Flotte d'Excellence</h2>
-              <p className="fleet-v2__subtitle">Découvrez nos véhicules premium</p>
-              
-              <div className="fleet-v2__grid">
-                {/* Mercedes Classe S */}
-                <div 
-                  className={`fleet-v2__card ${selectedVehicle === 'mercedes-s680' ? 'is-selected' : ''} ${fleetV2Details === 'mercedes-s680' ? 'has-details' : ''}`}
-                  onClick={(e) => {
-                    if (!e.target.closest('.fleet-v2__details-btn') && !e.target.closest('.fleet-v2__thumbnails')) {
-                      handleVehicleSelect('mercedes-s680')
-                      setTimeout(() => {
-                        scrollToSection('booking-route')
-                      }, 300)
-                    }
-                  }}
+            )}
+            {cart.route && (
+              <div className="cart__item">
+                <span className="cart__item-label">Itinéraire</span>
+                <span className="cart__item-value">{cart.route.from} → {cart.route.to}</span>
+                <button
+                  className="cart__item-remove"
+                  onClick={() => removeFromCart('route')}
+                  aria-label="Retirer l'itinéraire"
                 >
-                  <div className="fleet-v2__card-image-wrapper">
-                    <div className="fleet-v2__image-container">
-                      <img 
-                        src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" 
-                        alt="Mercedes Classe S" 
-                        className={`fleet-v2__card-image ${fleetV2ActiveImage['mercedes-s680'] === 0 ? 'is-active' : ''}`}
-                      />
-                      <img 
-                        src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" 
-                        alt="Intérieur Mercedes Classe S" 
-                        className={`fleet-v2__card-image ${fleetV2ActiveImage['mercedes-s680'] === 1 ? 'is-active' : ''}`}
-                      />
-                    </div>
-                    <div className="fleet-v2__card-overlay"></div>
-                    
-                    {fleetV2Details === 'mercedes-s680' && (
-                      <div className="fleet-v2__tech-overlay">
-                        <div className="fleet-v2__tech-overlay-item">
-                          <span className="fleet-v2__tech-overlay-number">4</span>
-                          <span className="fleet-v2__tech-overlay-label">Passagers</span>
-                        </div>
-                        <div className="fleet-v2__tech-overlay-item">
-                          <span className="fleet-v2__tech-overlay-number">3</span>
-                          <span className="fleet-v2__tech-overlay-label">Bagages</span>
-                        </div>
-                        <div className="fleet-v2__tech-overlay-item">
-                          <span className="fleet-v2__tech-overlay-number">450</span>
-                          <span className="fleet-v2__tech-overlay-label">HP</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="fleet-v2__card-content">
-                    <div className="fleet-v2__card-header">
-                      <h3 className="fleet-v2__card-title">Mercedes Classe S</h3>
-                      <p className="fleet-v2__card-tagline">L'EXCELLENCE POUR VOS MOMENTS PRESTIGIEUX</p>
-                      <div className="fleet-v2__card-specs">
-                        <div className="fleet-v2__spec-badge">
-                          <Zap size={12} />
-                          <span>250 KM/H</span>
-                        </div>
-                        <div className="fleet-v2__spec-badge">
-                          <Zap size={12} />
-                          <span>4 Passagers</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="fleet-v2__card-actions">
-                      <button 
-                        className="fleet-v2__reserve-btn"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleVehicleSelect('mercedes-s680')
-                          setTimeout(() => {
-                            scrollToSection('booking-route')
-                          }, 300)
-                        }}
-                      >
-                        RÉSERVER
-                      </button>
-                      <button 
-                        className="fleet-v2__details-btn"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setFleetV2Details(fleetV2Details === 'mercedes-s680' ? null : 'mercedes-s680')
-                        }}
-                      >
-                        <span>Détails</span>
-                        <ChevronRight className={`fleet-v2__details-icon ${fleetV2Details === 'mercedes-s680' ? 'is-open' : ''}`} size={16} />
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <div className={`fleet-v2__thumbnails-panel ${fleetV2Details === 'mercedes-s680' ? 'is-open' : ''}`}>
-                    <div className="fleet-v2__thumbnails">
-                      <button 
-                        className={`fleet-v2__thumbnail ${fleetV2ActiveImage['mercedes-s680'] === 0 ? 'is-active' : ''}`}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setFleetV2ActiveImage({ ...fleetV2ActiveImage, 'mercedes-s680': 0 })
-                        }}
-                      >
-                        <img src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" alt="Extérieur" />
-                      </button>
-                      <button 
-                        className={`fleet-v2__thumbnail ${fleetV2ActiveImage['mercedes-s680'] === 1 ? 'is-active' : ''}`}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setFleetV2ActiveImage({ ...fleetV2ActiveImage, 'mercedes-s680': 1 })
-                        }}
-                      >
-                        <img src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" alt="Intérieur" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Mercedes Classe E */}
-                <div 
-                  className={`fleet-v2__card ${selectedVehicle === 'mercedes-e-class' ? 'is-selected' : ''} ${fleetV2Details === 'mercedes-e-class' ? 'has-details' : ''}`}
-                  onClick={(e) => {
-                    if (!e.target.closest('.fleet-v2__details-btn') && !e.target.closest('.fleet-v2__thumbnails')) {
-                      handleVehicleSelect('mercedes-e-class')
-                      setTimeout(() => {
-                        scrollToSection('booking-route')
-                      }, 300)
-                    }
-                  }}
-                >
-                  <div className="fleet-v2__card-image-wrapper">
-                    <div className="fleet-v2__image-container">
-                      <img 
-                        src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" 
-                        alt="Mercedes Classe E" 
-                        className={`fleet-v2__card-image ${fleetV2ActiveImage['mercedes-e-class'] === 0 ? 'is-active' : ''}`}
-                      />
-                      <img 
-                        src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" 
-                        alt="Intérieur Mercedes Classe E" 
-                        className={`fleet-v2__card-image ${fleetV2ActiveImage['mercedes-e-class'] === 1 ? 'is-active' : ''}`}
-                      />
-                    </div>
-                    <div className="fleet-v2__card-overlay"></div>
-                    
-                    {fleetV2Details === 'mercedes-e-class' && (
-                      <div className="fleet-v2__tech-overlay">
-                        <div className="fleet-v2__tech-overlay-item">
-                          <span className="fleet-v2__tech-overlay-number">4</span>
-                          <span className="fleet-v2__tech-overlay-label">Passagers</span>
-                        </div>
-                        <div className="fleet-v2__tech-overlay-item">
-                          <span className="fleet-v2__tech-overlay-number">2</span>
-                          <span className="fleet-v2__tech-overlay-label">Bagages</span>
-                        </div>
-                        <div className="fleet-v2__tech-overlay-item">
-                          <span className="fleet-v2__tech-overlay-number">320</span>
-                          <span className="fleet-v2__tech-overlay-label">HP</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="fleet-v2__card-content">
-                    <div className="fleet-v2__card-header">
-                      <h3 className="fleet-v2__card-title">Classe E / MERCEDES</h3>
-                      <p className="fleet-v2__card-tagline">ÉLÉGANCE ET PERFORMANCE POUR VOS DÉPLACEMENTS</p>
-                      <div className="fleet-v2__card-specs">
-                        <div className="fleet-v2__spec-badge">
-                          <Zap size={12} />
-                          <span>220 KM/H</span>
-                        </div>
-                        <div className="fleet-v2__spec-badge">
-                          <Zap size={12} />
-                          <span>4 Passagers</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="fleet-v2__card-actions">
-                      <button 
-                        className="fleet-v2__reserve-btn"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleVehicleSelect('mercedes-e-class')
-                          setTimeout(() => {
-                            scrollToSection('booking-route')
-                          }, 300)
-                        }}
-                      >
-                        RÉSERVER
-                      </button>
-                      <button 
-                        className="fleet-v2__details-btn"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setFleetV2Details(fleetV2Details === 'mercedes-e-class' ? null : 'mercedes-e-class')
-                        }}
-                      >
-                        <span>Détails</span>
-                        <ChevronRight className={`fleet-v2__details-icon ${fleetV2Details === 'mercedes-e-class' ? 'is-open' : ''}`} size={16} />
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <div className={`fleet-v2__thumbnails-panel ${fleetV2Details === 'mercedes-e-class' ? 'is-open' : ''}`}>
-                    <div className="fleet-v2__thumbnails">
-                      <button 
-                        className={`fleet-v2__thumbnail ${fleetV2ActiveImage['mercedes-e-class'] === 0 ? 'is-active' : ''}`}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setFleetV2ActiveImage({ ...fleetV2ActiveImage, 'mercedes-e-class': 0 })
-                        }}
-                      >
-                        <img src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" alt="Extérieur" />
-                      </button>
-                      <button 
-                        className={`fleet-v2__thumbnail ${fleetV2ActiveImage['mercedes-e-class'] === 1 ? 'is-active' : ''}`}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setFleetV2ActiveImage({ ...fleetV2ActiveImage, 'mercedes-e-class': 1 })
-                        }}
-                      >
-                        <img src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" alt="Intérieur" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Van Premium */}
-                <div 
-                  className={`fleet-v2__card ${selectedVehicle === 'van-luxe' ? 'is-selected' : ''} ${fleetV2Details === 'van-luxe' ? 'has-details' : ''}`}
-                  onClick={(e) => {
-                    if (!e.target.closest('.fleet-v2__details-btn') && !e.target.closest('.fleet-v2__thumbnails')) {
-                      handleVehicleSelect('van-luxe')
-                      setTimeout(() => {
-                        scrollToSection('booking-route')
-                      }, 300)
-                    }
-                  }}
-                >
-                  <div className="fleet-v2__card-image-wrapper">
-                    <div className="fleet-v2__image-container">
-                      <img 
-                        src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" 
-                        alt="Van Premium" 
-                        className={`fleet-v2__card-image ${fleetV2ActiveImage['van-luxe'] === 0 ? 'is-active' : ''}`}
-                      />
-                      <img 
-                        src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" 
-                        alt="Intérieur Van Premium" 
-                        className={`fleet-v2__card-image ${fleetV2ActiveImage['van-luxe'] === 1 ? 'is-active' : ''}`}
-                      />
-                    </div>
-                    <div className="fleet-v2__card-overlay"></div>
-                    
-                    {fleetV2Details === 'van-luxe' && (
-                      <div className="fleet-v2__tech-overlay">
-                        <div className="fleet-v2__tech-overlay-item">
-                          <span className="fleet-v2__tech-overlay-number">8</span>
-                          <span className="fleet-v2__tech-overlay-label">Passagers</span>
-                        </div>
-                        <div className="fleet-v2__tech-overlay-item">
-                          <span className="fleet-v2__tech-overlay-number">6</span>
-                          <span className="fleet-v2__tech-overlay-label">Bagages</span>
-                        </div>
-                        <div className="fleet-v2__tech-overlay-item">
-                          <span className="fleet-v2__tech-overlay-number">280</span>
-                          <span className="fleet-v2__tech-overlay-label">HP</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="fleet-v2__card-content">
-                    <div className="fleet-v2__card-header">
-                      <h3 className="fleet-v2__card-title">Van Premium</h3>
-                      <p className="fleet-v2__card-tagline">CONFORT MAXIMAL POUR VOS GROUPES</p>
-                      <div className="fleet-v2__card-specs">
-                        <div className="fleet-v2__spec-badge">
-                          <Zap size={12} />
-                          <span>180 KM/H</span>
-                        </div>
-                        <div className="fleet-v2__spec-badge">
-                          <Zap size={12} />
-                          <span>8 Passagers</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="fleet-v2__card-actions">
-                      <button 
-                        className="fleet-v2__reserve-btn"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          handleVehicleSelect('van-luxe')
-                          setTimeout(() => {
-                            scrollToSection('booking-route')
-                          }, 300)
-                        }}
-                      >
-                        RÉSERVER
-                      </button>
-                      <button 
-                        className="fleet-v2__details-btn"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setFleetV2Details(fleetV2Details === 'van-luxe' ? null : 'van-luxe')
-                        }}
-                      >
-                        <span>Détails</span>
-                        <ChevronRight className={`fleet-v2__details-icon ${fleetV2Details === 'van-luxe' ? 'is-open' : ''}`} size={16} />
-                      </button>
-                    </div>
-                  </div>
-                  
-                  <div className={`fleet-v2__thumbnails-panel ${fleetV2Details === 'van-luxe' ? 'is-open' : ''}`}>
-                    <div className="fleet-v2__thumbnails">
-                      <button 
-                        className={`fleet-v2__thumbnail ${fleetV2ActiveImage['van-luxe'] === 0 ? 'is-active' : ''}`}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setFleetV2ActiveImage({ ...fleetV2ActiveImage, 'van-luxe': 0 })
-                        }}
-                      >
-                        <img src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" alt="Extérieur" />
-                      </button>
-                      <button 
-                        className={`fleet-v2__thumbnail ${fleetV2ActiveImage['van-luxe'] === 1 ? 'is-active' : ''}`}
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          setFleetV2ActiveImage({ ...fleetV2ActiveImage, 'van-luxe': 1 })
-                        }}
-                      >
-                        <img src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" alt="Intérieur" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Section Itinéraires V2 - Design Premium Ticket */}
-        <section className="section section--routes-v2" id="routes-v2">
-          <div className="section__overlay"></div>
-          <div className="section__content">
-            <div className="routes-v2">
-              <h2 className="routes-v2__title">Nos Itinéraires Premium</h2>
-              <p className="routes-v2__subtitle">Choisissez votre destination</p>
-              
-              <div className="routes-v2__grid">
-                {/* Transfert Aéroport */}
-                <div 
-                  className={`routes-v2__ticket ${(bookingState.route.type === 'preset' && bookingState.route.presetId === 'cdg_paris') ? 'is-selected' : ''} ${routesV2Details === 'cdg_paris' ? 'has-details' : ''}`}
-                  onClick={(e) => {
-                    if (!e.target.closest('.routes-v2__details-btn') && !e.target.closest('.routes-v2__services-panel')) {
-                      handleRouteSelect('preset', 'cdg_paris')
-                    }
-                  }}
-                >
-                  <div className="routes-v2__ticket-image-wrapper">
-                    <img src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" alt="Aéroport CDG" className="routes-v2__ticket-image" />
-                    <div className="routes-v2__ticket-overlay"></div>
-                    
-                    <div className="routes-v2__ticket-content">
-                      <div className="routes-v2__ticket-badge">
-                        <span>45 min</span>
-                      </div>
-                      
-                      <div className="routes-v2__ticket-header">
-                        <div className="routes-v2__route">
-                          <span className="routes-v2__route-point">Paris</span>
-                          <ChevronRight className="routes-v2__route-arrow" size={20} />
-                          <span className="routes-v2__route-point">CDG</span>
-                        </div>
-                        <div className="routes-v2__ticket-price">
-                          <span className="routes-v2__price-amount">À partir de</span>
-                          <span className="routes-v2__price-value">120€</span>
-                        </div>
-                      </div>
-                      
-                      <div className="routes-v2__ticket-actions">
-                        <button 
-                          className="routes-v2__select-btn"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleRouteSelect('preset', 'cdg_paris')
-                          }}
-                        >
-                          Sélectionner
-                        </button>
-                        <button 
-                          className="routes-v2__details-btn"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setRoutesV2Details(routesV2Details === 'cdg_paris' ? null : 'cdg_paris')
-                          }}
-                        >
-                          <span>Infos</span>
-                          <ChevronRight className={`routes-v2__details-icon ${routesV2Details === 'cdg_paris' ? 'is-open' : ''}`} size={16} />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Panel Services Inclus */}
-                  <div className={`routes-v2__services-panel ${routesV2Details === 'cdg_paris' ? 'is-open' : ''}`}>
-                    <div className="routes-v2__services-content">
-                      <h4 className="routes-v2__services-title">Services inclus</h4>
-                      <ul className="routes-v2__services-list">
-                        <li className="routes-v2__service-item">
-                          <Check size={16} />
-                          <span>Accueil avec pancarte nominative</span>
-                        </li>
-                        <li className="routes-v2__service-item">
-                          <Check size={16} />
-                          <span>Attente gratuite 30 minutes</span>
-                        </li>
-                        <li className="routes-v2__service-item">
-                          <Check size={16} />
-                          <span>Rafraîchissements à bord</span>
-                        </li>
-                        <li className="routes-v2__service-item">
-                          <Check size={16} />
-                          <span>Suivi en temps réel</span>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Disneyland */}
-                <div 
-                  className={`routes-v2__ticket ${(bookingState.route.type === 'preset' && bookingState.route.presetId === 'disneyland') ? 'is-selected' : ''} ${routesV2Details === 'disneyland' ? 'has-details' : ''}`}
-                  onClick={(e) => {
-                    if (!e.target.closest('.routes-v2__details-btn') && !e.target.closest('.routes-v2__services-panel')) {
-                      handleRouteSelect('preset', 'disneyland')
-                    }
-                  }}
-                >
-                  <div className="routes-v2__ticket-image-wrapper">
-                    <img src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" alt="Disneyland" className="routes-v2__ticket-image" />
-                    <div className="routes-v2__ticket-overlay"></div>
-                    
-                    <div className="routes-v2__ticket-content">
-                      <div className="routes-v2__ticket-badge">
-                        <span>50 min</span>
-                      </div>
-                      
-                      <div className="routes-v2__ticket-header">
-                        <div className="routes-v2__route">
-                          <span className="routes-v2__route-point">Paris</span>
-                          <ChevronRight className="routes-v2__route-arrow" size={20} />
-                          <span className="routes-v2__route-point">Disneyland</span>
-                        </div>
-                        <div className="routes-v2__ticket-price">
-                          <span className="routes-v2__price-amount">À partir de</span>
-                          <span className="routes-v2__price-value">150€</span>
-                        </div>
-                      </div>
-                      
-                      <div className="routes-v2__ticket-actions">
-                        <button 
-                          className="routes-v2__select-btn"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleRouteSelect('preset', 'disneyland')
-                          }}
-                        >
-                          Sélectionner
-                        </button>
-                        <button 
-                          className="routes-v2__details-btn"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setRoutesV2Details(routesV2Details === 'disneyland' ? null : 'disneyland')
-                          }}
-                        >
-                          <span>Infos</span>
-                          <ChevronRight className={`routes-v2__details-icon ${routesV2Details === 'disneyland' ? 'is-open' : ''}`} size={16} />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className={`routes-v2__services-panel ${routesV2Details === 'disneyland' ? 'is-open' : ''}`}>
-                    <div className="routes-v2__services-content">
-                      <h4 className="routes-v2__services-title">Services inclus</h4>
-                      <ul className="routes-v2__services-list">
-                        <li className="routes-v2__service-item">
-                          <Check size={16} />
-                          <span>Accueil avec pancarte nominative</span>
-                        </li>
-                        <li className="routes-v2__service-item">
-                          <Check size={16} />
-                          <span>Attente gratuite 45 minutes</span>
-                        </li>
-                        <li className="routes-v2__service-item">
-                          <Check size={16} />
-                          <span>Rafraîchissements à bord</span>
-                        </li>
-                        <li className="routes-v2__service-item">
-                          <Check size={16} />
-                          <span>WiFi haut débit</span>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Trajet Rapide */}
-                <div 
-                  className={`routes-v2__ticket ${(bookingState.route.type === 'preset' && bookingState.route.presetId === 'orly_paris') ? 'is-selected' : ''} ${routesV2Details === 'orly_paris' ? 'has-details' : ''}`}
-                  onClick={(e) => {
-                    if (!e.target.closest('.routes-v2__details-btn') && !e.target.closest('.routes-v2__services-panel')) {
-                      handleRouteSelect('preset', 'orly_paris')
-                    }
-                  }}
-                >
-                  <div className="routes-v2__ticket-image-wrapper">
-                    <img src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" alt="Trajet rapide" className="routes-v2__ticket-image" />
-                    <div className="routes-v2__ticket-overlay"></div>
-                    
-                    <div className="routes-v2__ticket-content">
-                      <div className="routes-v2__ticket-badge">
-                        <span>30 min</span>
-                      </div>
-                      
-                      <div className="routes-v2__ticket-header">
-                        <div className="routes-v2__route">
-                          <span className="routes-v2__route-point">Paris</span>
-                          <ChevronRight className="routes-v2__route-arrow" size={20} />
-                          <span className="routes-v2__route-point">Orly</span>
-                        </div>
-                        <div className="routes-v2__ticket-price">
-                          <span className="routes-v2__price-amount">À partir de</span>
-                          <span className="routes-v2__price-value">100€</span>
-                        </div>
-                      </div>
-                      
-                      <div className="routes-v2__ticket-actions">
-                        <button 
-                          className="routes-v2__select-btn"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleRouteSelect('preset', 'orly_paris')
-                          }}
-                        >
-                          Sélectionner
-                        </button>
-                        <button 
-                          className="routes-v2__details-btn"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setRoutesV2Details(routesV2Details === 'orly_paris' ? null : 'orly_paris')
-                          }}
-                        >
-                          <span>Infos</span>
-                          <ChevronRight className={`routes-v2__details-icon ${routesV2Details === 'orly_paris' ? 'is-open' : ''}`} size={16} />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className={`routes-v2__services-panel ${routesV2Details === 'orly_paris' ? 'is-open' : ''}`}>
-                    <div className="routes-v2__services-content">
-                      <h4 className="routes-v2__services-title">Services inclus</h4>
-                      <ul className="routes-v2__services-list">
-                        <li className="routes-v2__service-item">
-                          <Check size={16} />
-                          <span>Accueil avec pancarte nominative</span>
-                        </li>
-                        <li className="routes-v2__service-item">
-                          <Check size={16} />
-                          <span>Attente gratuite 20 minutes</span>
-                        </li>
-                        <li className="routes-v2__service-item">
-                          <Check size={16} />
-                          <span>Rafraîchissements à bord</span>
-                        </li>
-                        <li className="routes-v2__service-item">
-                          <Check size={16} />
-                          <span>Service express</span>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Itinéraire Personnalisé */}
-                <div 
-                  className={`routes-v2__ticket routes-v2__ticket--custom ${bookingState.route.type === 'custom' ? 'is-selected' : ''} ${routesV2Details === 'custom' ? 'has-details' : ''}`}
-                  onClick={(e) => {
-                    if (!e.target.closest('.routes-v2__details-btn') && !e.target.closest('.routes-v2__services-panel')) {
-                      handleRouteSelect('custom')
-                    }
-                  }}
-                >
-                  <div className="routes-v2__ticket-image-wrapper">
-                    <img src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" alt="Itinéraire personnalisé" className="routes-v2__ticket-image" />
-                    <div className="routes-v2__ticket-overlay"></div>
-                    
-                    <div className="routes-v2__ticket-content">
-                      <div className="routes-v2__ticket-badge routes-v2__ticket-badge--custom">
-                        <span>Sur mesure</span>
-                      </div>
-                      
-                      <div className="routes-v2__ticket-header">
-                        <div className="routes-v2__route">
-                          <span className="routes-v2__route-point">Départ</span>
-                          <ChevronRight className="routes-v2__route-arrow" size={20} />
-                          <span className="routes-v2__route-point">Destination</span>
-                        </div>
-                        <div className="routes-v2__ticket-price">
-                          <span className="routes-v2__price-amount">Sur devis</span>
-                          <span className="routes-v2__price-value">Personnalisé</span>
-                        </div>
-                      </div>
-                      
-                      <div className="routes-v2__ticket-actions">
-                        <button 
-                          className="routes-v2__select-btn"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleRouteSelect('custom')
-                          }}
-                        >
-                          Sélectionner
-                        </button>
-                        <button 
-                          className="routes-v2__details-btn"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setRoutesV2Details(routesV2Details === 'custom' ? null : 'custom')
-                          }}
-                        >
-                          <span>Infos</span>
-                          <ChevronRight className={`routes-v2__details-icon ${routesV2Details === 'custom' ? 'is-open' : ''}`} size={16} />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className={`routes-v2__services-panel ${routesV2Details === 'custom' ? 'is-open' : ''}`}>
-                    <div className="routes-v2__services-content">
-                      <h4 className="routes-v2__services-title">Avantages</h4>
-                      <ul className="routes-v2__services-list">
-                        <li className="routes-v2__service-item">
-                          <Check size={16} />
-                          <span>Itinéraire 100% personnalisé</span>
-                        </li>
-                        <li className="routes-v2__service-item">
-                          <Check size={16} />
-                          <span>Arrêts multiples possibles</span>
-                        </li>
-                        <li className="routes-v2__service-item">
-                          <Check size={16} />
-                          <span>Service premium complet</span>
-                        </li>
-                        <li className="routes-v2__service-item">
-                          <Check size={16} />
-                          <span>Devis gratuit et rapide</span>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Section 4: Booking - Route Selection */}
-        <section className="section" id="booking-route">
-          <div className="section__overlay"></div>
-          <div className="section__content">
-            <h2 className="text-center mb-lg">Sélectionnez votre itinéraire</h2>
-            <div className="route-list">
-              <div 
-                className={`route-card ${(bookingState.route.type === 'preset' && bookingState.route.presetId === 'cdg_paris') ? 'selected' : ''}`}
-                onClick={() => handleRouteSelect('preset', 'cdg_paris')}
-              >
-                <div className="route-card__image-wrapper">
-                  <img src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" alt="Transfert aéroport" className="route-card__image" />
-                  <div className="route-card__overlay"></div>
-                  <div className="route-card__content">
-                    <div className="route-card__info">
-                      <h3 className="route-card__title">Transfert aéroport</h3>
-                      <p className="route-card__tagline">L'EXCELLENCE POUR VOS MOMENTS PRESTIGIEUX.</p>
-                    </div>
-                    <div className="route-card__actions">
-                      <button className="route-card__details-btn" onClick={(e) => { e.stopPropagation(); handleRouteSelect('preset', 'cdg_paris'); }}>
-                        <span>+</span>
-                        <div className="route-card__arrow-icon">
-                          <ChevronRight size={20} strokeWidth={2.5} />
-                        </div>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div 
-                className={`route-card ${(bookingState.route.type === 'preset' && bookingState.route.presetId === 'disneyland') ? 'selected' : ''}`}
-                onClick={() => handleRouteSelect('preset', 'disneyland')}
-              >
-                <div className="route-card__image-wrapper">
-                  <img src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" alt="Disneyland" className="route-card__image" />
-                  <div className="route-card__overlay"></div>
-                  <div className="route-card__content">
-                    <div className="route-card__info">
-                      <h3 className="route-card__title">Disneyland</h3>
-                      <p className="route-card__tagline">L'EXCELLENCE POUR VOS MOMENTS PRESTIGIEUX.</p>
-                    </div>
-                    <div className="route-card__actions">
-                      <button className="route-card__details-btn" onClick={(e) => { e.stopPropagation(); handleRouteSelect('preset', 'disneyland'); }}>
-                        <span>+</span>
-                        <div className="route-card__arrow-icon">
-                          <ChevronRight size={20} strokeWidth={2.5} />
-                        </div>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div 
-                className={`route-card ${(bookingState.route.type === 'preset' && bookingState.route.presetId === 'orly_paris') ? 'selected' : ''}`}
-                onClick={() => handleRouteSelect('preset', 'orly_paris')}
-              >
-                <div className="route-card__image-wrapper">
-                  <img src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" alt="Trajet rapide" className="route-card__image" />
-                  <div className="route-card__overlay"></div>
-                  <div className="route-card__content">
-                    <div className="route-card__info">
-                      <h3 className="route-card__title">Trajet rapide</h3>
-                      <p className="route-card__tagline">L'EXCELLENCE POUR VOS MOMENTS PRESTIGIEUX.</p>
-                    </div>
-                    <div className="route-card__actions">
-                      <button className="route-card__details-btn" onClick={(e) => { e.stopPropagation(); handleRouteSelect('preset', 'orly_paris'); }}>
-                        <span>+</span>
-                        <div className="route-card__arrow-icon">
-                          <ChevronRight size={20} strokeWidth={2.5} />
-                        </div>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div 
-                className={`route-card ${bookingState.route.type === 'custom' ? 'selected' : ''}`}
-                onClick={() => handleRouteSelect('custom')}
-              >
-                <div className="route-card__image-wrapper">
-                  <img src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" alt="Itinéraire personnalisé" className="route-card__image" />
-                  <div className="route-card__overlay"></div>
-                  <div className="route-card__content">
-                    <div className="route-card__info">
-                      <h3 className="route-card__title">Itinéraire personnalisé</h3>
-                      <p className="route-card__tagline">L'EXCELLENCE POUR VOS MOMENTS PRESTIGIEUX.</p>
-                    </div>
-                    <div className="route-card__actions">
-                      <button className="route-card__details-btn" onClick={(e) => { e.stopPropagation(); handleRouteSelect('custom'); }}>
-                        <span>+</span>
-                        <div className="route-card__arrow-icon">
-                          <ChevronRight size={20} strokeWidth={2.5} />
-                        </div>
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="form-container">
-              <div className="text-center mt-xl">
-                <button 
-                  className="btn btn--primary btn--large" 
-                  disabled={!validateStep('route')}
-                  onClick={() => {
-                    setShowConfirmationOverlay(true)
-                    document.body.style.overflow = 'hidden'
-                  }}
-                >
-                  CONTINUER
+                  <X size={14} />
                 </button>
               </div>
-            </div>
+            )}
+            <button className="cart__confirm">
+              Réserver
+              <ArrowRight size={16} />
+            </button>
           </div>
-        </section>
+        </div>
+      )}
 
-
-        {/* Overlay de Confirmation */}
-        {showConfirmationOverlay && (
-          <div className="confirmation-overlay">
-            <div className="confirmation-overlay__backdrop" onClick={handleCloseOverlay}></div>
-            <div className="confirmation-overlay__content">
-              <button className="confirmation-overlay__back-btn" onClick={handleCloseOverlay}>
-                ← Retour
+      {/* BookingWizard Overlay */}
+      {wizardOpen && (
+        <div className="booking-wizard">
+          <div className="booking-wizard__backdrop" onClick={closeWizard}></div>
+          <div className="booking-wizard__container">
+            {/* Header avec progression */}
+            <div className="booking-wizard__header">
+              <button className="booking-wizard__close" onClick={closeWizard}>
+                <X size={24} />
               </button>
-              
-              <h2 className="text-center mb-lg">Détails de votre réservation</h2>
-              
-              {/* Récapitulatif en haut - Interactif */}
-              <div className="summary-card mb-xl">
-                <div className="grid-gap-md">
-                  <div className="summary-selector">
-                    <strong className="label-text">Véhicule</strong>
-                    <div className="summary-selector__container">
-                      <button 
-                        className="summary-selector__arrow"
-                        onClick={() => handleVehicleChangeInOverlay('prev')}
-                        aria-label="Véhicule précédent"
-                      >
-                        <ChevronLeft size={18} strokeWidth={2.5} />
-                      </button>
-                      <p className="summary-value">{getVehicleName(bookingState.vehicle.id)}</p>
-                      <button 
-                        className="summary-selector__arrow"
-                        onClick={() => handleVehicleChangeInOverlay('next')}
-                        aria-label="Véhicule suivant"
-                      >
-                        <ChevronRight size={18} strokeWidth={2.5} />
-                      </button>
-                    </div>
+              <div className="booking-wizard__progress">
+                {[1, 2, 3, 4, 5].map((step) => (
+                  <div
+                    key={step}
+                    className={`booking-wizard__progress-step ${step <= currentStep ? 'is-active' : ''} ${step < currentStep ? 'is-completed' : ''}`}
+                  >
+                    <div className="booking-wizard__progress-dot"></div>
+                    {step < currentStep && <div className="booking-wizard__progress-line"></div>}
                   </div>
-                  <div className="summary-selector">
-                    <strong className="label-text">Service</strong>
-                    <div className="summary-selector__container">
-                      <button 
-                        className="summary-selector__arrow"
-                        onClick={() => handleRouteChangeInOverlay('prev')}
-                        aria-label="Service précédent"
-                      >
-                        <ChevronLeft size={18} strokeWidth={2.5} />
-                      </button>
-                      <p className="summary-value">{getRouteName()}</p>
-                      <button 
-                        className="summary-selector__arrow"
-                        onClick={() => handleRouteChangeInOverlay('next')}
-                        aria-label="Service suivant"
-                      >
-                        <ChevronRight size={18} strokeWidth={2.5} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
+                ))}
               </div>
+              <div className="booking-wizard__step-indicator">
+                Étape {currentStep} sur 5
+              </div>
+            </div>
 
-              {/* Champs d'adresse si Trajet Personnalisé */}
-              {bookingState.route.type === 'custom' && (
-                <div className="form-container--small mb-xl">
-                  <div className="form-group">
-                    <label className="form-label" htmlFor="pickupAddress">Adresse de prise en charge</label>
-                    <input 
-                      type="text" 
-                      id="pickupAddress" 
-                      className="form-input" 
-                      placeholder="Ex: 123 Avenue des Champs-Élysées, Paris"
-                      value={bookingState.route.customRoute.pickup.address || ''}
-                      onChange={(e) => handleCustomRouteChange('pickup.address', e.target.value)}
+            {/* Contenu des étapes */}
+            <div className="booking-wizard__content">
+              {/* Étape 1 : Sélection Véhicule */}
+              {currentStep === 1 && (
+                <div className="booking-wizard__step">
+                  <h2 className="booking-wizard__step-title">Choisissez votre véhicule</h2>
+                  <p className="booking-wizard__step-subtitle">Combien de bagages transportez-vous ?</p>
+                  
+                  <div className="booking-wizard__luggage-input">
+                    <input
+                      type="number"
+                      min="0"
+                      max="10"
+                      value={bookingData.luggage || ''}
+                      onChange={(e) => updateBookingData('luggage', parseInt(e.target.value) || 0)}
+                      placeholder="Nombre de bagages"
+                      className="booking-wizard__input"
                     />
                   </div>
-                  <div className="form-group">
-                    <label className="form-label" htmlFor="dropoffAddress">Adresse de destination</label>
-                    <input 
-                      type="text" 
-                      id="dropoffAddress" 
-                      className="form-input" 
-                      placeholder="Ex: Aéroport Charles de Gaulle"
-                      value={bookingState.route.customRoute.dropoff.address || ''}
-                      onChange={(e) => handleCustomRouteChange('dropoff.address', e.target.value)}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label" htmlFor="pickupInstructions">Instructions spéciales (optionnel)</label>
-                    <input 
-                      type="text" 
-                      id="pickupInstructions" 
-                      className="form-input" 
-                      placeholder="Ex: Porte cochère gauche"
-                      onChange={(e) => handleCustomRouteChange('pickup.instructions', e.target.value)}
-                    />
+
+                  {bookingData.luggage > 0 && (
+                    <div className="booking-wizard__recommendation">
+                      <span className="booking-wizard__recommendation-text">
+                        Recommandation IA : {bookingData.luggage <= 2 ? 'Berline' : bookingData.luggage <= 4 ? 'SUV' : 'Van'}
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="booking-wizard__vehicles">
+                    {vehicles.map((vehicle) => {
+                      const isSelected = bookingData.vehicle?.id === vehicle.id
+                      const recommended = isRecommended(vehicle.id)
+                      
+                      return (
+                        <div
+                          key={vehicle.id}
+                          className={`booking-wizard__vehicle-card ${isSelected ? 'is-selected' : ''} ${recommended ? 'is-recommended' : ''}`}
+                          onClick={() => updateBookingData('vehicle', vehicle)}
+                        >
+                          <div 
+                            className="booking-wizard__vehicle-image"
+                            style={{ backgroundImage: `url(${vehicle.images[0]})` }}
+                          >
+                            <div className="booking-wizard__vehicle-overlay"></div>
+                            {recommended && (
+                              <div className="booking-wizard__vehicle-badge">
+                                SÉLECTION IA
+                              </div>
+                            )}
+                          </div>
+                          <div className="booking-wizard__vehicle-content">
+                            <h3 className="booking-wizard__vehicle-name">{vehicle.name}</h3>
+                            <p className="booking-wizard__vehicle-tagline">{vehicle.tagline}</p>
+                            <div className="booking-wizard__vehicle-specs">
+                              <span>{vehicle.specs.passengers} passagers</span>
+                              <span>•</span>
+                              <span>{vehicle.specs.luggage} bagages</span>
+                            </div>
+                            <div className="booking-wizard__vehicle-price">{vehicle.price}</div>
+                          </div>
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
               )}
 
-              {/* Formulaire de détails */}
-              <div className="form-container--small mb-xl">
-                <div className="form-group">
-                  <label className="form-label" htmlFor="bookingDate">Date</label>
-                  <input 
-                    type="date" 
-                    id="bookingDate" 
-                    className="form-input" 
-                    required
-                    min={new Date().toISOString().split('T')[0]}
-                    value={bookingState.schedule.date || ''}
-                    onChange={(e) => handleDetailsChange('schedule.date', e.target.value)}
-                  />
+              {/* Étape 2 : Sélection Itinéraire */}
+              {currentStep === 2 && (
+                <div className="booking-wizard__step">
+                  <h2 className="booking-wizard__step-title">Choisissez votre itinéraire</h2>
+                  <p className="booking-wizard__step-subtitle">Sélectionnez une destination ou créez un trajet personnalisé</p>
+                  
+                  <div className="booking-wizard__routes">
+                    {routes.map((route) => {
+                      const isSelected = bookingData.route?.id === route.id
+                      
+                      return (
+                        <div
+                          key={route.id}
+                          className={`booking-wizard__route-card ${isSelected ? 'is-selected' : ''}`}
+                          onClick={() => updateBookingData('route', route)}
+                        >
+                          <div 
+                            className="booking-wizard__route-image"
+                            style={{ backgroundImage: `url(${route.image})` }}
+                          >
+                            <div className="booking-wizard__route-overlay"></div>
+                            <div className="booking-wizard__route-badge">{route.duration}</div>
+                          </div>
+                          <div className="booking-wizard__route-content">
+                            <div className="booking-wizard__route-route">
+                              <span>{route.from}</span>
+                              <ArrowRight size={18} />
+                              <span>{route.to}</span>
+                            </div>
+                            <div className="booking-wizard__route-price">{route.price}</div>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
                 </div>
-                <div className="form-group">
-                  <label className="form-label" htmlFor="bookingTime">Heure</label>
-                  <input 
-                    type="time" 
-                    id="bookingTime" 
-                    className="form-input" 
-                    required
-                    value={bookingState.schedule.time || ''}
-                    onChange={(e) => handleDetailsChange('schedule.time', e.target.value)}
-                  />
-                </div>
-                <div className="form-group">
-                  <label className="form-label" htmlFor="passengerName">Nom complet</label>
-                  <input 
-                    type="text" 
-                    id="passengerName" 
-                    className="form-input" 
-                    placeholder="Prénom et nom" 
-                    required
-                    onChange={(e) => handleDetailsChange('name', e.target.value)}
-                  />
-                </div>
-                <div className="form-group">
-                  <label className="form-label" htmlFor="passengerPhone">Téléphone</label>
-                  <input 
-                    type="tel" 
-                    id="passengerPhone" 
-                    className="form-input" 
-                    placeholder="+33 6 12 34 56 78" 
-                    required
-                    value={bookingState.passenger.phone || ''}
-                    onChange={(e) => handleDetailsChange('passenger.phone', e.target.value)}
-                  />
-                </div>
-                <div className="form-group">
-                  <label className="form-label" htmlFor="passengerEmail">Email</label>
-                  <input 
-                    type="email" 
-                    id="passengerEmail" 
-                    className="form-input" 
-                    placeholder="votre@email.com" 
-                    required
-                    value={bookingState.passenger.email || ''}
-                    onChange={(e) => handleDetailsChange('passenger.email', e.target.value)}
-                  />
-                </div>
-                <div className="form-group">
-                  <label className="form-label" htmlFor="specialRequests">Demandes spéciales (optionnel)</label>
-                  <textarea 
-                    id="specialRequests" 
-                    className="form-input" 
-                    rows="3" 
-                    placeholder="Ex: Siège enfant, Champagne, etc."
-                    value={bookingState.passenger.specialRequests || ''}
-                    onChange={(e) => handleDetailsChange('passenger.specialRequests', e.target.value)}
-                  />
-                </div>
-              </div>
+              )}
 
-              {/* Mode de paiement */}
-              <div className="form-group mb-xl">
-                <label className="form-label">Mode de paiement</label>
-                <div className="grid-auto-fit--small">
-                  <button 
-                    className={`btn btn--primary payment-btn ${bookingState.payment.method === 'onboard' ? 'selected' : ''}`}
-                    onClick={() => handlePaymentSelect('onboard')}
-                  >
-                    Paiement à bord
-                  </button>
-                  <button 
-                    className={`btn btn--primary payment-btn ${bookingState.payment.method === 'link' ? 'selected' : ''}`}
-                    onClick={() => handlePaymentSelect('link')}
-                  >
-                    Lien de paiement
-                  </button>
-                  <button 
-                    className={`btn btn--primary payment-btn ${bookingState.payment.method === 'card' ? 'selected' : ''}`}
-                    onClick={() => handlePaymentSelect('card')}
-                  >
-                    Carte bancaire
-                  </button>
+              {/* Étape 3 : Date & Heure */}
+              {currentStep === 3 && (
+                <div className="booking-wizard__step">
+                  <h2 className="booking-wizard__step-title">Date et heure</h2>
+                  <p className="booking-wizard__step-subtitle">Quand souhaitez-vous être pris en charge ?</p>
+                  
+                  <div className="booking-wizard__datetime">
+                    <div className="booking-wizard__field">
+                      <label className="booking-wizard__label">Date</label>
+                      <input
+                        type="date"
+                        value={bookingData.date}
+                        onChange={(e) => updateBookingData('date', e.target.value)}
+                        min={new Date().toISOString().split('T')[0]}
+                        className="booking-wizard__input"
+                      />
+                    </div>
+                    <div className="booking-wizard__field">
+                      <label className="booking-wizard__label">Heure</label>
+                      <input
+                        type="time"
+                        value={bookingData.time}
+                        onChange={(e) => updateBookingData('time', e.target.value)}
+                        className="booking-wizard__input"
+                      />
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
 
-              {/* Bouton de confirmation */}
-              <div className="text-center">
+              {/* Étape 4 : Informations Passager */}
+              {currentStep === 4 && (
+                <div className="booking-wizard__step">
+                  <h2 className="booking-wizard__step-title">Vos informations</h2>
+                  <p className="booking-wizard__step-subtitle">Nous avons besoin de quelques détails pour finaliser votre réservation</p>
+                  
+                  <div className="booking-wizard__form">
+                    <div className="booking-wizard__field">
+                      <label className="booking-wizard__label">Prénom</label>
+                      <input
+                        type="text"
+                        value={bookingData.passenger.firstName}
+                        onChange={(e) => updateBookingData('passenger.firstName', e.target.value)}
+                        placeholder="Votre prénom"
+                        className="booking-wizard__input"
+                      />
+                    </div>
+                    <div className="booking-wizard__field">
+                      <label className="booking-wizard__label">Nom</label>
+                      <input
+                        type="text"
+                        value={bookingData.passenger.lastName}
+                        onChange={(e) => updateBookingData('passenger.lastName', e.target.value)}
+                        placeholder="Votre nom"
+                        className="booking-wizard__input"
+                      />
+                    </div>
+                    <div className="booking-wizard__field">
+                      <label className="booking-wizard__label">Téléphone</label>
+                      <input
+                        type="tel"
+                        value={bookingData.passenger.phone}
+                        onChange={(e) => updateBookingData('passenger.phone', e.target.value)}
+                        placeholder="+33 6 12 34 56 78"
+                        className="booking-wizard__input"
+                      />
+                    </div>
+                    <div className="booking-wizard__field">
+                      <label className="booking-wizard__label">Email</label>
+                      <input
+                        type="email"
+                        value={bookingData.passenger.email}
+                        onChange={(e) => updateBookingData('passenger.email', e.target.value)}
+                        placeholder="votre@email.com"
+                        className="booking-wizard__input"
+                      />
+                    </div>
+                    <div className="booking-wizard__field">
+                      <label className="booking-wizard__label">Demandes spéciales (optionnel)</label>
+                      <textarea
+                        value={bookingData.passenger.specialRequests}
+                        onChange={(e) => updateBookingData('passenger.specialRequests', e.target.value)}
+                        placeholder="Siège enfant, champagne, etc."
+                        className="booking-wizard__textarea"
+                        rows="3"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Étape 5 : Récapitulatif */}
+              {currentStep === 5 && (
+                <div className="booking-wizard__step">
+                  <h2 className="booking-wizard__step-title">Récapitulatif</h2>
+                  <p className="booking-wizard__step-subtitle">Vérifiez les détails de votre réservation</p>
+                  
+                  <div className="booking-wizard__summary">
+                    <div className="booking-wizard__summary-item">
+                      <span className="booking-wizard__summary-label">Véhicule</span>
+                      <span className="booking-wizard__summary-value">{bookingData.vehicle?.name || 'Non sélectionné'}</span>
+                    </div>
+                    <div className="booking-wizard__summary-item">
+                      <span className="booking-wizard__summary-label">Itinéraire</span>
+                      <span className="booking-wizard__summary-value">
+                        {bookingData.route ? `${bookingData.route.from} → ${bookingData.route.to}` : 'Non sélectionné'}
+                      </span>
+                    </div>
+                    <div className="booking-wizard__summary-item">
+                      <span className="booking-wizard__summary-label">Date</span>
+                      <span className="booking-wizard__summary-value">{bookingData.date || 'Non renseigné'}</span>
+                    </div>
+                    <div className="booking-wizard__summary-item">
+                      <span className="booking-wizard__summary-label">Heure</span>
+                      <span className="booking-wizard__summary-value">{bookingData.time || 'Non renseigné'}</span>
+                    </div>
+                    <div className="booking-wizard__summary-item">
+                      <span className="booking-wizard__summary-label">Bagages</span>
+                      <span className="booking-wizard__summary-value">{bookingData.luggage || 0}</span>
+                    </div>
+                    <div className="booking-wizard__summary-item">
+                      <span className="booking-wizard__summary-label">Client</span>
+                      <span className="booking-wizard__summary-value">
+                        {bookingData.passenger.firstName} {bookingData.passenger.lastName}
+                      </span>
+                    </div>
+                    <div className="booking-wizard__summary-item">
+                      <span className="booking-wizard__summary-label">Contact</span>
+                      <span className="booking-wizard__summary-value">
+                        {bookingData.passenger.phone} / {bookingData.passenger.email}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Navigation */}
+            <div className="booking-wizard__navigation">
+              {currentStep > 1 && (
+                <button className="booking-wizard__btn booking-wizard__btn--secondary" onClick={prevStep}>
+                  <ChevronLeft size={20} />
+                  Précédent
+                </button>
+              )}
+              <div className="booking-wizard__navigation-spacer"></div>
+              {currentStep < 5 ? (
                 <button 
-                  className={`btn btn--white btn--large ${!isConfirmEnabled() ? 'btn--disabled' : ''}`}
-                  disabled={!isConfirmEnabled()}
+                  className="booking-wizard__btn booking-wizard__btn--primary" 
+                  onClick={nextStep}
+                  disabled={
+                    (currentStep === 1 && !bookingData.vehicle) ||
+                    (currentStep === 2 && !bookingData.route) ||
+                    (currentStep === 3 && (!bookingData.date || !bookingData.time))
+                  }
+                >
+                  Suivant
+                  <ArrowRight size={20} />
+                </button>
+              ) : (
+                <button 
+                  className="booking-wizard__btn booking-wizard__btn--primary" 
                   onClick={handleConfirmBooking}
                 >
-                  CONFIRMER LA RÉSERVATION
-                </button>
-                {!isConfirmEnabled() && (
-                  <div className="confirm-debug">
-                    Champs manquants : {getMissingConfirmFields().join(', ')}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Bouton Flottant (Le Panier) */}
-        {bookingState.vehicle.id && (
-          <div className="floating-booking-card">
-            <div className="floating-booking-card__content">
-              <div className="floating-booking-card__info">
-                <span className="floating-booking-card__label">Véhicule :</span>
-                <span className="floating-booking-card__value">{getVehicleName(bookingState.vehicle.id)}</span>
-                <span className="floating-booking-card__separator">|</span>
-                <span className="floating-booking-card__label">Service :</span>
-                <span className="floating-booking-card__value">
-                  {bookingState.route.type ? getRouteName() : 'En attente'}
-                </span>
-              </div>
-              {bookingState.route.type && (
-                <button 
-                  className="floating-booking-card__btn"
-                  onClick={() => {
-                    setShowConfirmationOverlay(true)
-                    document.body.style.overflow = 'hidden'
-                  }}
-                >
-                  Réserver
+                  Confirmer la réservation
+                  <ArrowRight size={20} />
                 </button>
               )}
             </div>
           </div>
-        )}
-
-        {/* Section About - L'Excellence avec FleetPrivée */}
-        <section className="section" id="about">
-          <img 
-            src="https://mercedes-benz-mauritius.com//uploads/vehicles/versions/21C0407_011.jpg" 
-            alt="Luxury Vehicle" 
-            className="section__bg"
-          />
-          <div className="section__overlay"></div>
-          <div className="section__content">
-            <h2 className="text-center mb-xl">L'Excellence avec FleetPrivée</h2>
-            <div className="accordion-group">
-              <div className={`accordion ${openAccordion === 'qui' ? 'is-open' : ''}`}>
-                <div className="accordion__header" onClick={() => setOpenAccordion(openAccordion === 'qui' ? null : 'qui')}>
-                  <h3 className="accordion__title">Qui sommes nous ?</h3>
-                  <ChevronRight className="accordion__icon" />
-                </div>
-                <div className="accordion__content">
-                  <div className="accordion__body">
-                    <div className="accordion__text">
-                      <p>FleetPrivée est une entreprise spécialisée dans le transport de luxe depuis 2018. Nous proposons une flotte exclusive de véhicules haut de gamme avec des chauffeurs professionnels expérimentés, dédiés à offrir une expérience de transport exceptionnelle.</p>
-                      <p>Notre mission est de transformer chaque trajet en un moment de confort et d'élégance, que ce soit pour vos déplacements professionnels, vos événements spéciaux ou vos transferts aéroport.</p>
-                      <p>Avec des agences à Paris, Milan, Amsterdam et Munich, nous couvrons les principales destinations européennes avec le même niveau d'excellence.</p>
-                    </div>
-                    <img src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" alt="Chauffeur professionnel" className="accordion__image" />
-                  </div>
-                </div>
-              </div>
-
-              <div className={`accordion ${openAccordion === 'diff' ? 'is-open' : ''}`}>
-                <div className="accordion__header" onClick={() => setOpenAccordion(openAccordion === 'diff' ? null : 'diff')}>
-                  <h3 className="accordion__title">Qu'est-ce qui vous différencie des autres Shuttles ?</h3>
-                  <ChevronRight className="accordion__icon" />
-                </div>
-                <div className="accordion__content">
-                  <div className="accordion__body">
-                    <div className="accordion__text">
-                      <p>FleetPrivée se distingue par son approche personnalisée et son attention aux détails. Contrairement aux services de transport classiques, nous offrons :</p>
-                      <ul className="list-unstyled">
-                        <li className="mb-12">✓ Une flotte exclusivement composée de véhicules premium (Mercedes Classe S, Classe E, Vans de luxe)</li>
-                        <li className="mb-12">✓ Des chauffeurs formés aux standards de l'excellence, bilingues et discrets</li>
-                        <li className="mb-12">✓ Un service sur-mesure avec options personnalisables (champagne, WiFi, sièges enfant)</li>
-                        <li className="mb-12">✓ Un suivi en temps réel de votre réservation et une disponibilité 24/7</li>
-                        <li className="mb-12">✓ Des tarifs transparents sans frais cachés</li>
-                      </ul>
-                      <p>Chaque trajet est conçu pour être une expérience mémorable, où le confort et la ponctualité sont garantis.</p>
-                    </div>
-                    <img src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" alt="Véhicule de luxe" className="accordion__image" />
-                  </div>
-                </div>
-              </div>
-
-              <div className={`accordion ${openAccordion === 'shuttle' ? 'is-open' : ''}`}>
-                <div className="accordion__header" onClick={() => setOpenAccordion(openAccordion === 'shuttle' ? null : 'shuttle')}>
-                  <h3 className="accordion__title">Qu'est ce qu'un Shuttle ?</h3>
-                  <ChevronRight className="accordion__icon" />
-                </div>
-                <div className="accordion__content">
-                  <div className="accordion__body">
-                    <div className="accordion__text">
-                      <p>Un Shuttle, dans notre contexte, désigne un service de transport privé avec chauffeur, généralement utilisé pour des trajets point à point ou des transferts aéroport.</p>
-                      <p>Chez FleetPrivée, nous avons élevé le concept du Shuttle à un niveau supérieur en proposant :</p>
-                      <ul className="list-unstyled">
-                        <li className="mb-12">• Des véhicules de prestige plutôt que des minibus standards</li>
-                        <li className="mb-12">• Un service individuel et personnalisé, non partagé</li>
-                        <li className="mb-12">• Des itinéraires flexibles adaptés à vos besoins</li>
-                        <li className="mb-12">• Un confort et une discrétion de niveau VIP</li>
-                      </ul>
-                      <p>Notre service Shuttle est idéal pour les professionnels exigeants, les événements d'entreprise, les mariages, ou simplement pour ceux qui souhaitent voyager dans les meilleures conditions.</p>
-                    </div>
-                    <img src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" alt="Service Shuttle" className="accordion__image" />
-                  </div>
-                </div>
-              </div>
-
-              <div className={`accordion ${openAccordion === 'reserver' ? 'is-open' : ''}`}>
-                <div className="accordion__header" onClick={() => setOpenAccordion(openAccordion === 'reserver' ? null : 'reserver')}>
-                  <h3 className="accordion__title">Comment réserver ?</h3>
-                  <ChevronRight className="accordion__icon" />
-                </div>
-                <div className="accordion__content">
-                  <div className="accordion__body">
-                    <div className="accordion__text">
-                      <p>Réserver avec FleetPrivée est simple et rapide :</p>
-                      <ol className="ol-padding">
-                        <li className="mb-12"><strong>Choisissez votre véhicule</strong> parmi notre flotte premium (Mercedes Classe S, Classe E, Vans de luxe)</li>
-                        <li className="mb-12"><strong>Sélectionnez votre itinéraire</strong> : utilisez nos trajets rapides (Aéroport CDG, Orly, Disneyland) ou créez un trajet personnalisé</li>
-                        <li className="mb-12"><strong>Renseignez les détails</strong> : date, heure, adresses de prise en charge et de destination, nombre de passagers</li>
-                        <li className="mb-12"><strong>Personnalisez votre expérience</strong> : options supplémentaires (champagne, WiFi, sièges enfant, etc.)</li>
-                        <li className="mb-12"><strong>Validez et payez</strong> : consultez le récapitulatif et choisissez votre mode de paiement</li>
-                      </ol>
-                      <p>Vous recevrez une confirmation immédiate par email avec tous les détails de votre réservation. Notre équipe reste disponible 24/7 pour toute assistance.</p>
-                    </div>
-                    <img src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=400&q=80" alt="Réservation en ligne" className="accordion__image" />
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="text-center mt-xl">
-              <button className="btn btn--white btn--large" onClick={() => scrollToSection('booking-vehicle')}>
-                RÉSERVER MAINTENANT
-              </button>
-            </div>
-            
-            {/* Footer intégré */}
-            <footer className="footer">
-              <div className="footer__content">
-                <div className="footer__links">
-                  <a href="#hero" className="footer__link">Accueil</a>
-                  <a href="#booking-vehicle" className="footer__link">Réservation</a>
-                  <a href="#about" className="footer__link">À propos</a>
-                  <a href="mailto:contact@fleetprivee.com" className="footer__link">Contact</a>
-                </div>
-                <div className="footer__copyright">
-                  © 2024 FleetPrivée. Tous droits réservés.
-                </div>
-              </div>
-            </footer>
-          </div>
-        </section>
-      </main>
-
-      {/* Navigation Indicators */}
-      {currentSection >= 2 && (
-        <nav className={`nav-indicators ${currentSection >= 2 ? 'visible' : ''}`}>
-          <a 
-            href="#booking-vehicle" 
-            className={`nav-indicator ${currentSection === 2 ? 'is-active' : ''} ${validateStep('vehicle') ? 'is-validated' : ''}`}
-            onClick={(e) => { e.preventDefault(); scrollToSection('booking-vehicle'); }}
-          >
-            <span className="nav-indicator__number">1</span>
-            <Check className="nav-indicator__check" size={16} strokeWidth={2.5} />
-          </a>
-          <a 
-            href="#booking-route" 
-            className={`nav-indicator ${currentSection === 3 ? 'is-active' : ''} ${validateStep('route') ? 'is-validated' : ''}`}
-            onClick={(e) => { e.preventDefault(); scrollToSection('booking-route'); }}
-          >
-            <span className="nav-indicator__number">2</span>
-            <Check className="nav-indicator__check" size={16} strokeWidth={2.5} />
-          </a>
-        </nav>
+        </div>
       )}
-    </>
+
+      {/* Footer Minimaliste avec FAQ */}
+      <footer className="footer">
+        <div className="footer__content">
+          {/* FAQ Section */}
+          <div className="footer__faq">
+            <h3 className="footer__faq-title">Questions Fréquentes</h3>
+            <div className="footer__faq-list">
+              {faqs.map((faq) => (
+                <div 
+                  key={faq.id}
+                  className={`footer__faq-item ${openFAQ === faq.id ? 'is-open' : ''}`}
+                >
+                  <button
+                    className="footer__faq-question"
+                    onClick={() => setOpenFAQ(openFAQ === faq.id ? null : faq.id)}
+                  >
+                    <span>{faq.question}</span>
+                    <ChevronDown 
+                      className={`footer__faq-icon ${openFAQ === faq.id ? 'is-open' : ''}`}
+                      size={20}
+                    />
+                  </button>
+                  {openFAQ === faq.id && (
+                    <div className="footer__faq-answer">
+                      <p>{faq.answer}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Footer Links */}
+          <div className="footer__bottom">
+            <div className="footer__brand">FleetPrivée</div>
+            <div className="footer__links">
+              <a href="#hero">Accueil</a>
+              <a href="#fleet">Flotte</a>
+              <a href="#airports">Aéroports</a>
+              <a href="mailto:contact@fleetprivee.com">Contact</a>
+              <a href="#legal">Mentions Légales</a>
+            </div>
+            <div className="footer__copyright">
+              © 2024 FleetPrivée. Tous droits réservés.
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
   )
 }
 
