@@ -35,7 +35,10 @@ function App() {
   const [expandedDetails, setExpandedDetails] = useState({}) // { vehicleId: true/false }
   const [openFAQ, setOpenFAQ] = useState(null) // FAQ accordion
   const [testimonialIndex, setTestimonialIndex] = useState(0) // Pour le slider d'avis
+  const [navExpanded, setNavExpanded] = useState(false) // Menu navigation expanded
+  const [isScrolled, setIsScrolled] = useState(false) // Navigation scrolled state
   const heroVideoRef = useRef(null)
+  const heroRef = useRef(null)
 
   // Données
   const vehicles = [
@@ -173,6 +176,15 @@ function App() {
     }
   ]
 
+  // Données Partenaires
+  const partners = [
+    'Mercedes-Benz',
+    'BMW',
+    'Audi',
+    'Porsche',
+    'Bentley'
+  ]
+
   // Handlers
   const addToCart = (type, item) => {
     setCart(prev => ({
@@ -207,14 +219,18 @@ function App() {
     }))
   }
 
-  // Scroll tracking
+  // Scroll tracking avec transformation navigation
   useEffect(() => {
     const handleScroll = () => {
-      setScrollY(window.scrollY)
+      const scroll = window.scrollY
+      setScrollY(scroll)
+      setIsScrolled(scroll > 100)
     }
-    window.addEventListener('scroll', handleScroll)
+    window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  // Auto-rotation partenaires (désactivée pour l'instant, animation CSS gère le scroll)
 
   // Auto-play hero video
   useEffect(() => {
@@ -313,19 +329,65 @@ function App() {
 
   return (
     <div className="app">
-      {/* Navigation Minimaliste */}
-      <nav className="nav">
-        <div className="nav__logo">FleetPrivée</div>
-        <button 
-          className="nav__menu"
-          onClick={() => scrollToSection('hero')}
-        >
-          Menu
-        </button>
+      {/* Navigation Intelligente - Transformation au Scroll */}
+      <nav className={`nav ${isScrolled ? 'is-scrolled' : ''} ${navExpanded ? 'is-expanded' : ''}`}>
+        <div className="nav__container">
+          {/* Logo - Se transforme au scroll */}
+          <div className="nav__logo-wrapper">
+            <div className={`nav__logo ${isScrolled ? 'is-compact' : ''}`}>
+              <span className="nav__logo-full">FleetPrivée</span>
+              <span className="nav__logo-compact">FP</span>
+            </div>
+          </div>
+
+          {/* Menu Desktop - Se cache au scroll */}
+          <div className={`nav__links ${isScrolled ? 'is-hidden' : ''}`}>
+            <a href="#fleet" className="nav__link" onClick={(e) => { e.preventDefault(); scrollToSection('fleet'); setNavExpanded(false); }}>Flotte</a>
+            <a href="#airports" className="nav__link" onClick={(e) => { e.preventDefault(); scrollToSection('airports'); setNavExpanded(false); }}>Aéroports</a>
+            <a href="#testimonials" className="nav__link" onClick={(e) => { e.preventDefault(); scrollToSection('testimonials'); setNavExpanded(false); }}>Avis</a>
+            <button className="nav__link nav__link--cta" onClick={() => { openWizard(); setNavExpanded(false); }}>Réserver</button>
+          </div>
+
+          {/* Menu Mobile - Bouton hamburger */}
+          <button 
+            className="nav__menu-trigger"
+            onClick={() => setNavExpanded(!navExpanded)}
+            aria-label="Menu"
+          >
+            <div className="nav__menu-icon">
+              <span className={`nav__menu-line ${navExpanded ? 'is-open' : ''}`}></span>
+              <span className={`nav__menu-line ${navExpanded ? 'is-open' : ''}`}></span>
+              <span className={`nav__menu-line ${navExpanded ? 'is-open' : ''}`}></span>
+            </div>
+          </button>
+        </div>
+
+        {/* Menu Mobile Expanded */}
+        <div className={`nav__expanded ${navExpanded ? 'is-open' : ''}`}>
+          <div className="nav__expanded-content">
+            <a href="#fleet" className="nav__expanded-link" onClick={(e) => { e.preventDefault(); scrollToSection('fleet'); setNavExpanded(false); }}>
+              <span className="nav__expanded-number">01</span>
+              <span className="nav__expanded-text">Flotte</span>
+            </a>
+            <a href="#airports" className="nav__expanded-link" onClick={(e) => { e.preventDefault(); scrollToSection('airports'); setNavExpanded(false); }}>
+              <span className="nav__expanded-number">02</span>
+              <span className="nav__expanded-text">Aéroports</span>
+            </a>
+            <a href="#testimonials" className="nav__expanded-link" onClick={(e) => { e.preventDefault(); scrollToSection('testimonials'); setNavExpanded(false); }}>
+              <span className="nav__expanded-number">03</span>
+              <span className="nav__expanded-text">Avis Clients</span>
+            </a>
+            <button className="nav__expanded-link nav__expanded-link--cta" onClick={() => { openWizard(); setNavExpanded(false); }}>
+              <span className="nav__expanded-number">→</span>
+              <span className="nav__expanded-text">Réserver maintenant</span>
+            </button>
+          </div>
+        </div>
       </nav>
 
-      {/* Hero Section - Cinématographique */}
-      <section id="hero" className="hero">
+      {/* Hero Section - Monolithique & Finalisé */}
+      <section id="hero" className="hero" ref={heroRef}>
+        {/* Background Media */}
         <div className="hero__media">
           <div className="hero__image-wrapper">
             <img 
@@ -336,28 +398,51 @@ function App() {
           </div>
           <div className="hero__overlay"></div>
         </div>
-        
-        <div className="hero__content">
-          <div className="hero__badge">DEPUIS 2018</div>
-          <h1 className="hero__title">
-            <span className="hero__title-line">Transport</span>
-            <span className="hero__title-line">d'Excellence</span>
-          </h1>
-          <p className="hero__subtitle">
-            Expérience premium avec chauffeur privé
-          </p>
-          <button 
-            className="hero__cta"
-            onClick={openWizard}
-          >
-            Réserver maintenant
-            <ArrowRight size={20} />
-          </button>
-        </div>
 
-        <div className="hero__scroll-indicator">
-          <div className="hero__scroll-line"></div>
-          <span>Scroll</span>
+        {/* Contenu Monolithique */}
+        <div className="hero__unified">
+          {/* Badge & Titre */}
+          <div className="hero__header">
+            <div className="hero__badge">DEPUIS 2018</div>
+            <h1 className="hero__title">
+              <span className="hero__title-line">Transport</span>
+              <span className="hero__title-line">d'Excellence</span>
+            </h1>
+            <p className="hero__subtitle">
+              Expérience premium avec chauffeur privé
+            </p>
+          </div>
+
+          {/* CTA Principal */}
+          <div className="hero__cta-zone">
+            <button 
+              className="hero__cta"
+              onClick={openWizard}
+            >
+              <span className="hero__cta-text">Réserver maintenant</span>
+              <ArrowRight size={20} className="hero__cta-icon" />
+            </button>
+          </div>
+
+          {/* Partenaires Intégrés - Élément Vivant */}
+          <div className="hero__partners">
+            <div className="hero__partners-label">Nos partenaires</div>
+            <div className="hero__partners-scroll">
+              <div className="hero__partners-track">
+                {[...partners, ...partners].map((partner, index) => (
+                  <div key={index} className="hero__partners-item">
+                    {partner}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Scroll Indicator */}
+          <div className="hero__scroll-zone">
+            <div className="hero__scroll-line"></div>
+            <span className="hero__scroll-text">Scroll</span>
+          </div>
         </div>
       </section>
 
