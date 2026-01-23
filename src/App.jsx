@@ -342,6 +342,7 @@ function App() {
 
           {/* Menu Desktop - Se cache au scroll */}
           <div className={`nav__links ${isScrolled ? 'is-hidden' : ''}`}>
+            <a href="#about" className="nav__link" onClick={(e) => { e.preventDefault(); scrollToSection('about'); setNavExpanded(false); }}>À Propos</a>
             <a href="#fleet" className="nav__link" onClick={(e) => { e.preventDefault(); scrollToSection('fleet'); setNavExpanded(false); }}>Flotte</a>
             <a href="#airports" className="nav__link" onClick={(e) => { e.preventDefault(); scrollToSection('airports'); setNavExpanded(false); }}>Aéroports</a>
             <a href="#testimonials" className="nav__link" onClick={(e) => { e.preventDefault(); scrollToSection('testimonials'); setNavExpanded(false); }}>Avis</a>
@@ -365,16 +366,20 @@ function App() {
         {/* Menu Mobile Expanded */}
         <div className={`nav__expanded ${navExpanded ? 'is-open' : ''}`}>
           <div className="nav__expanded-content">
-            <a href="#fleet" className="nav__expanded-link" onClick={(e) => { e.preventDefault(); scrollToSection('fleet'); setNavExpanded(false); }}>
+            <a href="#about" className="nav__expanded-link" onClick={(e) => { e.preventDefault(); scrollToSection('about'); setNavExpanded(false); }}>
               <span className="nav__expanded-number">01</span>
+              <span className="nav__expanded-text">À Propos</span>
+            </a>
+            <a href="#fleet" className="nav__expanded-link" onClick={(e) => { e.preventDefault(); scrollToSection('fleet'); setNavExpanded(false); }}>
+              <span className="nav__expanded-number">02</span>
               <span className="nav__expanded-text">Flotte</span>
             </a>
             <a href="#airports" className="nav__expanded-link" onClick={(e) => { e.preventDefault(); scrollToSection('airports'); setNavExpanded(false); }}>
-              <span className="nav__expanded-number">02</span>
+              <span className="nav__expanded-number">03</span>
               <span className="nav__expanded-text">Aéroports</span>
             </a>
             <a href="#testimonials" className="nav__expanded-link" onClick={(e) => { e.preventDefault(); scrollToSection('testimonials'); setNavExpanded(false); }}>
-              <span className="nav__expanded-number">03</span>
+              <span className="nav__expanded-number">04</span>
               <span className="nav__expanded-text">Avis Clients</span>
             </a>
             <button className="nav__expanded-link nav__expanded-link--cta" onClick={() => { openWizard(); setNavExpanded(false); }}>
@@ -446,11 +451,59 @@ function App() {
         </div>
       </section>
 
+      {/* Section À Propos */}
+      <section id="about" className="about">
+        <div className="about__header">
+          <div className="about__header-content">
+            <span className="about__number">01</span>
+            <h2 className="about__title">À Propos</h2>
+          </div>
+          <p className="about__description">
+            Excellence et discrétion depuis 2018
+          </p>
+        </div>
+
+        <div className="about__content">
+          <div className="about__text">
+            <p className="about__paragraph">
+              FleetPrivée incarne l'excellence du transport privé avec chauffeur. 
+              Depuis 2018, nous offrons une expérience de mobilité haut de gamme, 
+              alliant confort, sécurité et discrétion absolue.
+            </p>
+            <p className="about__paragraph">
+              Notre flotte de véhicules premium, sélectionnés avec soin, 
+              et nos chauffeurs professionnels certifiés garantissent un service 
+              irréprochable pour chaque trajet, qu'il s'agisse d'un transfert 
+              aéroport, d'un déplacement professionnel ou d'une occasion spéciale.
+            </p>
+          </div>
+
+          <div className="about__stats">
+            <div className="about__stat">
+              <div className="about__stat-number">6+</div>
+              <div className="about__stat-label">Années d'expérience</div>
+            </div>
+            <div className="about__stat">
+              <div className="about__stat-number">1000+</div>
+              <div className="about__stat-label">Clients satisfaits</div>
+            </div>
+            <div className="about__stat">
+              <div className="about__stat-number">24/7</div>
+              <div className="about__stat-label">Disponibilité</div>
+            </div>
+            <div className="about__stat">
+              <div className="about__stat-number">100%</div>
+              <div className="about__stat-label">Satisfaction</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Section Flotte - Style Rimac Automobili */}
       <section id="fleet" className="fleet">
         <div className="fleet__header">
           <div className="fleet__header-content">
-            <span className="fleet__number">01</span>
+            <span className="fleet__number">02</span>
             <h2 className="fleet__title">Notre Flotte</h2>
           </div>
           <p className="fleet__description">
@@ -532,7 +585,7 @@ function App() {
       <section id="airports" className="airports">
         <div className="airports__header">
           <div className="airports__header-content">
-            <span className="airports__number">02</span>
+            <span className="airports__number">03</span>
             <h2 className="airports__title">Transferts Aéroport</h2>
           </div>
           <p className="airports__description">
@@ -570,7 +623,7 @@ function App() {
       <section id="testimonials" className="testimonials">
         <div className="testimonials__header">
           <div className="testimonials__header-content">
-            <span className="testimonials__number">03</span>
+            <span className="testimonials__number">04</span>
             <h2 className="testimonials__title">Avis Clients</h2>
           </div>
           <p className="testimonials__description">
@@ -615,7 +668,7 @@ function App() {
       <section id="routes" className="routes">
         <div className="routes__header">
           <div className="routes__header-content">
-            <span className="routes__number">02</span>
+            <span className="routes__number">05</span>
             <h2 className="routes__title">Itinéraires</h2>
           </div>
           <p className="routes__description">
