@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { ChevronRight, ChevronLeft, ArrowRight, Play, Pause, X, Plus, Minus, Plane, Star, ChevronDown } from 'lucide-react'
+import { ChevronRight, ChevronLeft, ArrowRight, Play, Pause, X, Plus, Minus, Plane, Star, ChevronDown, Users, Package } from 'lucide-react'
 import './index.css'
 import './styles.css'
 
@@ -33,6 +33,7 @@ function App() {
   const [hoveredCard, setHoveredCard] = useState(null)
   const [scrollY, setScrollY] = useState(0)
   const [expandedDetails, setExpandedDetails] = useState({}) // { vehicleId: true/false }
+  const [expandedVehicleDetails, setExpandedVehicleDetails] = useState({}) // { vehicleId: true/false }
   const [openFAQ, setOpenFAQ] = useState(null) // FAQ accordion
   const [testimonialIndex, setTestimonialIndex] = useState(0) // Pour le slider d'avis
   const [navExpanded, setNavExpanded] = useState(false) // Menu navigation expanded
@@ -47,37 +48,48 @@ function App() {
       name: 'Mercedes Classe E',
       tagline: 'ÉLÉGANCE ET PERFORMANCE',
       category: 'berline',
-      specs: { passengers: 4, luggage: 2, power: '320 HP', speed: '220 KM/H' },
+      vehicleClass: 'Business',
+      specs: { passengers: 4, luggage: 2, power: '320 HP', speed: '220 KM/H', horsepower: 320 },
       images: [
+        'https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg',
         'https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg',
         'https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg'
       ],
-      price: 'À partir de 100€'
+      price: 'À partir de 100€',
+      description: 'Business - rendez-vous d\'affaires, transferts aéroport',
+      occasion: 'Idéal pour les rendez-vous d\'affaires, les événements professionnels et les transferts aéroport. Son élégance discrète et son confort premium en font le choix parfait pour les déplacements urbains et interurbains en toute sérénité.'
     },
     {
       id: 'mercedes-s680',
       name: 'Mercedes Classe S',
       tagline: 'L\'EXCELLENCE ABSOLUE',
       category: 'suv',
-      specs: { passengers: 4, luggage: 3, power: '450 HP', speed: '250 KM/H' },
+      vehicleClass: 'Prestige',
+      specs: { passengers: 4, luggage: 3, power: '450 HP', speed: '250 KM/H', horsepower: 450 },
       images: [
         'https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg',
         'https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg',
         'https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg'
       ],
-      price: 'À partir de 120€'
+      price: 'À partir de 120€',
+      description: 'Prestige - mariages, galas, événements VIP',
+      occasion: 'Parfait pour les occasions prestigieuses, les mariages, les galas et les événements VIP. Son intérieur somptueux et ses technologies de pointe offrent une expérience de luxe inégalée pour vos moments les plus importants.'
     },
     {
       id: 'van-luxe',
-      name: 'Van Premium',
+      name: 'Mercedes Classe V',
       tagline: 'CONFORT MAXIMAL POUR GROUPES',
       category: 'van',
-      specs: { passengers: 8, luggage: 6, power: '280 HP', speed: '180 KM/H' },
+      vehicleClass: 'Sedan',
+      specs: { passengers: 8, luggage: 6, power: '280 HP', speed: '180 KM/H', horsepower: 280 },
       images: [
+        'https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg',
         'https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg',
         'https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg'
       ],
-      price: 'À partir de 150€'
+      price: 'À partir de 150€',
+      description: 'Sedan - groupes, familles, transferts avec bagages',
+      occasion: 'Conçu pour les groupes, les familles nombreuses et les événements nécessitant un transport spacieux. Idéal pour les sorties en groupe, les transferts aéroport avec bagages volumineux et les déplacements confortables à plusieurs.'
     }
   ]
 
@@ -176,13 +188,11 @@ function App() {
     }
   ]
 
-  // Données Partenaires
-  const partners = [
-    'Mercedes-Benz',
-    'BMW',
-    'Audi',
-    'Porsche',
-    'Bentley'
+  // Données Partenaires / Langues
+  const languages = [
+    { code: 'ES', name: 'Espagne', flag: '🇪🇸' },
+    { code: 'FR', name: 'France', flag: '🇫🇷' },
+    { code: 'GB', name: 'Royaume-Uni', flag: '🇬🇧' }
   ]
 
   // Handlers
@@ -390,63 +400,64 @@ function App() {
         </div>
       </nav>
 
-      {/* Hero Section - Monolithique & Finalisé */}
+      {/* Hero Section - Exactement comme l'image */}
       <section id="hero" className="hero" ref={heroRef}>
-        {/* Background Media */}
-        <div className="hero__media">
-          <div className="hero__image-wrapper">
-            <img 
-              src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg"
-              alt="Luxury Vehicle"
-              className="hero__image"
-            />
+        {/* Header en haut avec Policy et Logo */}
+        <div className="hero__top-header">
+          <div className="hero__policy">
+            <div className="hero__policy-item">
+              <span className="hero__policy-ac">AC</span>
+              <span className="hero__policy-dot"></span>
+            </div>
+            <span className="hero__policy-text">POLICY</span>
           </div>
-          <div className="hero__overlay"></div>
+          <div className="hero__logo-box">
+            <span className="hero__logo-text">BEHIND OUR</span>
+          </div>
         </div>
 
-        {/* Contenu Monolithique */}
-        <div className="hero__unified">
-          {/* Badge & Titre */}
-          <div className="hero__header">
-            <div className="hero__badge">DEPUIS 2018</div>
-            <h1 className="hero__title">
-              <span className="hero__title-line">Transport</span>
-              <span className="hero__title-line">d'Excellence</span>
+        {/* Image principale avec arrondis en haut */}
+        <div className="hero__image-container">
+          <img 
+            src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg"
+            alt="Mercedes S-Class"
+            className="hero__main-image"
+          />
+          
+          {/* Badge 2018-2026 */}
+          <div className="hero__year-badge">2018-2026</div>
+          
+          {/* Dégradé en bas */}
+          <div className="hero__image-overlay"></div>
+          
+          {/* Texte principal */}
+          <div className="hero__main-text">
+            <h1 className="hero__main-title">
+              Transport d'Excellence avec chauffeur privé à disposition
             </h1>
-            <p className="hero__subtitle">
-              Expérience premium avec chauffeur privé
-            </p>
           </div>
-
-          {/* CTA Principal */}
-          <div className="hero__cta-zone">
-            <button 
-              className="hero__cta"
-              onClick={openWizard}
-            >
-              <span className="hero__cta-text">Réserver maintenant</span>
-              <ArrowRight size={20} className="hero__cta-icon" />
-            </button>
-          </div>
-
-          {/* Partenaires Intégrés - Élément Vivant */}
-          <div className="hero__partners">
-            <div className="hero__partners-label">Nos partenaires</div>
-            <div className="hero__partners-scroll">
-              <div className="hero__partners-track">
-                {[...partners, ...partners].map((partner, index) => (
-                  <div key={index} className="hero__partners-item">
-                    {partner}
-                  </div>
-                ))}
-              </div>
+          
+          {/* Container pour bouton */}
+          <div className="hero__cta-wrapper">
+            <div className="hero__cta-container">
+              <button className="hero__cta-button" onClick={openWizard}>
+                <span className="hero__cta-button-text">Book a ride</span>
+                <div className="hero__cta-button-icon">
+                  <ArrowRight size={20} />
+                </div>
+              </button>
             </div>
           </div>
+        </div>
 
-          {/* Scroll Indicator */}
-          <div className="hero__scroll-zone">
-            <div className="hero__scroll-line"></div>
-            <span className="hero__scroll-text">Scroll</span>
+        {/* Drapeaux de langues qui défilent */}
+        <div className="hero__languages">
+          <div className="hero__languages-track">
+            {[...languages, ...languages, ...languages].map((lang, index) => (
+              <div key={index} className="hero__language-flag">
+                {lang.flag}
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -518,59 +529,133 @@ function App() {
             return (
               <div 
                 key={vehicle.id}
-                className="fleet__card-showcase"
-                onClick={() => {
-                  updateBookingData('vehicle', vehicle)
-                  openWizard()
-                }}
+                className="fleet__card"
               >
-                {/* Image Slider - 100% de la carte */}
-                <div className="fleet__card-showcase-media">
-                  <div className="fleet__card-showcase-slider">
+                {/* Zone image avec slider */}
+                <div className="fleet__card-image-wrapper">
+                  <div className="fleet__card-image-container">
                     {vehicle.images.map((img, imgIndex) => (
                       <div
                         key={imgIndex}
-                        className={`fleet__card-showcase-slide ${imgIndex === currentSlide ? 'is-active' : ''}`}
+                        className={`fleet__card-image ${imgIndex === currentSlide ? 'is-active' : ''}`}
                         style={{ backgroundImage: `url(${img})` }}
                       />
                     ))}
-                  </div>
-                  
-                  {/* Indicateurs visuels seulement */}
-                  {vehicle.images.length > 1 && (
-                    <div className="fleet__card-showcase-indicators">
-                      {vehicle.images.map((_, dotIndex) => (
+                    
+                    {/* Flèches de navigation */}
+                    {vehicle.images.length > 1 && (
+                      <>
                         <button
-                          key={dotIndex}
-                          className={`fleet__card-showcase-dot ${dotIndex === currentSlide ? 'is-active' : ''}`}
+                          className="fleet__card-nav fleet__card-nav--prev"
                           onClick={(e) => {
                             e.stopPropagation()
                             setActiveFleetSlide(prev => ({
                               ...prev,
-                              [vehicle.id]: dotIndex
+                              [vehicle.id]: (currentSlide - 1 + vehicle.images.length) % vehicle.images.length
                             }))
                           }}
-                          aria-label={`Image ${dotIndex + 1}`}
-                        />
-                      ))}
+                          aria-label="Image précédente"
+                        >
+                          <ChevronLeft size={20} />
+                        </button>
+                        <button
+                          className="fleet__card-nav fleet__card-nav--next"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setActiveFleetSlide(prev => ({
+                              ...prev,
+                              [vehicle.id]: (currentSlide + 1) % vehicle.images.length
+                            }))
+                          }}
+                          aria-label="Image suivante"
+                        >
+                          <ChevronRight size={20} />
+                        </button>
+                      </>
+                    )}
+                    
+                    {/* Indicateurs */}
+                    {vehicle.images.length > 1 && (
+                      <div className="fleet__card-dots">
+                        {vehicle.images.map((_, dotIndex) => (
+                          <button
+                            key={dotIndex}
+                            className={`fleet__card-dot ${dotIndex === currentSlide ? 'is-active' : ''}`}
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setActiveFleetSlide(prev => ({
+                                ...prev,
+                                [vehicle.id]: dotIndex
+                              }))
+                            }}
+                            aria-label={`Image ${dotIndex + 1}`}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                {/* Contenu de la carte */}
+                <div className="fleet__card-body">
+                  <div className="fleet__card-header">
+                    <h3 className="fleet__card-title">{vehicle.name}</h3>
+                    <p className="fleet__card-subtitle">{vehicle.description}</p>
+                  </div>
+                  
+                  <div className="fleet__card-footer">
+                    <div className="fleet__card-specs">
+                      <div className="fleet__card-spec">
+                        <Users size={14} />
+                        <span>{vehicle.specs.passengers}</span>
+                      </div>
+                      <div className="fleet__card-spec">
+                        <Package size={14} />
+                        <span>{vehicle.specs.luggage}</span>
+                      </div>
                     </div>
-                  )}
-
-                  {/* Overlay avec nom et prix */}
-                  <div className="fleet__card-showcase-overlay">
-                    <div className="fleet__card-showcase-info">
-                      <h3 className="fleet__card-showcase-name">{vehicle.name}</h3>
-                      <div className="fleet__card-showcase-price">{vehicle.price}</div>
-                    </div>
+                    
                     <button 
-                      className="fleet__card-showcase-btn"
+                      className="fleet__card-info-btn"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setExpandedVehicleDetails(prev => ({
+                          ...prev,
+                          [vehicle.id]: !prev[vehicle.id]
+                        }))
+                      }}
+                    >
+                      +info
+                    </button>
+                    
+                    {expandedVehicleDetails[vehicle.id] && (
+                      <div className="fleet__card-details">
+                        <div className="fleet__card-details-grid">
+                          <div className="fleet__card-details-item">
+                            <span className="fleet__card-details-label">Puissance</span>
+                            <span className="fleet__card-details-value">{vehicle.specs.power}</span>
+                          </div>
+                          <div className="fleet__card-details-item">
+                            <span className="fleet__card-details-label">Chevaux</span>
+                            <span className="fleet__card-details-value">{vehicle.specs.horsepower} ch</span>
+                          </div>
+                          <div className="fleet__card-details-item">
+                            <span className="fleet__card-details-label">Vitesse max</span>
+                            <span className="fleet__card-details-value">{vehicle.specs.speed}</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    <button 
+                      className="fleet__card-cta"
                       onClick={(e) => {
                         e.stopPropagation()
                         updateBookingData('vehicle', vehicle)
                         openWizard()
                       }}
                     >
-                      Réserver
+                      Choisir ce véhicule
                       <ArrowRight size={18} />
                     </button>
                   </div>
