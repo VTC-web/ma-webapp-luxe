@@ -1,13 +1,14 @@
 import { useState, useEffect, useRef } from 'react'
-import { ChevronRight, ChevronLeft, ArrowRight, Play, Pause, X, Plus, Minus, Plane, Star, ChevronDown, Users, Package } from 'lucide-react'
+import { ChevronRight, ChevronLeft, ArrowRight, Play, Pause, X, Plus, Minus, Plane, Star, ChevronDown, Users, Package, Sparkles, Briefcase, Heart, Mail, Phone, MapPin, Instagram, Facebook, Linkedin, Clock, Shield, Award } from 'lucide-react'
+import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
+import AnimatedCounter from './components/AnimatedCounter'
 import './index.css'
 import './styles.css'
 
 function App() {
   // State Management - Simplifié pour le panier uniquement
   const [cart, setCart] = useState({
-    vehicle: null,
-    route: null
+    vehicle: null
   })
 
   // BookingWizard State
@@ -16,7 +17,7 @@ function App() {
   const [bookingData, setBookingData] = useState({
     vehicle: null,
     luggage: 0,
-    route: null,
+    service: null,
     date: '',
     time: '',
     passenger: {
@@ -37,6 +38,7 @@ function App() {
   const [openFAQ, setOpenFAQ] = useState(null) // FAQ accordion
   const [testimonialIndex, setTestimonialIndex] = useState(0) // Pour le slider d'avis
   const [navExpanded, setNavExpanded] = useState(false) // Menu navigation expanded
+  const [heroMenuExpanded, setHeroMenuExpanded] = useState(false) // Hero menu expanded
   const [isScrolled, setIsScrolled] = useState(false) // Navigation scrolled state
   const heroVideoRef = useRef(null)
   const heroRef = useRef(null)
@@ -93,42 +95,38 @@ function App() {
     }
   ]
 
-  const routes = [
+  const services = [
     {
-      id: 'cdg_paris',
-      from: 'Paris',
-      to: 'CDG',
-      duration: '45 min',
-      price: '120€',
-      image: 'https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg',
-      services: ['Accueil pancarte', 'Attente 30min', 'Rafraîchissements', 'Suivi temps réel']
+      id: 'transfert-aeroport',
+      name: 'Transfert Aéroport',
+      icon: '✈️',
+      description: 'Service premium de transfert vers tous les aéroports parisiens avec accueil personnalisé et suivi en temps réel.',
+      features: ['Accueil avec pancarte', 'Attente gratuite 30min', 'Rafraîchissements', 'Suivi GPS'],
+      image: 'https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg'
     },
     {
-      id: 'disneyland',
-      from: 'Paris',
-      to: 'Disneyland',
-      duration: '50 min',
-      price: '150€',
-      image: 'https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg',
-      services: ['Accueil pancarte', 'Attente 45min', 'Rafraîchissements', 'WiFi haut débit']
+      id: 'evenement-corporate',
+      name: 'Événement Corporate',
+      icon: '💼',
+      description: 'Transport VIP pour vos événements d\'affaires, conférences et rendez-vous professionnels avec chauffeur dédié.',
+      features: ['Chauffeur professionnel', 'WiFi haut débit', 'Espace de travail', 'Service discret'],
+      image: 'https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg'
     },
     {
-      id: 'orly_paris',
-      from: 'Paris',
-      to: 'Orly',
-      duration: '30 min',
-      price: '100€',
-      image: 'https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg',
-      services: ['Accueil pancarte', 'Attente 20min', 'Rafraîchissements', 'Service express']
+      id: 'mariage-prestige',
+      name: 'Mariage & Prestige',
+      icon: '💍',
+      description: 'Service de luxe pour vos moments les plus importants : mariages, galas et événements prestigieux.',
+      features: ['Décoration personnalisée', 'Champagne offert', 'Service 24/7', 'Photographe optionnel'],
+      image: 'https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg'
     },
     {
-      id: 'custom',
-      from: 'Départ',
-      to: 'Destination',
-      duration: 'Sur mesure',
-      price: 'Sur devis',
-      image: 'https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg',
-      services: ['Itinéraire personnalisé', 'Arrêts multiples', 'Service premium', 'Devis gratuit']
+      id: 'service-sur-mesure',
+      name: 'Service sur Mesure',
+      icon: '⭐',
+      description: 'Création d\'un service personnalisé adapté à vos besoins spécifiques et à vos exigences particulières.',
+      features: ['Itinéraire personnalisé', 'Arrêts multiples', 'Devis gratuit', 'Service premium'],
+      image: 'https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg'
     }
   ]
 
@@ -188,12 +186,6 @@ function App() {
     }
   ]
 
-  // Données Partenaires / Langues
-  const languages = [
-    { code: 'ES', name: 'Espagne', flag: '🇪🇸' },
-    { code: 'FR', name: 'France', flag: '🇫🇷' },
-    { code: 'GB', name: 'Royaume-Uni', flag: '🇬🇧' }
-  ]
 
   // Handlers
   const addToCart = (type, item) => {
@@ -321,7 +313,7 @@ function App() {
     const whatsappNumber = '33605998211'
     let message = 'RÉSERVATION\n\n'
     message += `Véhicule : ${bookingData.vehicle?.name || 'Non sélectionné'}\n`
-    message += `Itinéraire : ${bookingData.route ? `${bookingData.route.from} → ${bookingData.route.to}` : 'Non sélectionné'}\n`
+    message += `Service : ${bookingData.service?.name || 'Non sélectionné'}\n`
     message += `Date : ${bookingData.date || 'Non renseigné'}\n`
     message += `Heure : ${bookingData.time || 'Non renseigné'}\n`
     message += `Bagages : ${bookingData.luggage || 0}\n\n`
@@ -340,24 +332,75 @@ function App() {
   return (
     <div className="app">
       {/* Navigation Intelligente - Transformation au Scroll */}
-      <nav className={`nav ${isScrolled ? 'is-scrolled' : ''} ${navExpanded ? 'is-expanded' : ''}`}>
-        <div className="nav__container">
+      <motion.nav 
+        className={`nav ${isScrolled ? 'is-scrolled' : ''} ${navExpanded ? 'is-expanded' : ''}`}
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <motion.div 
+          className="nav__container"
+          animate={{
+            padding: isScrolled ? '12px 24px' : '16px 24px',
+            borderRadius: isScrolled ? '999px' : '0px',
+            margin: isScrolled ? '12px 24px' : '0',
+            background: 'transparent'
+          }}
+          transition={{ duration: 0.3 }}
+        >
           {/* Logo - Se transforme au scroll */}
-          <div className="nav__logo-wrapper">
-            <div className={`nav__logo ${isScrolled ? 'is-compact' : ''}`}>
-              <span className="nav__logo-full">FleetPrivée</span>
-              <span className="nav__logo-compact">FP</span>
-            </div>
-          </div>
+          <motion.div className="nav__logo-wrapper">
+            <AnimatePresence mode="wait">
+              {isScrolled ? (
+                <motion.div 
+                  key="compact"
+                  className="nav__logo is-compact"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <span className="nav__logo-compact">FP</span>
+                </motion.div>
+              ) : (
+                <motion.div 
+                  key="full"
+                  className="nav__logo"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <span className="nav__logo-full">FleetPrivée</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
 
           {/* Menu Desktop - Se cache au scroll */}
-          <div className={`nav__links ${isScrolled ? 'is-hidden' : ''}`}>
-            <a href="#about" className="nav__link" onClick={(e) => { e.preventDefault(); scrollToSection('about'); setNavExpanded(false); }}>À Propos</a>
-            <a href="#fleet" className="nav__link" onClick={(e) => { e.preventDefault(); scrollToSection('fleet'); setNavExpanded(false); }}>Flotte</a>
-            <a href="#airports" className="nav__link" onClick={(e) => { e.preventDefault(); scrollToSection('airports'); setNavExpanded(false); }}>Aéroports</a>
-            <a href="#testimonials" className="nav__link" onClick={(e) => { e.preventDefault(); scrollToSection('testimonials'); setNavExpanded(false); }}>Avis</a>
-            <button className="nav__link nav__link--cta" onClick={() => { openWizard(); setNavExpanded(false); }}>Réserver</button>
-          </div>
+          <AnimatePresence>
+            {!isScrolled && (
+              <motion.div 
+                className="nav__links"
+                initial={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20, width: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <a href="#about" className="nav__link" onClick={(e) => { e.preventDefault(); scrollToSection('about'); setNavExpanded(false); }}>À Propos</a>
+                <a href="#fleet" className="nav__link" onClick={(e) => { e.preventDefault(); scrollToSection('fleet'); setNavExpanded(false); }}>Flotte</a>
+                <a href="#airports" className="nav__link" onClick={(e) => { e.preventDefault(); scrollToSection('airports'); setNavExpanded(false); }}>Aéroports</a>
+                <a href="#testimonials" className="nav__link" onClick={(e) => { e.preventDefault(); scrollToSection('testimonials'); setNavExpanded(false); }}>Avis</a>
+                <motion.button 
+                  className="nav__link nav__link--cta" 
+                  onClick={() => { openWizard(); setNavExpanded(false); }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Réserver
+                </motion.button>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Menu Mobile - Bouton hamburger */}
           <button 
@@ -369,9 +412,9 @@ function App() {
               <span className={`nav__menu-line ${navExpanded ? 'is-open' : ''}`}></span>
               <span className={`nav__menu-line ${navExpanded ? 'is-open' : ''}`}></span>
               <span className={`nav__menu-line ${navExpanded ? 'is-open' : ''}`}></span>
-            </div>
-          </button>
         </div>
+        </button>
+        </motion.div>
 
         {/* Menu Mobile Expanded */}
         <div className={`nav__expanded ${navExpanded ? 'is-open' : ''}`}>
@@ -398,69 +441,259 @@ function App() {
             </button>
           </div>
         </div>
-      </nav>
+      </motion.nav>
 
-      {/* Hero Section - Exactement comme l'image */}
+      {/* Hero Section - Design 2026 */}
       <section id="hero" className="hero" ref={heroRef}>
-        {/* Header en haut avec Policy et Logo */}
-        <div className="hero__top-header">
-          <div className="hero__policy">
-            <div className="hero__policy-item">
-              <span className="hero__policy-ac">AC</span>
-              <span className="hero__policy-dot"></span>
-            </div>
-            <span className="hero__policy-text">POLICY</span>
-          </div>
-          <div className="hero__logo-box">
-            <span className="hero__logo-text">BEHIND OUR</span>
-          </div>
-        </div>
+        {/* Barre de menu/logo en haut du Hero */}
+        <motion.div 
+          className={`hero__top-bar ${isScrolled ? 'is-scrolled' : ''}`}
+          initial={{ y: -100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <motion.div 
+            className="hero__top-bar-container"
+            animate={{
+              padding: isScrolled ? '6px 10px' : '6px 12px',
+              borderRadius: '12px',
+              margin: isScrolled ? '8px 16px' : '8px 24px',
+              background: isScrolled ? 'rgba(0, 0, 0, 0.85)' : 'rgba(0, 0, 0, 0.05)',
+              maxWidth: isScrolled ? 'fit-content' : 'calc(100% - 48px)',
+              width: isScrolled ? 'auto' : 'calc(100% - 48px)'
+            }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <div className="hero__top-bar-container-inner">
+              {/* Logo */}
+              <motion.div 
+                className="hero__top-bar-logo"
+              animate={{
+                scale: isScrolled ? 0.85 : 1,
+                fontSize: isScrolled ? '0.875rem' : '1.25rem'
+              }}
+              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <AnimatePresence mode="wait">
+                {isScrolled ? (
+                  <motion.span
+                    key="compact"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    FleetPrivée
+                  </motion.span>
+                ) : (
+                  <motion.span
+                    key="full"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    FleetPrivée
+                  </motion.span>
+                )}
+              </AnimatePresence>
+            </motion.div>
 
-        {/* Image principale avec arrondis en haut */}
-        <div className="hero__image-container">
-          <img 
-            src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg"
-            alt="Mercedes S-Class"
-            className="hero__main-image"
-          />
-          
-          {/* Badge 2018-2026 */}
-          <div className="hero__year-badge">2018-2026</div>
-          
-          {/* Dégradé en bas */}
-          <div className="hero__image-overlay"></div>
-          
-          {/* Texte principal */}
-          <div className="hero__main-text">
-            <h1 className="hero__main-title">
-              Transport d'Excellence avec chauffeur privé à disposition
-            </h1>
-          </div>
-          
-          {/* Container pour bouton */}
-          <div className="hero__cta-wrapper">
-            <div className="hero__cta-container">
-              <button className="hero__cta-button" onClick={openWizard}>
-                <span className="hero__cta-button-text">Book a ride</span>
-                <div className="hero__cta-button-icon">
-                  <ArrowRight size={20} />
-                </div>
-              </button>
-            </div>
-          </div>
-        </div>
+            {/* Menu Navigation Desktop */}
+            <nav className="hero__top-bar-menu">
+              <a 
+                href="#about" 
+                className="hero__top-bar-link"
+                onClick={(e) => { e.preventDefault(); scrollToSection('about'); }}
+              >
+                À Propos
+              </a>
+              <a 
+                href="#fleet" 
+                className="hero__top-bar-link"
+                onClick={(e) => { e.preventDefault(); scrollToSection('fleet'); }}
+              >
+                Flotte
+              </a>
+              <a 
+                href="#services" 
+                className="hero__top-bar-link"
+                onClick={(e) => { e.preventDefault(); scrollToSection('services'); }}
+              >
+                Services
+              </a>
+              <a 
+                href="#airports" 
+                className="hero__top-bar-link"
+                onClick={(e) => { e.preventDefault(); scrollToSection('airports'); }}
+              >
+                Aéroports
+              </a>
+            </nav>
 
-        {/* Drapeaux de langues qui défilent */}
-        <div className="hero__languages">
-          <div className="hero__languages-track">
-            {[...languages, ...languages, ...languages].map((lang, index) => (
-              <div key={index} className="hero__language-flag">
-                {lang.flag}
+            {/* Menu Hamburger Mobile */}
+            <button 
+              className="hero__top-bar-hamburger"
+              onClick={() => setHeroMenuExpanded(!heroMenuExpanded)}
+              aria-label="Menu"
+            >
+              <div className="hero__top-bar-hamburger-icon">
+                <span className={`hero__top-bar-hamburger-line ${heroMenuExpanded ? 'is-open' : ''}`}></span>
+                <span className={`hero__top-bar-hamburger-line ${heroMenuExpanded ? 'is-open' : ''}`}></span>
+                <span className={`hero__top-bar-hamburger-line ${heroMenuExpanded ? 'is-open' : ''}`}></span>
               </div>
-            ))}
+            </button>
+
+            {/* Bouton Réservation Rapide - Apparaît quand scrolled */}
+            <AnimatePresence>
+              {isScrolled && (
+                <motion.div
+                  className="hero__top-bar-cta"
+                  initial={{ opacity: 0, scale: 0.8, x: 20 }}
+                  animate={{ opacity: 1, scale: 1, x: 0 }}
+                  exit={{ opacity: 0, scale: 0.8, x: 20 }}
+                  transition={{ duration: 0.3, delay: 0.1 }}
+                >
+                  <motion.button 
+                    className="hero__top-bar-cta-btn" 
+                    onClick={() => { openWizard(); }}
+                    whileHover={{ scale: 1.05, y: -2 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <ArrowRight size={16} />
+                    <span>Réserver</span>
+                  </motion.button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            </div>
+
+            {/* Menu Mobile Expanded Hero - Se déroule depuis la barre */}
+            <AnimatePresence>
+              {heroMenuExpanded && (
+                <motion.div 
+                  className="hero__top-bar-expanded"
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <div className="hero__top-bar-expanded-content">
+                    <a 
+                      href="#about" 
+                      className="hero__top-bar-expanded-link"
+                      onClick={(e) => { e.preventDefault(); scrollToSection('about'); setHeroMenuExpanded(false); }}
+                    >
+                      À Propos
+                    </a>
+                    <a 
+                      href="#fleet" 
+                      className="hero__top-bar-expanded-link"
+                      onClick={(e) => { e.preventDefault(); scrollToSection('fleet'); setHeroMenuExpanded(false); }}
+                    >
+                      Flotte
+                    </a>
+                    <a 
+                      href="#services" 
+                      className="hero__top-bar-expanded-link"
+                      onClick={(e) => { e.preventDefault(); scrollToSection('services'); setHeroMenuExpanded(false); }}
+                    >
+                      Services
+                    </a>
+                    <a 
+                      href="#airports" 
+                      className="hero__top-bar-expanded-link"
+                      onClick={(e) => { e.preventDefault(); scrollToSection('airports'); setHeroMenuExpanded(false); }}
+                    >
+                      Aéroports
+                    </a>
+                    <button 
+                      className="hero__top-bar-expanded-link hero__top-bar-expanded-link--cta"
+                      onClick={() => { openWizard(); setHeroMenuExpanded(false); }}
+                    >
+                      Réserver
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        </motion.div>
+
+        <div className="hero__container">
+          {/* Image de fond avec overlay */}
+          <motion.div 
+            className="hero__image-wrapper"
+            initial={{ scale: 1.1, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+          >
+          <img 
+            src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" 
+            alt="Mercedes S-Class" 
+              className="hero__background-image"
+            />
+            <div className="hero__image-overlay"></div>
+          </motion.div>
+
+          {/* Contenu principal */}
+          <div className="hero__content">
+            {/* Titre principal */}
+            <motion.div 
+              className="hero__title-wrapper"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+            >
+              <div className="hero__label-wrapper">
+                <motion.p 
+                  className="hero__label"
+                  initial={{ 
+                    clipPath: 'polygon(24px 0%, 24px 0%, 24px 100%, 24px 100%)',
+                    opacity: 0
+                  }}
+                  animate={{ 
+                    clipPath: 'polygon(24px 0%, 100% 0%, 100% 100%, 24px 100%)',
+                    opacity: 1
+                  }}
+                  transition={{ 
+                    clipPath: { duration: 1.4, delay: 0.8, ease: [0.22, 1, 0.36, 1] },
+                    opacity: { duration: 0.8, delay: 0.9, ease: 'easeOut' }
+                  }}
+                >
+                  chauffeur vip
+                </motion.p>
+              </div>
+              <h1 className="hero__title">
+                Transport d'Excellence
+              </h1>
+              <p className="hero__subtitle">
+                Service premium de transport avec chauffeur privé. Élégance, discrétion et ponctualité pour tous vos déplacements d'exception.
+              </p>
+            </motion.div>
+
+            {/* CTA Section */}
+            <motion.div 
+              className="hero__cta-section"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.5 }}
+            >
+              <motion.button 
+                className="hero__cta-button" 
+                onClick={openWizard}
+                whileHover={{ scale: 1.02, y: -2 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <span className="hero__cta-text">Réserver un Chauffeur</span>
+                <ArrowRight size={20} />
+              </motion.button>
+            </motion.div>
           </div>
         </div>
-      </section>
+
+        </section>
 
       {/* Section À Propos */}
       <section id="about" className="about">
@@ -468,46 +701,121 @@ function App() {
           <div className="about__header-content">
             <span className="about__number">01</span>
             <h2 className="about__title">À Propos</h2>
-          </div>
+                </div>
           <p className="about__description">
             Excellence et discrétion depuis 2018
           </p>
-        </div>
+                    </div>
 
         <div className="about__content">
           <div className="about__text">
             <p className="about__paragraph">
-              FleetPrivée incarne l'excellence du transport privé avec chauffeur. 
-              Depuis 2018, nous offrons une expérience de mobilité haut de gamme, 
-              alliant confort, sécurité et discrétion absolue.
+              FleetPrivée est votre partenaire de confiance pour tous vos déplacements d'exception. 
+              Depuis 2018, nous avons perfectionné l'art du transport privé avec chauffeur, 
+              offrant une expérience sur-mesure qui allie élégance, ponctualité et discrétion absolue.
             </p>
-            <p className="about__paragraph">
-              Notre flotte de véhicules premium, sélectionnés avec soin, 
-              et nos chauffeurs professionnels certifiés garantissent un service 
-              irréprochable pour chaque trajet, qu'il s'agisse d'un transfert 
-              aéroport, d'un déplacement professionnel ou d'une occasion spéciale.
-            </p>
+            
+            <div className="about__qualities">
+              <div className="about__quality">
+                <div className="about__quality-icon">
+                  <Star size={24} />
+                </div>
+                <div className="about__quality-text">
+                  <h3 className="about__quality-title">Excellence</h3>
+                  <p className="about__quality-description">Service premium de qualité</p>
+                </div>
+              </div>
+              
+              <div className="about__quality">
+                <div className="about__quality-icon">
+                  <Clock size={24} />
+                </div>
+                <div className="about__quality-text">
+                  <h3 className="about__quality-title">Ponctualité</h3>
+                  <p className="about__quality-description">Respect des horaires garantis</p>
+                </div>
+              </div>
+              
+              <div className="about__quality">
+                <div className="about__quality-icon">
+                  <Shield size={24} />
+                </div>
+                <div className="about__quality-text">
+                  <h3 className="about__quality-title">Discrétion</h3>
+                  <p className="about__quality-description">Confidentialité absolue</p>
+                </div>
+              </div>
+              
+              <div className="about__quality">
+                <div className="about__quality-icon">
+                  <Award size={24} />
+                </div>
+                <div className="about__quality-text">
+                  <h3 className="about__quality-title">Prestige</h3>
+                  <p className="about__quality-description">Expérience haut de gamme</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="about__image-wrapper">
+            <img 
+              src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg"
+              alt="FleetPrivée - Service premium de transport"
+              className="about__image"
+              loading="lazy"
+            />
           </div>
 
           <div className="about__stats">
-            <div className="about__stat">
-              <div className="about__stat-number">6+</div>
-              <div className="about__stat-label">Années d'expérience</div>
-            </div>
-            <div className="about__stat">
-              <div className="about__stat-number">1000+</div>
-              <div className="about__stat-label">Clients satisfaits</div>
-            </div>
-            <div className="about__stat">
+            <motion.div 
+              className="about__stat"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
+              <div className="about__stat-number">
+                <AnimatedCounter value={6} suffix="+" />
+                </div>
+              <div className="about__stat-label">Années d'excellence</div>
+            </motion.div>
+            <motion.div 
+              className="about__stat"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              <div className="about__stat-number">
+                <AnimatedCounter value={2500} suffix="+" />
+                    </div>
+              <div className="about__stat-label">Clients fidèles</div>
+            </motion.div>
+            <motion.div 
+              className="about__stat"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
               <div className="about__stat-number">24/7</div>
-              <div className="about__stat-label">Disponibilité</div>
-            </div>
-            <div className="about__stat">
-              <div className="about__stat-number">100%</div>
-              <div className="about__stat-label">Satisfaction</div>
-            </div>
-          </div>
-        </div>
+              <div className="about__stat-label">Service disponible</div>
+            </motion.div>
+            <motion.div 
+              className="about__stat"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
+              <div className="about__stat-number">
+                <AnimatedCounter value={98} suffix="%" />
+                  </div>
+              <div className="about__stat-label">Taux de satisfaction</div>
+            </motion.div>
+                </div>
+              </div>
       </section>
 
       {/* Section Flotte - Style Rimac Automobili */}
@@ -516,20 +824,25 @@ function App() {
           <div className="fleet__header-content">
             <span className="fleet__number">02</span>
             <h2 className="fleet__title">Notre Flotte</h2>
-          </div>
+                </div>
           <p className="fleet__description">
-            Sélection de véhicules premium pour chaque occasion
+            Découvrez notre collection exclusive de véhicules premium, chacun sélectionné pour répondre à vos besoins spécifiques. De la berline d'affaires à la limousine de prestige, chaque modèle incarne l'excellence du transport privé.
           </p>
-        </div>
+                    </div>
 
         <div className="fleet__grid">
           {vehicles.map((vehicle, index) => {
             const currentSlide = activeFleetSlide[vehicle.id] || 0
             
             return (
-              <div 
+              <motion.div 
                 key={vehicle.id}
                 className="fleet__card"
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-100px' }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                whileHover={{ y: -8 }}
               >
                 {/* Zone image avec slider */}
                 <div className="fleet__card-image-wrapper">
@@ -591,29 +904,29 @@ function App() {
                             aria-label={`Image ${dotIndex + 1}`}
                           />
                         ))}
-                      </div>
-                    )}
                   </div>
+                    )}
                 </div>
-                
+              </div>
+
                 {/* Contenu de la carte */}
                 <div className="fleet__card-body">
                   <div className="fleet__card-header">
                     <h3 className="fleet__card-title">{vehicle.name}</h3>
                     <p className="fleet__card-subtitle">{vehicle.description}</p>
-                  </div>
+                </div>
                   
                   <div className="fleet__card-footer">
                     <div className="fleet__card-specs">
                       <div className="fleet__card-spec">
                         <Users size={14} />
                         <span>{vehicle.specs.passengers}</span>
-                      </div>
+                    </div>
                       <div className="fleet__card-spec">
                         <Package size={14} />
                         <span>{vehicle.specs.luggage}</span>
-                      </div>
-                    </div>
+                  </div>
+                </div>
                     
                     <button 
                       className="fleet__card-info-btn"
@@ -626,7 +939,7 @@ function App() {
                       }}
                     >
                       +info
-                    </button>
+                      </button>
                     
                     {expandedVehicleDetails[vehicle.id] && (
                       <div className="fleet__card-details">
@@ -634,16 +947,16 @@ function App() {
                           <div className="fleet__card-details-item">
                             <span className="fleet__card-details-label">Puissance</span>
                             <span className="fleet__card-details-value">{vehicle.specs.power}</span>
-                          </div>
+                    </div>
                           <div className="fleet__card-details-item">
                             <span className="fleet__card-details-label">Chevaux</span>
                             <span className="fleet__card-details-value">{vehicle.specs.horsepower} ch</span>
-                          </div>
+                  </div>
                           <div className="fleet__card-details-item">
                             <span className="fleet__card-details-label">Vitesse max</span>
                             <span className="fleet__card-details-value">{vehicle.specs.speed}</span>
-                          </div>
-                        </div>
+                      </div>
+                      </div>
                       </div>
                     )}
                     
@@ -658,12 +971,12 @@ function App() {
                       Choisir ce véhicule
                       <ArrowRight size={18} />
                     </button>
-                  </div>
-                </div>
-              </div>
+                      </div>
+                      </div>
+              </motion.div>
             )
           })}
-        </div>
+                      </div>
       </section>
 
       {/* Section Transferts Aéroport */}
@@ -672,36 +985,54 @@ function App() {
           <div className="airports__header-content">
             <span className="airports__number">03</span>
             <h2 className="airports__title">Transferts Aéroport</h2>
-          </div>
+                    </div>
           <p className="airports__description">
-            Service premium vers tous les aéroports parisiens
+            Transferts aéroport haut de gamme vers CDG, Orly et Le Bourget. Accueil personnalisé, suivi en temps réel et service VIP pour un voyage sans stress.
           </p>
-        </div>
+                </div>
 
-        <div className="airports__grid">
-          {airports.map((airport) => (
-            <div 
-              key={airport.id}
-              className="airports__card"
-              onClick={() => {
-                const route = routes.find(r => r.to === airport.code || r.id === airport.id.toLowerCase().replace('-', '_'))
-                if (route) {
-                  updateBookingData('route', route)
-                  openWizard()
-                }
-              }}
-            >
-              <div className="airports__icon">
-                <Plane size={32} />
-              </div>
-              <div className="airports__content">
-                <h3 className="airports__name">{airport.name}</h3>
-                <p className="airports__code">{airport.code}</p>
-                <p className="airports__duration">{airport.duration}</p>
-              </div>
-            </div>
-          ))}
-        </div>
+          <div className="airports__grid">
+           {airports.map((airport, index) => (
+               <motion.div 
+                 key={airport.id}
+                 className="airports__card"
+                 initial={{ opacity: 0, y: 50 }}
+                 whileInView={{ opacity: 1, y: 0 }}
+                 viewport={{ once: true, margin: '-100px' }}
+                 transition={{ duration: 0.6, delay: index * 0.1 }}
+                 whileHover={{ y: -8 }}
+                  onClick={() => {
+                   openWizard()
+                 }}
+               >
+                 <div className="airports__card-image-wrapper">
+                   <div className="airports__card-image-container">
+                     <div className="airports__card-image" style={{ backgroundImage: `url('https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg')` }}></div>
+                     <div className="airports__icon">
+                       <Plane size={40} />
+                          </div>
+                        </div>
+                      </div>
+                 
+                 <div className="airports__card-body">
+                   <div className="airports__card-header">
+                     <h3 className="airports__card-title">{airport.name}</h3>
+                     <p className="airports__card-code">{airport.code}</p>
+                    </div>
+                   
+                   <div className="airports__card-footer">
+                     <div className="airports__card-duration">
+                       <span>{airport.duration}</span>
+                  </div>
+                     <button className="airports__card-cta">
+                       Réserver
+                       <ArrowRight size={18} />
+                     </button>
+                      </div>
+                      </div>
+               </motion.div>
+           ))}
+                      </div>
       </section>
 
       {/* Section Avis Clients */}
@@ -710,11 +1041,11 @@ function App() {
           <div className="testimonials__header-content">
             <span className="testimonials__number">04</span>
             <h2 className="testimonials__title">Avis Clients</h2>
-          </div>
+                      </div>
           <p className="testimonials__description">
-            Ce que nos clients VIP disent de notre service
+            La satisfaction de nos clients est notre priorité. Découvrez les témoignages de ceux qui nous font confiance pour leurs déplacements d'exception.
           </p>
-        </div>
+                </div>
 
         <div className="testimonials__container">
           <div className="testimonials__slider">
@@ -727,15 +1058,15 @@ function App() {
                   {[...Array(testimonial.rating)].map((_, i) => (
                     <Star key={i} size={16} fill="currentColor" />
                   ))}
-                </div>
+                          </div>
                 <p className="testimonial__text">"{testimonial.text}"</p>
                 <div className="testimonial__author">
                   <div className="testimonial__name">{testimonial.name}</div>
                   <div className="testimonial__role">{testimonial.role}</div>
-                </div>
-              </div>
+                        </div>
+                      </div>
             ))}
-          </div>
+                    </div>
           <div className="testimonials__nav">
             {testimonials.map((_, index) => (
               <button
@@ -745,81 +1076,83 @@ function App() {
                 aria-label={`Avis ${index + 1}`}
               />
             ))}
-          </div>
-        </div>
+                  </div>
+                      </div>
       </section>
 
-      {/* Section Itinéraires - Catalogue de Voyage Privé */}
-      <section id="routes" className="routes">
-        <div className="routes__header">
-          <div className="routes__header-content">
-            <span className="routes__number">05</span>
-            <h2 className="routes__title">Itinéraires</h2>
-          </div>
-          <p className="routes__description">
-            Destinations premium sélectionnées pour votre confort
+      {/* Section Services - Prestations Premium */}
+      <section id="services" className="services">
+        <div className="services__header">
+          <div className="services__header-content">
+            <span className="services__number">05</span>
+            <h2 className="services__title">Nos Services</h2>
+                      </div>
+          <p className="services__description">
+            Découvrez notre gamme complète de services premium, conçus pour répondre à tous vos besoins de transport avec chauffeur privé.
           </p>
-        </div>
+                      </div>
 
-        <div className="routes__catalog">
-          {routes.map((route) => {
-            const isSelected = cart.route?.id === route.id
-            
-            return (
-              <div
-                key={route.id}
-                className={`routes__item ${isSelected ? 'is-selected' : ''}`}
-                onClick={() => {
-                  if (isSelected) {
-                    removeFromCart('route')
-                  } else {
-                    addToCart('route', route)
-                  }
-                }}
+        <div className="services__catalog">
+          {services.map((service, index) => (
+            <motion.div
+              key={service.id}
+              className="services__item"
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-100px' }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+              whileHover={{ y: -8 }}
+              onClick={() => {
+                openWizard()
+              }}
+            >
+              <div 
+                className="services__item-image"
+                style={{ backgroundImage: `url(${service.image})` }}
               >
-                <div 
-                  className="routes__item-image"
-                  style={{ backgroundImage: `url(${route.image})` }}
-                >
-                  <div className="routes__item-overlay"></div>
-                  <div className="routes__item-badge">{route.duration}</div>
-                </div>
+                <div className="services__item-overlay"></div>
+                <div className="services__item-icon">
+                  {service.icon === '✈️' && <Plane size={40} />}
+                  {service.icon === '💼' && <Briefcase size={40} />}
+                  {service.icon === '💍' && <Heart size={40} />}
+                  {service.icon === '⭐' && <Sparkles size={40} />}
+                      </div>
+                      </div>
+              
+              <div className="services__item-content">
+                <div className="services__item-header">
+                  <h3 className="services__item-title">{service.name}</h3>
+                  <p className="services__item-description">{service.description}</p>
+                      </div>
                 
-                <div className="routes__item-content">
-                  <div className="routes__item-route">
-                    <span className="routes__item-from">{route.from}</span>
-                    <ArrowRight className="routes__item-arrow" size={20} />
-                    <span className="routes__item-to">{route.to}</span>
-                  </div>
-                  
-                  <div className="routes__item-services">
-                    {route.services.slice(0, 2).map((service, idx) => (
-                      <span key={idx} className="routes__item-service">{service}</span>
-                    ))}
-                  </div>
-                  
-                  <div className="routes__item-footer">
-                    <span className="routes__item-price">{route.price}</span>
-                    <div className={`routes__item-check ${isSelected ? 'is-checked' : ''}`}>
-                      {isSelected ? <X size={16} /> : <Plus size={16} />}
+                <div className="services__item-features">
+                  {service.features.map((feature, idx) => (
+                    <div key={idx} className="services__item-feature">
+                      <span className="services__item-feature-dot"></span>
+                      <span className="services__item-feature-text">{feature}</span>
                     </div>
+                  ))}
                   </div>
+                
+                <button className="services__item-cta">
+                  Découvrir
+                  <ArrowRight size={18} />
+                </button>
                 </div>
+            </motion.div>
+          ))}
               </div>
-            )
-          })}
-        </div>
       </section>
 
       {/* Panier Flottant Minimaliste */}
-      {(cart.vehicle || cart.route) && (
+      {cart.vehicle && (
         <div className="cart">
           <div className="cart__content">
             {cart.vehicle && (
               <div className="cart__item">
                 <span className="cart__item-label">Véhicule</span>
                 <span className="cart__item-value">{cart.vehicle.name}</span>
-                <button
+                <button 
                   className="cart__item-remove"
                   onClick={() => removeFromCart('vehicle')}
                   aria-label="Retirer le véhicule"
@@ -828,37 +1161,43 @@ function App() {
                 </button>
               </div>
             )}
-            {cart.route && (
-              <div className="cart__item">
-                <span className="cart__item-label">Itinéraire</span>
-                <span className="cart__item-value">{cart.route.from} → {cart.route.to}</span>
-                <button
-                  className="cart__item-remove"
-                  onClick={() => removeFromCart('route')}
-                  aria-label="Retirer l'itinéraire"
-                >
-                  <X size={14} />
-                </button>
-              </div>
-            )}
-            <button className="cart__confirm">
+            <button className="cart__confirm" onClick={openWizard}>
               Réserver
               <ArrowRight size={16} />
             </button>
+            </div>
           </div>
-        </div>
       )}
 
       {/* BookingWizard Overlay */}
-      {wizardOpen && (
-        <div className="booking-wizard">
-          <div className="booking-wizard__backdrop" onClick={closeWizard}></div>
-          <div className="booking-wizard__container">
+      <AnimatePresence>
+        {wizardOpen && (
+          <motion.div 
+            className="booking-wizard"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <motion.div 
+              className="booking-wizard__backdrop" 
+              onClick={closeWizard}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            ></motion.div>
+            <motion.div 
+              className="booking-wizard__container"
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            >
             {/* Header avec progression */}
             <div className="booking-wizard__header">
               <button className="booking-wizard__close" onClick={closeWizard}>
                 <X size={24} />
-              </button>
+                  </button>
               <div className="booking-wizard__progress">
                 {[1, 2, 3, 4, 5].map((step) => (
                   <div
@@ -872,19 +1211,27 @@ function App() {
               </div>
               <div className="booking-wizard__step-indicator">
                 Étape {currentStep} sur 5
+                </div>
               </div>
-            </div>
 
             {/* Contenu des étapes */}
             <div className="booking-wizard__content">
-              {/* Étape 1 : Sélection Véhicule */}
-              {currentStep === 1 && (
-                <div className="booking-wizard__step">
+              <AnimatePresence mode="wait">
+                {/* Étape 1 : Sélection Véhicule */}
+                {currentStep === 1 && (
+                  <motion.div 
+                    key="step1"
+                    className="booking-wizard__step"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.3 }}
+                  >
                   <h2 className="booking-wizard__step-title">Choisissez votre véhicule</h2>
                   <p className="booking-wizard__step-subtitle">Combien de bagages transportez-vous ?</p>
                   
                   <div className="booking-wizard__luggage-input">
-                    <input
+                    <input 
                       type="number"
                       min="0"
                       max="10"
@@ -900,7 +1247,7 @@ function App() {
                       <span className="booking-wizard__recommendation-text">
                         Recommandation IA : {bookingData.luggage <= 2 ? 'Berline' : bookingData.luggage <= 4 ? 'SUV' : 'Van'}
                       </span>
-                    </div>
+                  </div>
                   )}
 
                   <div className="booking-wizard__vehicles">
@@ -922,9 +1269,9 @@ function App() {
                             {recommended && (
                               <div className="booking-wizard__vehicle-badge">
                                 SÉLECTION IA
-                              </div>
+                  </div>
                             )}
-                          </div>
+                </div>
                           <div className="booking-wizard__vehicle-content">
                             <h3 className="booking-wizard__vehicle-name">{vehicle.name}</h3>
                             <p className="booking-wizard__vehicle-tagline">{vehicle.tagline}</p>
@@ -939,94 +1286,116 @@ function App() {
                       )
                     })}
                   </div>
-                </div>
-              )}
+                  </motion.div>
+                )}
 
-              {/* Étape 2 : Sélection Itinéraire */}
-              {currentStep === 2 && (
-                <div className="booking-wizard__step">
-                  <h2 className="booking-wizard__step-title">Choisissez votre itinéraire</h2>
-                  <p className="booking-wizard__step-subtitle">Sélectionnez une destination ou créez un trajet personnalisé</p>
+                {/* Étape 2 : Sélection Service */}
+                {currentStep === 2 && (
+                  <motion.div 
+                    key="step2"
+                    className="booking-wizard__step"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                  <h2 className="booking-wizard__step-title">Choisissez votre service</h2>
+                  <p className="booking-wizard__step-subtitle">Sélectionnez le service qui correspond à vos besoins</p>
                   
-                  <div className="booking-wizard__routes">
-                    {routes.map((route) => {
-                      const isSelected = bookingData.route?.id === route.id
+                  <div className="booking-wizard__services">
+                    {services.map((service) => {
+                      const isSelected = bookingData.service?.id === service.id
                       
                       return (
                         <div
-                          key={route.id}
-                          className={`booking-wizard__route-card ${isSelected ? 'is-selected' : ''}`}
-                          onClick={() => updateBookingData('route', route)}
+                          key={service.id}
+                          className={`booking-wizard__service-card ${isSelected ? 'is-selected' : ''}`}
+                          onClick={() => updateBookingData('service', service)}
                         >
                           <div 
-                            className="booking-wizard__route-image"
-                            style={{ backgroundImage: `url(${route.image})` }}
+                            className="booking-wizard__service-image"
+                            style={{ backgroundImage: `url(${service.image})` }}
                           >
-                            <div className="booking-wizard__route-overlay"></div>
-                            <div className="booking-wizard__route-badge">{route.duration}</div>
-                          </div>
-                          <div className="booking-wizard__route-content">
-                            <div className="booking-wizard__route-route">
-                              <span>{route.from}</span>
-                              <ArrowRight size={18} />
-                              <span>{route.to}</span>
-                            </div>
-                            <div className="booking-wizard__route-price">{route.price}</div>
-                          </div>
+                            <div className="booking-wizard__service-overlay"></div>
+                            <div className="booking-wizard__service-icon">
+                              {service.icon === '✈️' && <Plane size={32} />}
+                              {service.icon === '💼' && <Briefcase size={32} />}
+                              {service.icon === '💍' && <Heart size={32} />}
+                              {service.icon === '⭐' && <Sparkles size={32} />}
+              </div>
+            </div>
+                          <div className="booking-wizard__service-content">
+                            <h3 className="booking-wizard__service-name">{service.name}</h3>
+                            <p className="booking-wizard__service-description">{service.description}</p>
+          </div>
                         </div>
                       )
                     })}
                   </div>
-                </div>
-              )}
+                  </motion.div>
+                )}
 
-              {/* Étape 3 : Date & Heure */}
-              {currentStep === 3 && (
-                <div className="booking-wizard__step">
+                {/* Étape 3 : Date & Heure */}
+                {currentStep === 3 && (
+                  <motion.div 
+                    key="step3"
+                    className="booking-wizard__step"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.3 }}
+                  >
                   <h2 className="booking-wizard__step-title">Date et heure</h2>
                   <p className="booking-wizard__step-subtitle">Quand souhaitez-vous être pris en charge ?</p>
                   
                   <div className="booking-wizard__datetime">
                     <div className="booking-wizard__field">
                       <label className="booking-wizard__label">Date</label>
-                      <input
-                        type="date"
+                <input 
+                  type="date" 
                         value={bookingData.date}
                         onChange={(e) => updateBookingData('date', e.target.value)}
-                        min={new Date().toISOString().split('T')[0]}
+                  min={new Date().toISOString().split('T')[0]}
                         className="booking-wizard__input"
-                      />
-                    </div>
+                />
+              </div>
                     <div className="booking-wizard__field">
                       <label className="booking-wizard__label">Heure</label>
-                      <input
-                        type="time"
+                <input 
+                  type="time" 
                         value={bookingData.time}
                         onChange={(e) => updateBookingData('time', e.target.value)}
                         className="booking-wizard__input"
-                      />
-                    </div>
+                />
+              </div>
                   </div>
-                </div>
-              )}
+                  </motion.div>
+                )}
 
-              {/* Étape 4 : Informations Passager */}
-              {currentStep === 4 && (
-                <div className="booking-wizard__step">
+                {/* Étape 4 : Informations Passager */}
+                {currentStep === 4 && (
+                  <motion.div 
+                    key="step4"
+                    className="booking-wizard__step"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.3 }}
+                  >
                   <h2 className="booking-wizard__step-title">Vos informations</h2>
                   <p className="booking-wizard__step-subtitle">Nous avons besoin de quelques détails pour finaliser votre réservation</p>
                   
                   <div className="booking-wizard__form">
                     <div className="booking-wizard__field">
                       <label className="booking-wizard__label">Prénom</label>
-                      <input
-                        type="text"
+                <input 
+                  type="text" 
                         value={bookingData.passenger.firstName}
                         onChange={(e) => updateBookingData('passenger.firstName', e.target.value)}
                         placeholder="Votre prénom"
                         className="booking-wizard__input"
-                      />
-                    </div>
+                />
+              </div>
                     <div className="booking-wizard__field">
                       <label className="booking-wizard__label">Nom</label>
                       <input
@@ -1039,41 +1408,48 @@ function App() {
                     </div>
                     <div className="booking-wizard__field">
                       <label className="booking-wizard__label">Téléphone</label>
-                      <input
-                        type="tel"
+                <input 
+                  type="tel" 
                         value={bookingData.passenger.phone}
                         onChange={(e) => updateBookingData('passenger.phone', e.target.value)}
-                        placeholder="+33 6 12 34 56 78"
+                  placeholder="+33 6 12 34 56 78" 
                         className="booking-wizard__input"
-                      />
-                    </div>
+                />
+              </div>
                     <div className="booking-wizard__field">
                       <label className="booking-wizard__label">Email</label>
-                      <input
-                        type="email"
+                <input 
+                  type="email" 
                         value={bookingData.passenger.email}
                         onChange={(e) => updateBookingData('passenger.email', e.target.value)}
-                        placeholder="votre@email.com"
+                  placeholder="votre@email.com" 
                         className="booking-wizard__input"
-                      />
-                    </div>
+                />
+              </div>
                     <div className="booking-wizard__field">
                       <label className="booking-wizard__label">Demandes spéciales (optionnel)</label>
-                      <textarea
+                <textarea 
                         value={bookingData.passenger.specialRequests}
                         onChange={(e) => updateBookingData('passenger.specialRequests', e.target.value)}
                         placeholder="Siège enfant, champagne, etc."
                         className="booking-wizard__textarea"
-                        rows="3"
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
+                  rows="3" 
+                />
+              </div>
+              </div>
+                  </motion.div>
+                )}
 
-              {/* Étape 5 : Récapitulatif */}
-              {currentStep === 5 && (
-                <div className="booking-wizard__step">
+                {/* Étape 5 : Récapitulatif */}
+                {currentStep === 5 && (
+                  <motion.div 
+                    key="step5"
+                    className="booking-wizard__step"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.3 }}
+                  >
                   <h2 className="booking-wizard__step-title">Récapitulatif</h2>
                   <p className="booking-wizard__step-subtitle">Vérifiez les détails de votre réservation</p>
                   
@@ -1081,21 +1457,21 @@ function App() {
                     <div className="booking-wizard__summary-item">
                       <span className="booking-wizard__summary-label">Véhicule</span>
                       <span className="booking-wizard__summary-value">{bookingData.vehicle?.name || 'Non sélectionné'}</span>
-                    </div>
+                      </div>
                     <div className="booking-wizard__summary-item">
-                      <span className="booking-wizard__summary-label">Itinéraire</span>
+                      <span className="booking-wizard__summary-label">Service</span>
                       <span className="booking-wizard__summary-value">
-                        {bookingData.route ? `${bookingData.route.from} → ${bookingData.route.to}` : 'Non sélectionné'}
+                        {bookingData.service?.name || 'Non sélectionné'}
                       </span>
-                    </div>
+                      </div>
                     <div className="booking-wizard__summary-item">
                       <span className="booking-wizard__summary-label">Date</span>
                       <span className="booking-wizard__summary-value">{bookingData.date || 'Non renseigné'}</span>
-                    </div>
+                      </div>
                     <div className="booking-wizard__summary-item">
                       <span className="booking-wizard__summary-label">Heure</span>
                       <span className="booking-wizard__summary-value">{bookingData.time || 'Non renseigné'}</span>
-                    </div>
+                      </div>
                     <div className="booking-wizard__summary-item">
                       <span className="booking-wizard__summary-label">Bagages</span>
                       <span className="booking-wizard__summary-value">{bookingData.luggage || 0}</span>
@@ -1113,9 +1489,10 @@ function App() {
                       </span>
                     </div>
                   </div>
-                </div>
-              )}
-            </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+                  </div>
 
             {/* Navigation */}
             <div className="booking-wizard__navigation">
@@ -1123,84 +1500,189 @@ function App() {
                 <button className="booking-wizard__btn booking-wizard__btn--secondary" onClick={prevStep}>
                   <ChevronLeft size={20} />
                   Précédent
-                </button>
+                      </button>
               )}
               <div className="booking-wizard__navigation-spacer"></div>
               {currentStep < 5 ? (
-                <button 
+                      <button 
                   className="booking-wizard__btn booking-wizard__btn--primary" 
                   onClick={nextStep}
                   disabled={
                     (currentStep === 1 && !bookingData.vehicle) ||
-                    (currentStep === 2 && !bookingData.route) ||
+                    (currentStep === 2 && !bookingData.service) ||
                     (currentStep === 3 && (!bookingData.date || !bookingData.time))
                   }
                 >
                   Suivant
                   <ArrowRight size={20} />
-                </button>
+                      </button>
               ) : (
-                <button 
+                      <button 
                   className="booking-wizard__btn booking-wizard__btn--primary" 
                   onClick={handleConfirmBooking}
-                >
+                      >
                   Confirmer la réservation
                   <ArrowRight size={20} />
-                </button>
+                      </button>
               )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Footer Minimaliste avec FAQ */}
-      <footer className="footer">
-        <div className="footer__content">
-          {/* FAQ Section */}
-          <div className="footer__faq">
-            <h3 className="footer__faq-title">Questions Fréquentes</h3>
-            <div className="footer__faq-list">
-              {faqs.map((faq) => (
-                <div 
-                  key={faq.id}
-                  className={`footer__faq-item ${openFAQ === faq.id ? 'is-open' : ''}`}
-                >
-                  <button
-                    className="footer__faq-question"
-                    onClick={() => setOpenFAQ(openFAQ === faq.id ? null : faq.id)}
-                  >
-                    <span>{faq.question}</span>
-                    <ChevronDown 
-                      className={`footer__faq-icon ${openFAQ === faq.id ? 'is-open' : ''}`}
-                      size={20}
-                    />
-                  </button>
-                  {openFAQ === faq.id && (
-                    <div className="footer__faq-answer">
-                      <p>{faq.answer}</p>
                     </div>
-                  )}
-                </div>
-              ))}
-            </div>
+          </motion.div>
+        </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Footer Moderne 2026 */}
+      <motion.footer 
+        className="footer"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true, margin: '-100px' }}
+        transition={{ duration: 0.6 }}
+      >
+        <div className="footer__container">
+          {/* Section principale */}
+          <div className="footer__main">
+            {/* Brand & Description */}
+            <motion.div 
+              className="footer__brand"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+            >
+              <h3 className="footer__brand-name">FleetPrivée</h3>
+              <p className="footer__brand-tagline">Transport d'Excellence depuis 2018</p>
+              <p className="footer__brand-description">
+                Service premium de transport avec chauffeur privé. Élégance, discrétion et ponctualité pour tous vos déplacements d'exception.
+              </p>
+            </motion.div>
+
+            {/* Navigation Links */}
+            <motion.div 
+              className="footer__nav"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <h4 className="footer__nav-title">Navigation</h4>
+              <ul className="footer__nav-list">
+                <li><a href="#hero" onClick={(e) => { e.preventDefault(); scrollToSection('hero'); }}>Accueil</a></li>
+                <li><a href="#about" onClick={(e) => { e.preventDefault(); scrollToSection('about'); }}>À Propos</a></li>
+                <li><a href="#fleet" onClick={(e) => { e.preventDefault(); scrollToSection('fleet'); }}>Flotte</a></li>
+                <li><a href="#services" onClick={(e) => { e.preventDefault(); scrollToSection('services'); }}>Services</a></li>
+                <li><a href="#airports" onClick={(e) => { e.preventDefault(); scrollToSection('airports'); }}>Aéroports</a></li>
+                <li><a href="#testimonials" onClick={(e) => { e.preventDefault(); scrollToSection('testimonials'); }}>Avis Clients</a></li>
+              </ul>
+            </motion.div>
+
+            {/* Contact Info */}
+            <motion.div 
+              className="footer__contact"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            >
+              <h4 className="footer__contact-title">Contact</h4>
+              <ul className="footer__contact-list">
+                <li>
+                  <a href="tel:+33612345678" className="footer__contact-item">
+                    <Phone size={18} />
+                    <span>+33 6 12 34 56 78</span>
+                  </a>
+                </li>
+                <li>
+                  <a href="mailto:contact@fleetprivee.com" className="footer__contact-item">
+                    <Mail size={18} />
+                    <span>contact@fleetprivee.com</span>
+                  </a>
+                </li>
+                <li>
+                  <div className="footer__contact-item">
+                    <MapPin size={18} />
+                    <span>Paris, France</span>
+                  </div>
+                </li>
+              </ul>
+            </motion.div>
+
+            {/* Social Media & CTA */}
+            <motion.div 
+              className="footer__social"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <h4 className="footer__social-title">Suivez-nous</h4>
+              <div className="footer__social-links">
+                <motion.a 
+                  href="https://instagram.com/fleetprivee" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="footer__social-link"
+                  whileHover={{ scale: 1.1, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Instagram size={20} />
+                </motion.a>
+                <motion.a 
+                  href="https://facebook.com/fleetprivee" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="footer__social-link"
+                  whileHover={{ scale: 1.1, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Facebook size={20} />
+                </motion.a>
+                <motion.a 
+                  href="https://linkedin.com/company/fleetprivee" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="footer__social-link"
+                  whileHover={{ scale: 1.1, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Linkedin size={20} />
+                </motion.a>
+              </div>
+              <motion.button 
+                className="footer__cta-button"
+                onClick={openWizard}
+                whileHover={{ scale: 1.02, y: -2 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <span>Réserver maintenant</span>
+                <ArrowRight size={18} />
+              </motion.button>
+            </motion.div>
           </div>
 
-          {/* Footer Links */}
-          <div className="footer__bottom">
-            <div className="footer__brand">FleetPrivée</div>
-            <div className="footer__links">
-              <a href="#hero">Accueil</a>
-              <a href="#fleet">Flotte</a>
-              <a href="#airports">Aéroports</a>
-              <a href="mailto:contact@fleetprivee.com">Contact</a>
-              <a href="#legal">Mentions Légales</a>
+          {/* Footer Bottom */}
+          <motion.div 
+            className="footer__bottom"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.5 }}
+          >
+            <div className="footer__bottom-content">
+              <div className="footer__copyright">
+                <p>© 2026 FleetPrivée. Tous droits réservés.</p>
+              </div>
+              <div className="footer__legal">
+                <a href="#legal">Mentions Légales</a>
+                <span className="footer__separator">•</span>
+                <a href="#privacy">Politique de Confidentialité</a>
+                <span className="footer__separator">•</span>
+                <a href="#cookies">Cookies</a>
+              </div>
             </div>
-            <div className="footer__copyright">
-              © 2024 FleetPrivée. Tous droits réservés.
-            </div>
-          </div>
+          </motion.div>
         </div>
-      </footer>
+      </motion.footer>
     </div>
   )
 }
