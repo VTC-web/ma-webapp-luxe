@@ -40,10 +40,12 @@ function App() {
   const [expandedVehicleDetails, setExpandedVehicleDetails] = useState({})
   const [openFAQ, setOpenFAQ] = useState(null)
   const [testimonialIndex, setTestimonialIndex] = useState(0)
+  const [serviceIndex, setServiceIndex] = useState(0)
   const [menuExpanded, setMenuExpanded] = useState(false)
   const heroRef = useRef(null)
   const menuRef = useRef(null)
   const hamburgerRef = useRef(null)
+  const serviceViewportRef = useRef(null)
 
   // Données
   const vehicles = [
@@ -493,60 +495,171 @@ function App() {
 
           {/* Contenu principal */}
           <div className="hero__content">
-            {/* Titre principal */}
             <motion.div 
-              className="hero__title-wrapper"
-              initial={{ opacity: 0, y: 30 }}
+              className="hero__title-block"
+              initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={springConfig}
-              viewport={{ once: true }}
             >
-              <div className="hero__label-wrapper">
-                <button className="hero__label">TRANSPORT PRIVÉ DEPUIS 2018</button>
-              </div>
+              <p className="hero__label">TRANSPORT PRIVÉ DEPUIS 2018</p>
               <h1 className="hero__title">
                 Profitez d’un confort d’exception avec FleetPrivée, chauffeur VIP à Paris.
               </h1>
             </motion.div>
 
-            {/* CTA Section */}
             <motion.div 
-              className="hero__cta-section"
-              initial={{ opacity: 0, y: 30 }}
+              className="hero__cta-wrap"
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={springConfig}
-              viewport={{ once: true }}
+              transition={{ ...springConfig, delay: 0.15 }}
             >
-              <div className="hero__cta-frame">
-                <motion.button 
-                  className="hero__cta-text-button" 
-                  onClick={openWizard}
-                  whileHover={{ opacity: 0.8 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <span className="hero__cta-text">Réserver un Chauffeur</span>
-                </motion.button>
-                <motion.button
-                  className="hero__cta-icon-button"
-                  onClick={openWizard}
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  aria-label="Ouvrir la réservation"
-                >
-                  <ArrowRight size={18} />
-                </motion.button>
-              </div>
+              <motion.button 
+                className="hero__cta" 
+                onClick={openWizard}
+                whileHover={{ scale: 1.02, y: -2 }}
+                whileTap={{ scale: 0.98 }}
+                aria-label="Réserver un chauffeur"
+              >
+                <span>Réserver un Chauffeur</span>
+                <ArrowRight size={20} strokeWidth={2.2} />
+              </motion.button>
             </motion.div>
           </div>
         </div>
 
         </section>
 
+      {/* Section Services - Prestations Premium */}
+      <section id="services" className="services">
+        <div className="services__header">
+          <p className="services__subtitle">L'excellence en mouvement</p>
+          <div className="services__header-content">
+            <span className="services__number">01</span>
+            <h2 className="services__title">Nos Services</h2>
+          </div>
+          <p className="services__description">
+            Découvrez notre gamme complète de services premium, conçus pour répondre à tous vos besoins de transport avec chauffeur privé.
+          </p>
+          <motion.button
+            className="services__header-cta"
+            onClick={openWizard}
+            whileHover={{ scale: 1.02, y: -2 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            Réserver
+            <ArrowRight size={18} />
+          </motion.button>
+        </div>
+
+        <div className="services__catalog">
+          <div
+            ref={serviceViewportRef}
+            className="services__slider-viewport"
+            onScroll={(e) => {
+              const v = e.target
+              if (v.scrollWidth <= v.clientWidth) { setServiceIndex(0); return }
+              const i = Math.round((v.scrollLeft / (v.scrollWidth - v.clientWidth)) * (services.length - 1))
+              setServiceIndex(Math.max(0, Math.min(services.length - 1, i)))
+            }}
+          >
+            <div
+              className="services__slider-track"
+              style={{ width: `${services.length * 100}%` }}
+            >
+              {services.map((service, index) => (
+                <motion.div
+                  key={service.id}
+                  className={`services__item ${index === serviceIndex ? 'is-active' : ''}`}
+                  style={{ flex: `0 0 ${100 / services.length}%` }}
+                  onClick={() => openWizard()}
+                >
+                  <div 
+                    className="services__item-image"
+                    style={{ backgroundImage: `url(${service.image})` }}
+                  >
+                    <div className="services__item-overlay"></div>
+                    <div className="services__item-icon">
+                      {service.icon === '✈️' && <Plane size={40} />}
+                      {service.icon === '💼' && <Briefcase size={40} />}
+                      {service.icon === '💍' && <Heart size={40} />}
+                      {service.icon === '⭐' && <Sparkles size={40} />}
+                    </div>
+                  </div>
+                  <div className="services__item-content">
+                    <div className="services__item-header">
+                      <h3 className="services__item-title">{service.name}</h3>
+                      <p className="services__item-description">{service.description}</p>
+                    </div>
+                    <div className="services__item-features">
+                      {service.features.map((feature, idx) => (
+                        <div key={idx} className="services__item-feature">
+                          <span className="services__item-feature-text">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+            {services.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  className="services__nav services__nav--prev"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    const next = (serviceIndex - 1 + services.length) % services.length
+                    setServiceIndex(next)
+                    const v = serviceViewportRef.current
+                    if (v) v.scrollTo({ left: next * (v.scrollWidth / services.length), behavior: 'smooth' })
+                  }}
+                  aria-label="Service précédent"
+                >
+                  <ChevronLeft size={24} />
+                </button>
+                <button
+                  type="button"
+                  className="services__nav services__nav--next"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    const next = (serviceIndex + 1) % services.length
+                    setServiceIndex(next)
+                    const v = serviceViewportRef.current
+                    if (v) v.scrollTo({ left: next * (v.scrollWidth / services.length), behavior: 'smooth' })
+                  }}
+                  aria-label="Service suivant"
+                >
+                  <ChevronRight size={24} />
+                </button>
+              </>
+            )}
+          </div>
+          {services.length > 1 && (
+            <div className="services__nav-dots">
+              {services.map((_, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  className={`services__nav-dot ${index === serviceIndex ? 'is-active' : ''}`}
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setServiceIndex(index)
+                    const v = serviceViewportRef.current
+                    if (v) v.scrollTo({ left: index * (v.scrollWidth / services.length), behavior: 'smooth' })
+                  }}
+                  aria-label={`Service ${index + 1}`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
       {/* Section À Propos */}
       <section id="about" className="about">
         <div className="about__header">
           <div className="about__header-content">
-            <span className="about__number">01</span>
+            <span className="about__number">02</span>
             <h2 className="about__title">À Propos</h2>
                 </div>
           <p className="about__description">
@@ -669,7 +782,7 @@ function App() {
       <section id="fleet" className="fleet">
         <div className="fleet__header">
           <div className="fleet__header-content">
-            <span className="fleet__number">02</span>
+            <span className="fleet__number">03</span>
             <h2 className="fleet__title">Notre Flotte</h2>
                 </div>
           <p className="fleet__description">
@@ -830,7 +943,7 @@ function App() {
       <section id="airports" className="airports">
         <div className="airports__header">
           <div className="airports__header-content">
-            <span className="airports__number">03</span>
+            <span className="airports__number">04</span>
             <h2 className="airports__title">Transferts Aéroport</h2>
                     </div>
           <p className="airports__description">
@@ -886,7 +999,7 @@ function App() {
       <section id="testimonials" className="testimonials">
         <div className="testimonials__header">
           <div className="testimonials__header-content">
-            <span className="testimonials__number">04</span>
+            <span className="testimonials__number">05</span>
             <h2 className="testimonials__title">Avis Clients</h2>
                       </div>
           <p className="testimonials__description">
@@ -925,70 +1038,6 @@ function App() {
             ))}
                   </div>
                       </div>
-      </section>
-
-      {/* Section Services - Prestations Premium */}
-      <section id="services" className="services">
-        <div className="services__header">
-          <div className="services__header-content">
-            <span className="services__number">05</span>
-            <h2 className="services__title">Nos Services</h2>
-                      </div>
-          <p className="services__description">
-            Découvrez notre gamme complète de services premium, conçus pour répondre à tous vos besoins de transport avec chauffeur privé.
-          </p>
-                      </div>
-
-        <div className="services__catalog">
-          {services.map((service, index) => (
-            <motion.div
-              key={service.id}
-              className="services__item"
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-100px' }}
-              transition={{ ...springConfig, delay: index * 0.1 }}
-              whileHover={{ y: -8 }}
-              onClick={() => {
-                openWizard()
-              }}
-            >
-              <div 
-                className="services__item-image"
-                style={{ backgroundImage: `url(${service.image})` }}
-              >
-                <div className="services__item-overlay"></div>
-                <div className="services__item-icon">
-                  {service.icon === '✈️' && <Plane size={40} />}
-                  {service.icon === '💼' && <Briefcase size={40} />}
-                  {service.icon === '💍' && <Heart size={40} />}
-                  {service.icon === '⭐' && <Sparkles size={40} />}
-                      </div>
-                      </div>
-              
-              <div className="services__item-content">
-                <div className="services__item-header">
-                  <h3 className="services__item-title">{service.name}</h3>
-                  <p className="services__item-description">{service.description}</p>
-                      </div>
-                
-                <div className="services__item-features">
-                  {service.features.map((feature, idx) => (
-                    <div key={idx} className="services__item-feature">
-                      <span className="services__item-feature-dot"></span>
-                      <span className="services__item-feature-text">{feature}</span>
-                    </div>
-                  ))}
-                  </div>
-                
-                <button className="services__item-cta">
-                  Découvrir
-                  <ArrowRight size={18} />
-                </button>
-                </div>
-            </motion.div>
-          ))}
-              </div>
       </section>
 
       {/* Section FAQ */}
