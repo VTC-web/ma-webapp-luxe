@@ -351,7 +351,7 @@ function App() {
               {/* Logo */}
               <div className="hero__top-bar-logo">
                 <Car size={20} />
-                <span>FleetPrivée</span>
+                <span>SafenessTransport</span>
               </div>
 
             {/* Menu Navigation Desktop */}
@@ -478,52 +478,66 @@ function App() {
         </AnimatePresence>
 
         <div className="hero__container">
-          {/* Image de fond avec overlay */}
-          <motion.div 
-            className="hero__image-wrapper"
-            initial={{ scale: 1.1, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={springConfig}
-          >
-          <img 
-            src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" 
-            alt="Mercedes S-Class" 
+          {/* Image de fond pleine hauteur */}
+          <div className="hero__background-image-wrapper">
+            <img 
+              src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" 
+              alt="Mercedes S-Class" 
               className="hero__background-image"
             />
-            <div className="hero__image-overlay"></div>
-          </motion.div>
-
-          {/* Contenu principal */}
-          <div className="hero__content">
-            <motion.div 
-              className="hero__title-block"
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
+            <div className="hero__background-overlay"></div>
+          </div>
+          
+          {/* Hero “app-like” */}
+          <div className="hero__app">
+            <motion.div
+              className="hero__app-media"
+              initial={{ opacity: 0, scale: 0.98, y: 14 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={springConfig}
             >
-              <p className="hero__label">TRANSPORT PRIVÉ DEPUIS 2018</p>
-              <h1 className="hero__title">
-                Profitez d’un confort d’exception avec FleetPrivée, chauffeur VIP à Paris.
-              </h1>
+              <div className="hero__app-media-bg" aria-hidden="true" />
+              <div className="hero__app-media-badge" aria-hidden="true">
+                <Car size={18} />
+              </div>
+              <img
+                className="hero__app-media-car"
+                src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg"
+                alt="Véhicule premium"
+              />
+              <div className="hero__app-chip">Chauffeur VIP</div>
             </motion.div>
 
-            <motion.div 
-              className="hero__cta-wrap"
-              initial={{ opacity: 0, y: 20 }}
+            <motion.div
+              className="hero__app-body"
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ ...springConfig, delay: 0.15 }}
+              transition={{ ...springConfig, delay: 0.08 }}
             >
-              <motion.button 
-                className="hero__cta" 
-                onClick={openWizard}
-                whileHover={{ scale: 1.02, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-                aria-label="Réserver un chauffeur"
-              >
-                <span>Réserver un Chauffeur</span>
-                <ArrowRight size={20} strokeWidth={2.2} />
-              </motion.button>
+              <p className="hero__app-eyebrow">L’excellence depuis 2018</p>
+              <h1 className="hero__app-title">
+                SafenessTransport : chauffeur privé haut de gamme à Paris
+              </h1>
+              <p className="hero__app-subtitle">
+                Paris & Île‑de‑France — transferts aéroport, événements, mise à disposition.
+              </p>
             </motion.div>
+
+            <motion.button
+              className="hero__app-cta"
+              onClick={openWizard}
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.98 }}
+              aria-label="Réserver maintenant"
+            >
+              <span className="hero__app-cta-icon" aria-hidden="true">
+                <Car size={18} />
+              </span>
+              <span className="hero__app-cta-text">Réserver un chauffeur</span>
+              <span className="hero__app-cta-arrows" aria-hidden="true">
+                ›››
+              </span>
+            </motion.button>
           </div>
         </div>
 
@@ -670,7 +684,7 @@ function App() {
         <div className="about__content">
           <div className="about__text">
             <p className="about__paragraph">
-              FleetPrivée est votre partenaire de confiance pour tous vos déplacements d'exception. 
+              SafenessTransport est votre partenaire de confiance pour tous vos déplacements d'exception. 
               Depuis 2018, nous avons perfectionné l'art du transport privé avec chauffeur, 
               offrant une expérience sur-mesure qui allie élégance, ponctualité et discrétion absolue.
             </p>
@@ -721,7 +735,7 @@ function App() {
           <div className="about__image-wrapper">
             <img 
               src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg"
-              alt="FleetPrivée - Service premium de transport"
+              alt="SafenessTransport - Service premium de transport"
               className="about__image"
               loading="lazy"
             />
@@ -1499,7 +1513,7 @@ function App() {
               viewport={{ once: true }}
               transition={{ ...springConfig, delay: 0.1 }}
             >
-              <h3 className="footer__brand-name">FleetPrivée</h3>
+              <h3 className="footer__brand-name">SafenessTransport</h3>
               <p className="footer__brand-tagline">Transport d'Excellence depuis 2018</p>
               <p className="footer__brand-description">
                 Service premium de transport avec chauffeur privé. Élégance, discrétion et ponctualité pour tous vos déplacements d'exception.
@@ -1620,7 +1634,7 @@ function App() {
           >
             <div className="footer__bottom-content">
               <div className="footer__copyright">
-                <p>© 2026 FleetPrivée. Tous droits réservés.</p>
+                <p>© 2026 SafenessTransport. Tous droits réservés.</p>
               </div>
               <div className="footer__legal">
                 <a href="#legal">Mentions Légales</a>
