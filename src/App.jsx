@@ -384,19 +384,28 @@ function App() {
             </nav>
 
             {/* Menu Hamburger Mobile */}
-            <button 
-              ref={hamburgerRef}
-              className="hero__top-bar-hamburger"
-              onClick={() => setMenuExpanded(!menuExpanded)}
-              aria-label="Menu"
-              aria-expanded={menuExpanded}
-            >
-              <div className="hero__top-bar-hamburger-icon">
-                <span className={`hero__top-bar-hamburger-line ${menuExpanded ? 'is-open' : ''}`}></span>
-                <span className={`hero__top-bar-hamburger-line ${menuExpanded ? 'is-open' : ''}`}></span>
-                <span className={`hero__top-bar-hamburger-line ${menuExpanded ? 'is-open' : ''}`}></span>
-              </div>
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <a 
+                href="tel:+33605998211"
+                className="hero__top-bar-phone"
+                aria-label="Appeler"
+              >
+                <Phone size={16} />
+              </a>
+              <button 
+                ref={hamburgerRef}
+                className="hero__top-bar-hamburger"
+                onClick={() => setMenuExpanded(!menuExpanded)}
+                aria-label="Menu"
+                aria-expanded={menuExpanded}
+              >
+                <div className="hero__top-bar-hamburger-icon">
+                  <span className={`hero__top-bar-hamburger-line ${menuExpanded ? 'is-open' : ''}`}></span>
+                  <span className={`hero__top-bar-hamburger-line ${menuExpanded ? 'is-open' : ''}`}></span>
+                  <span className={`hero__top-bar-hamburger-line ${menuExpanded ? 'is-open' : ''}`}></span>
+                </div>
+              </button>
+            </div>
             </div>
           </div>
         </motion.div>
@@ -509,9 +518,9 @@ function App() {
             >
               <div className="hero__cta-frame">
                 <motion.button 
-                  className="hero__cta-button" 
+                  className="hero__cta-text-button" 
                   onClick={openWizard}
-                  whileHover={{ scale: 1.02, y: -2 }}
+                  whileHover={{ opacity: 0.8 }}
                   whileTap={{ scale: 0.98 }}
                 >
                   <span className="hero__cta-text">Réserver un Chauffeur</span>
