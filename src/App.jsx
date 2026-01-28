@@ -348,7 +348,8 @@ function App() {
             <div className="hero__top-bar-container-inner">
               {/* Logo */}
               <div className="hero__top-bar-logo">
-                FleetPrivée
+                <Car size={20} />
+                <span>FleetPrivée</span>
               </div>
 
             {/* Menu Navigation Desktop */}
@@ -390,7 +391,7 @@ function App() {
                 className="hero__top-bar-phone"
                 aria-label="Appeler"
               >
-                <Phone size={16} />
+                <Phone size={20} />
               </a>
               <button 
                 ref={hamburgerRef}
