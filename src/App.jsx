@@ -6,6 +6,13 @@ import './index.css'
 import './styles.css'
 
 function App() {
+  // Configuration Spring unifiée pour toutes les animations
+  const springConfig = {
+    type: "spring",
+    stiffness: 100,
+    damping: 20
+  }
+
   // State Management - Simplifié pour le panier uniquement
   const [cart, setCart] = useState({
     vehicle: null
@@ -30,17 +37,10 @@ function App() {
   })
 
   const [activeFleetSlide, setActiveFleetSlide] = useState({})
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [hoveredCard, setHoveredCard] = useState(null)
-  const [scrollY, setScrollY] = useState(0)
-  const [expandedDetails, setExpandedDetails] = useState({}) // { vehicleId: true/false }
-  const [expandedVehicleDetails, setExpandedVehicleDetails] = useState({}) // { vehicleId: true/false }
-  const [openFAQ, setOpenFAQ] = useState(null) // FAQ accordion
-  const [testimonialIndex, setTestimonialIndex] = useState(0) // Pour le slider d'avis
-  const [navExpanded, setNavExpanded] = useState(false) // Menu navigation expanded
-  const [heroMenuExpanded, setHeroMenuExpanded] = useState(false) // Hero menu expanded
-  const [isScrolled, setIsScrolled] = useState(false) // Navigation scrolled state
-  const heroVideoRef = useRef(null)
+  const [expandedVehicleDetails, setExpandedVehicleDetails] = useState({})
+  const [openFAQ, setOpenFAQ] = useState(null)
+  const [testimonialIndex, setTestimonialIndex] = useState(0)
+  const [menuExpanded, setMenuExpanded] = useState(false)
   const heroRef = useRef(null)
 
   // Données
@@ -221,27 +221,9 @@ function App() {
     }))
   }
 
-  // Scroll tracking avec transformation navigation
-  useEffect(() => {
-    const handleScroll = () => {
-      const scroll = window.scrollY
-      setScrollY(scroll)
-      setIsScrolled(scroll > 100)
-    }
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
 
   // Auto-rotation partenaires (désactivée pour l'instant, animation CSS gère le scroll)
 
-  // Auto-play hero video
-  useEffect(() => {
-    if (heroVideoRef.current) {
-      heroVideoRef.current.play().catch(() => {
-        // Auto-play blocked, user interaction required
-      })
-    }
-  }, [])
 
   const scrollToSection = (id) => {
     const element = document.getElementById(id)
@@ -270,12 +252,11 @@ function App() {
   const openWizard = () => {
     setWizardOpen(true)
     setCurrentStep(1)
-    document.body.style.overflow = 'hidden'
+    // Ne pas bloquer le scroll - le wizard utilise un backdrop qui permet le scroll
   }
 
   const closeWizard = () => {
     setWizardOpen(false)
-    document.body.style.overflow = ''
   }
 
   const nextStep = () => {
@@ -310,7 +291,7 @@ function App() {
 
   const handleConfirmBooking = () => {
     // Générer message WhatsApp
-    const whatsappNumber = '33605998211'
+    const whatsappNumber = '+33605998211'
     let message = 'RÉSERVATION\n\n'
     message += `Véhicule : ${bookingData.vehicle?.name || 'Non sélectionné'}\n`
     message += `Service : ${bookingData.service?.name || 'Non sélectionné'}\n`
@@ -331,173 +312,21 @@ function App() {
 
   return (
     <div className="app">
-      {/* Navigation Intelligente - Transformation au Scroll */}
-      <motion.nav 
-        className={`nav ${isScrolled ? 'is-scrolled' : ''} ${navExpanded ? 'is-expanded' : ''}`}
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <motion.div 
-          className="nav__container"
-          animate={{
-            padding: isScrolled ? '12px 24px' : '16px 24px',
-            borderRadius: isScrolled ? '999px' : '0px',
-            margin: isScrolled ? '12px 24px' : '0',
-            background: 'transparent'
-          }}
-          transition={{ duration: 0.3 }}
-        >
-          {/* Logo - Se transforme au scroll */}
-          <motion.div className="nav__logo-wrapper">
-            <AnimatePresence mode="wait">
-              {isScrolled ? (
-                <motion.div 
-                  key="compact"
-                  className="nav__logo is-compact"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <span className="nav__logo-compact">FP</span>
-                </motion.div>
-              ) : (
-                <motion.div 
-                  key="full"
-                  className="nav__logo"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <span className="nav__logo-full">FleetPrivée</span>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
-
-          {/* Menu Desktop - Se cache au scroll */}
-          <AnimatePresence>
-            {!isScrolled && (
-              <motion.div 
-                className="nav__links"
-                initial={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 20, width: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <a href="#about" className="nav__link" onClick={(e) => { e.preventDefault(); scrollToSection('about'); setNavExpanded(false); }}>À Propos</a>
-                <a href="#fleet" className="nav__link" onClick={(e) => { e.preventDefault(); scrollToSection('fleet'); setNavExpanded(false); }}>Flotte</a>
-                <a href="#airports" className="nav__link" onClick={(e) => { e.preventDefault(); scrollToSection('airports'); setNavExpanded(false); }}>Aéroports</a>
-                <a href="#testimonials" className="nav__link" onClick={(e) => { e.preventDefault(); scrollToSection('testimonials'); setNavExpanded(false); }}>Avis</a>
-                <motion.button 
-                  className="nav__link nav__link--cta" 
-                  onClick={() => { openWizard(); setNavExpanded(false); }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  Réserver
-                </motion.button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {/* Menu Mobile - Bouton hamburger */}
-          <button 
-            className="nav__menu-trigger"
-            onClick={() => setNavExpanded(!navExpanded)}
-            aria-label="Menu"
-          >
-            <div className="nav__menu-icon">
-              <span className={`nav__menu-line ${navExpanded ? 'is-open' : ''}`}></span>
-              <span className={`nav__menu-line ${navExpanded ? 'is-open' : ''}`}></span>
-              <span className={`nav__menu-line ${navExpanded ? 'is-open' : ''}`}></span>
-        </div>
-        </button>
-        </motion.div>
-
-        {/* Menu Mobile Expanded */}
-        <div className={`nav__expanded ${navExpanded ? 'is-open' : ''}`}>
-          <div className="nav__expanded-content">
-            <a href="#about" className="nav__expanded-link" onClick={(e) => { e.preventDefault(); scrollToSection('about'); setNavExpanded(false); }}>
-              <span className="nav__expanded-number">01</span>
-              <span className="nav__expanded-text">À Propos</span>
-            </a>
-            <a href="#fleet" className="nav__expanded-link" onClick={(e) => { e.preventDefault(); scrollToSection('fleet'); setNavExpanded(false); }}>
-              <span className="nav__expanded-number">02</span>
-              <span className="nav__expanded-text">Flotte</span>
-            </a>
-            <a href="#airports" className="nav__expanded-link" onClick={(e) => { e.preventDefault(); scrollToSection('airports'); setNavExpanded(false); }}>
-              <span className="nav__expanded-number">03</span>
-              <span className="nav__expanded-text">Aéroports</span>
-            </a>
-            <a href="#testimonials" className="nav__expanded-link" onClick={(e) => { e.preventDefault(); scrollToSection('testimonials'); setNavExpanded(false); }}>
-              <span className="nav__expanded-number">04</span>
-              <span className="nav__expanded-text">Avis Clients</span>
-            </a>
-            <button className="nav__expanded-link nav__expanded-link--cta" onClick={() => { openWizard(); setNavExpanded(false); }}>
-              <span className="nav__expanded-number">→</span>
-              <span className="nav__expanded-text">Réserver maintenant</span>
-            </button>
-          </div>
-        </div>
-      </motion.nav>
-
       {/* Hero Section - Design 2026 */}
       <section id="hero" className="hero" ref={heroRef}>
         {/* Barre de menu/logo en haut du Hero */}
         <motion.div 
-          className={`hero__top-bar ${isScrolled ? 'is-scrolled' : ''}`}
+          className="hero__top-bar"
           initial={{ y: -100, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          transition={springConfig}
         >
-          <motion.div 
-            className="hero__top-bar-container"
-            animate={{
-              padding: isScrolled ? '6px 10px' : '6px 12px',
-              borderRadius: '12px',
-              margin: isScrolled ? '8px 16px' : '8px 24px',
-              background: isScrolled ? 'rgba(0, 0, 0, 0.85)' : 'rgba(0, 0, 0, 0.05)',
-              maxWidth: isScrolled ? 'fit-content' : 'calc(100% - 48px)',
-              width: isScrolled ? 'auto' : 'calc(100% - 48px)'
-            }}
-            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          >
+          <div className="hero__top-bar-container">
             <div className="hero__top-bar-container-inner">
               {/* Logo */}
-              <motion.div 
-                className="hero__top-bar-logo"
-              animate={{
-                scale: isScrolled ? 0.85 : 1,
-                fontSize: isScrolled ? '0.875rem' : '1.25rem'
-              }}
-              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <AnimatePresence mode="wait">
-                {isScrolled ? (
-                  <motion.span
-                    key="compact"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    FleetPrivée
-                  </motion.span>
-                ) : (
-                  <motion.span
-                    key="full"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    FleetPrivée
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </motion.div>
+              <div className="hero__top-bar-logo">
+                FleetPrivée
+              </div>
 
             {/* Menu Navigation Desktop */}
             <nav className="hero__top-bar-menu">
@@ -534,83 +363,67 @@ function App() {
             {/* Menu Hamburger Mobile */}
             <button 
               className="hero__top-bar-hamburger"
-              onClick={() => setHeroMenuExpanded(!heroMenuExpanded)}
+              onClick={() => setMenuExpanded(!menuExpanded)}
               aria-label="Menu"
+              aria-expanded={menuExpanded}
             >
               <div className="hero__top-bar-hamburger-icon">
-                <span className={`hero__top-bar-hamburger-line ${heroMenuExpanded ? 'is-open' : ''}`}></span>
-                <span className={`hero__top-bar-hamburger-line ${heroMenuExpanded ? 'is-open' : ''}`}></span>
-                <span className={`hero__top-bar-hamburger-line ${heroMenuExpanded ? 'is-open' : ''}`}></span>
+                <span className={`hero__top-bar-hamburger-line ${menuExpanded ? 'is-open' : ''}`}></span>
+                <span className={`hero__top-bar-hamburger-line ${menuExpanded ? 'is-open' : ''}`}></span>
+                <span className={`hero__top-bar-hamburger-line ${menuExpanded ? 'is-open' : ''}`}></span>
               </div>
             </button>
-
-            {/* Bouton Réservation Rapide - Apparaît quand scrolled */}
-            <AnimatePresence>
-              {isScrolled && (
-                <motion.div
-                  className="hero__top-bar-cta"
-                  initial={{ opacity: 0, scale: 0.8, x: 20 }}
-                  animate={{ opacity: 1, scale: 1, x: 0 }}
-                  exit={{ opacity: 0, scale: 0.8, x: 20 }}
-                  transition={{ duration: 0.3, delay: 0.1 }}
-                >
-                  <motion.button 
-                    className="hero__top-bar-cta-btn" 
-                    onClick={() => { openWizard(); }}
-                    whileHover={{ scale: 1.05, y: -2 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <ArrowRight size={16} />
-                    <span>Réserver</span>
-                  </motion.button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
             </div>
 
             {/* Menu Mobile Expanded Hero - Se déroule depuis la barre */}
             <AnimatePresence>
-              {heroMenuExpanded && (
+              {menuExpanded && (
                 <motion.div 
                   className="hero__top-bar-expanded"
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                  transition={springConfig}
                 >
                   <div className="hero__top-bar-expanded-content">
                     <a 
                       href="#about" 
                       className="hero__top-bar-expanded-link"
-                      onClick={(e) => { e.preventDefault(); scrollToSection('about'); setHeroMenuExpanded(false); }}
+                      onClick={(e) => { e.preventDefault(); scrollToSection('about'); setMenuExpanded(false); }}
                     >
                       À Propos
                     </a>
                     <a 
                       href="#fleet" 
                       className="hero__top-bar-expanded-link"
-                      onClick={(e) => { e.preventDefault(); scrollToSection('fleet'); setHeroMenuExpanded(false); }}
+                      onClick={(e) => { e.preventDefault(); scrollToSection('fleet'); setMenuExpanded(false); }}
                     >
                       Flotte
                     </a>
                     <a 
                       href="#services" 
                       className="hero__top-bar-expanded-link"
-                      onClick={(e) => { e.preventDefault(); scrollToSection('services'); setHeroMenuExpanded(false); }}
+                      onClick={(e) => { e.preventDefault(); scrollToSection('services'); setMenuExpanded(false); }}
                     >
                       Services
                     </a>
                     <a 
                       href="#airports" 
                       className="hero__top-bar-expanded-link"
-                      onClick={(e) => { e.preventDefault(); scrollToSection('airports'); setHeroMenuExpanded(false); }}
+                      onClick={(e) => { e.preventDefault(); scrollToSection('airports'); setMenuExpanded(false); }}
                     >
                       Aéroports
                     </a>
+                    <a 
+                      href="#testimonials" 
+                      className="hero__top-bar-expanded-link"
+                      onClick={(e) => { e.preventDefault(); scrollToSection('testimonials'); setMenuExpanded(false); }}
+                    >
+                      Avis Clients
+                    </a>
                     <button 
                       className="hero__top-bar-expanded-link hero__top-bar-expanded-link--cta"
-                      onClick={() => { openWizard(); setHeroMenuExpanded(false); }}
+                      onClick={() => { openWizard(); setMenuExpanded(false); }}
                     >
                       Réserver
                     </button>
@@ -618,7 +431,7 @@ function App() {
                 </motion.div>
               )}
             </AnimatePresence>
-          </motion.div>
+          </div>
         </motion.div>
 
         <div className="hero__container">
@@ -627,7 +440,7 @@ function App() {
             className="hero__image-wrapper"
             initial={{ scale: 1.1, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
+            transition={springConfig}
           >
           <img 
             src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" 
@@ -644,7 +457,8 @@ function App() {
               className="hero__title-wrapper"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
+              transition={springConfig}
+              viewport={{ once: true }}
             >
               <div className="hero__label-wrapper">
                 <motion.p 
@@ -658,8 +472,8 @@ function App() {
                     opacity: 1
                   }}
                   transition={{ 
-                    clipPath: { duration: 1.4, delay: 0.8, ease: [0.22, 1, 0.36, 1] },
-                    opacity: { duration: 0.8, delay: 0.9, ease: 'easeOut' }
+                    clipPath: { ...springConfig, delay: 0.2 },
+                    opacity: { ...springConfig, delay: 0.3 }
                   }}
                 >
                   chauffeur vip
@@ -678,7 +492,8 @@ function App() {
               className="hero__cta-section"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.5 }}
+              transition={springConfig}
+              viewport={{ once: true }}
             >
               <motion.button 
                 className="hero__cta-button" 
@@ -773,7 +588,7 @@ function App() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.1 }}
+              transition={{ ...springConfig, delay: 0.1 }}
             >
               <div className="about__stat-number">
                 <AnimatedCounter value={6} suffix="+" />
@@ -785,7 +600,7 @@ function App() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 }}
+              transition={springConfig}
             >
               <div className="about__stat-number">
                 <AnimatedCounter value={2500} suffix="+" />
@@ -797,7 +612,7 @@ function App() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.3 }}
+              transition={springConfig}
             >
               <div className="about__stat-number">24/7</div>
               <div className="about__stat-label">Service disponible</div>
@@ -807,7 +622,7 @@ function App() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.4 }}
+              transition={springConfig}
             >
               <div className="about__stat-number">
                 <AnimatedCounter value={98} suffix="%" />
@@ -841,7 +656,7 @@ function App() {
                 initial={{ opacity: 0, y: 50 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-100px' }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
+                transition={{ ...springConfig, delay: index * 0.05 }}
                 whileHover={{ y: -8 }}
               >
                 {/* Zone image avec slider */}
@@ -999,7 +814,7 @@ function App() {
                  initial={{ opacity: 0, y: 50 }}
                  whileInView={{ opacity: 1, y: 0 }}
                  viewport={{ once: true, margin: '-100px' }}
-                 transition={{ duration: 0.6, delay: index * 0.1 }}
+                 transition={{ ...springConfig, delay: index * 0.05 }}
                  whileHover={{ y: -8 }}
                   onClick={() => {
                    openWizard()
@@ -1100,7 +915,7 @@ function App() {
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-100px' }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
+              transition={{ ...springConfig, delay: index * 0.1 }}
               whileHover={{ y: -8 }}
               onClick={() => {
                 openWizard()
@@ -1144,6 +959,59 @@ function App() {
               </div>
       </section>
 
+      {/* Section FAQ */}
+      <section id="faq" className="faq">
+        <div className="faq__header">
+          <div className="faq__header-content">
+            <span className="faq__number">06</span>
+            <h2 className="faq__title">Questions Fréquentes</h2>
+          </div>
+          <p className="faq__description">
+            Trouvez les réponses aux questions les plus courantes sur nos services de transport premium.
+          </p>
+        </div>
+
+        <div className="faq__list">
+          {faqs.map((faq, index) => (
+            <motion.div
+              key={faq.id}
+              className="faq__item"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ ...springConfig, delay: index * 0.1 }}
+            >
+              <button
+                className={`faq__question ${openFAQ === faq.id ? 'is-open' : ''}`}
+                onClick={() => setOpenFAQ(openFAQ === faq.id ? null : faq.id)}
+                aria-expanded={openFAQ === faq.id}
+              >
+                <span className="faq__question-text">{faq.question}</span>
+                <ChevronDown 
+                  className="faq__question-icon"
+                  size={20}
+                />
+              </button>
+              <AnimatePresence>
+                {openFAQ === faq.id && (
+                  <motion.div
+                    className="faq__answer"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={springConfig}
+                  >
+                    <div className="faq__answer-content">
+                      <p>{faq.answer}</p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
       {/* Panier Flottant Minimaliste */}
       {cart.vehicle && (
         <div className="cart">
@@ -1177,7 +1045,7 @@ function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={springConfig}
           >
             <motion.div 
               className="booking-wizard__backdrop" 
@@ -1191,7 +1059,7 @@ function App() {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              transition={springConfig}
             >
             {/* Header avec progression */}
             <div className="booking-wizard__header">
@@ -1225,7 +1093,7 @@ function App() {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.3 }}
+                    transition={springConfig}
                   >
                   <h2 className="booking-wizard__step-title">Choisissez votre véhicule</h2>
                   <p className="booking-wizard__step-subtitle">Combien de bagages transportez-vous ?</p>
@@ -1297,7 +1165,7 @@ function App() {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.3 }}
+                    transition={springConfig}
                   >
                   <h2 className="booking-wizard__step-title">Choisissez votre service</h2>
                   <p className="booking-wizard__step-subtitle">Sélectionnez le service qui correspond à vos besoins</p>
@@ -1343,7 +1211,7 @@ function App() {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.3 }}
+                    transition={springConfig}
                   >
                   <h2 className="booking-wizard__step-title">Date et heure</h2>
                   <p className="booking-wizard__step-subtitle">Quand souhaitez-vous être pris en charge ?</p>
@@ -1380,7 +1248,7 @@ function App() {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.3 }}
+                    transition={springConfig}
                   >
                   <h2 className="booking-wizard__step-title">Vos informations</h2>
                   <p className="booking-wizard__step-subtitle">Nous avons besoin de quelques détails pour finaliser votre réservation</p>
@@ -1448,7 +1316,7 @@ function App() {
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.3 }}
+                    transition={springConfig}
                   >
                   <h2 className="booking-wizard__step-title">Récapitulatif</h2>
                   <p className="booking-wizard__step-subtitle">Vérifiez les détails de votre réservation</p>
@@ -1537,7 +1405,7 @@ function App() {
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true, margin: '-100px' }}
-        transition={{ duration: 0.6 }}
+        transition={springConfig}
       >
         <div className="footer__container">
           {/* Section principale */}
@@ -1548,7 +1416,7 @@ function App() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.1 }}
+              transition={{ ...springConfig, delay: 0.1 }}
             >
               <h3 className="footer__brand-name">FleetPrivée</h3>
               <p className="footer__brand-tagline">Transport d'Excellence depuis 2018</p>
@@ -1563,7 +1431,7 @@ function App() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              transition={springConfig}
             >
               <h4 className="footer__nav-title">Navigation</h4>
               <ul className="footer__nav-list">
@@ -1573,6 +1441,7 @@ function App() {
                 <li><a href="#services" onClick={(e) => { e.preventDefault(); scrollToSection('services'); }}>Services</a></li>
                 <li><a href="#airports" onClick={(e) => { e.preventDefault(); scrollToSection('airports'); }}>Aéroports</a></li>
                 <li><a href="#testimonials" onClick={(e) => { e.preventDefault(); scrollToSection('testimonials'); }}>Avis Clients</a></li>
+                <li><a href="#faq" onClick={(e) => { e.preventDefault(); scrollToSection('faq'); }}>FAQ</a></li>
               </ul>
             </motion.div>
 
@@ -1582,14 +1451,14 @@ function App() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.3 }}
+              transition={springConfig}
             >
               <h4 className="footer__contact-title">Contact</h4>
               <ul className="footer__contact-list">
                 <li>
-                  <a href="tel:+33612345678" className="footer__contact-item">
+                  <a href="tel:+33605998211" className="footer__contact-item">
                     <Phone size={18} />
-                    <span>+33 6 12 34 56 78</span>
+                    <span>+33 6 05 99 82 11</span>
                   </a>
                 </li>
                 <li>
@@ -1613,7 +1482,7 @@ function App() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.4 }}
+              transition={springConfig}
             >
               <h4 className="footer__social-title">Suivez-nous</h4>
               <div className="footer__social-links">
@@ -1666,7 +1535,7 @@ function App() {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.5 }}
+            transition={springConfig}
           >
             <div className="footer__bottom-content">
               <div className="footer__copyright">
