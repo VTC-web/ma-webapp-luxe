@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { ChevronRight, ChevronLeft, ArrowRight, Play, Pause, X, Plus, Minus, Plane, Star, ChevronDown, Users, Package, Sparkles, Briefcase, Heart, Mail, Phone, MapPin, Instagram, Facebook, Linkedin, Clock, Shield, Award } from 'lucide-react'
+import { ChevronRight, ChevronLeft, ArrowRight, Play, Pause, X, Plus, Minus, Plane, Star, ChevronDown, Users, Package, Sparkles, Briefcase, Heart, Mail, Phone, MapPin, Instagram, Facebook, Linkedin, Clock, Shield, Award, Home, Car, Calendar } from 'lucide-react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import AnimatedCounter from './components/AnimatedCounter'
 import './index.css'
@@ -42,6 +42,8 @@ function App() {
   const [testimonialIndex, setTestimonialIndex] = useState(0)
   const [menuExpanded, setMenuExpanded] = useState(false)
   const heroRef = useRef(null)
+  const menuRef = useRef(null)
+  const hamburgerRef = useRef(null)
 
   // Données
   const vehicles = [
@@ -225,6 +227,27 @@ function App() {
   // Auto-rotation partenaires (désactivée pour l'instant, animation CSS gère le scroll)
 
 
+  // Fermer le menu déroulant quand on clique en dehors
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuExpanded && 
+          menuRef.current && 
+          hamburgerRef.current &&
+          !menuRef.current.contains(event.target) &&
+          !hamburgerRef.current.contains(event.target)) {
+        setMenuExpanded(false)
+      }
+    }
+
+    if (menuExpanded) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [menuExpanded])
+
   const scrollToSection = (id) => {
     const element = document.getElementById(id)
     if (element) {
@@ -362,6 +385,7 @@ function App() {
 
             {/* Menu Hamburger Mobile */}
             <button 
+              ref={hamburgerRef}
               className="hero__top-bar-hamburger"
               onClick={() => setMenuExpanded(!menuExpanded)}
               aria-label="Menu"
@@ -374,65 +398,72 @@ function App() {
               </div>
             </button>
             </div>
-
-            {/* Menu Mobile Expanded Hero - Se déroule depuis la barre */}
-            <AnimatePresence>
-              {menuExpanded && (
-                <motion.div 
-                  className="hero__top-bar-expanded"
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={springConfig}
-                >
-                  <div className="hero__top-bar-expanded-content">
-                    <a 
-                      href="#about" 
-                      className="hero__top-bar-expanded-link"
-                      onClick={(e) => { e.preventDefault(); scrollToSection('about'); setMenuExpanded(false); }}
-                    >
-                      À Propos
-                    </a>
-                    <a 
-                      href="#fleet" 
-                      className="hero__top-bar-expanded-link"
-                      onClick={(e) => { e.preventDefault(); scrollToSection('fleet'); setMenuExpanded(false); }}
-                    >
-                      Flotte
-                    </a>
-                    <a 
-                      href="#services" 
-                      className="hero__top-bar-expanded-link"
-                      onClick={(e) => { e.preventDefault(); scrollToSection('services'); setMenuExpanded(false); }}
-                    >
-                      Services
-                    </a>
-                    <a 
-                      href="#airports" 
-                      className="hero__top-bar-expanded-link"
-                      onClick={(e) => { e.preventDefault(); scrollToSection('airports'); setMenuExpanded(false); }}
-                    >
-                      Aéroports
-                    </a>
-                    <a 
-                      href="#testimonials" 
-                      className="hero__top-bar-expanded-link"
-                      onClick={(e) => { e.preventDefault(); scrollToSection('testimonials'); setMenuExpanded(false); }}
-                    >
-                      Avis Clients
-                    </a>
-                    <button 
-                      className="hero__top-bar-expanded-link hero__top-bar-expanded-link--cta"
-                      onClick={() => { openWizard(); setMenuExpanded(false); }}
-                    >
-                      Réserver
-                    </button>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
           </div>
         </motion.div>
+
+        {/* Menu Mobile Expanded - Bloc externe en dessous de la barre */}
+        <AnimatePresence>
+          {menuExpanded && (
+            <motion.div 
+              ref={menuRef}
+              className="hero__top-bar-expanded"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={springConfig}
+            >
+              <div className="hero__top-bar-expanded-content">
+                <a 
+                  href="#hero" 
+                  className="hero__top-bar-expanded-link"
+                  onClick={(e) => { e.preventDefault(); scrollToSection('hero'); setMenuExpanded(false); }}
+                >
+                  <Home size={20} />
+                  <span>Accueil</span>
+                </a>
+                <a 
+                  href="#about" 
+                  className="hero__top-bar-expanded-link"
+                  onClick={(e) => { e.preventDefault(); scrollToSection('about'); setMenuExpanded(false); }}
+                >
+                  <Users size={20} />
+                  <span>À Propos</span>
+                </a>
+                <a 
+                  href="#services" 
+                  className="hero__top-bar-expanded-link"
+                  onClick={(e) => { e.preventDefault(); scrollToSection('services'); setMenuExpanded(false); }}
+                >
+                  <Briefcase size={20} />
+                  <span>Services</span>
+                </a>
+                <a 
+                  href="#fleet" 
+                  className="hero__top-bar-expanded-link"
+                  onClick={(e) => { e.preventDefault(); scrollToSection('fleet'); setMenuExpanded(false); }}
+                >
+                  <Car size={20} />
+                  <span>Flottes</span>
+                </a>
+                <a 
+                  href="#contact" 
+                  className="hero__top-bar-expanded-link"
+                  onClick={(e) => { e.preventDefault(); const footer = document.querySelector('.footer'); if (footer) footer.scrollIntoView({ behavior: 'smooth', block: 'start' }); setMenuExpanded(false); }}
+                >
+                  <Mail size={20} />
+                  <span>Contact</span>
+                </a>
+                <button 
+                  className="hero__top-bar-expanded-link hero__top-bar-expanded-link--cta"
+                  onClick={() => { openWizard(); setMenuExpanded(false); }}
+                >
+                  <Calendar size={16} />
+                  <span>Réserver</span>
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div className="hero__container">
           {/* Image de fond avec overlay */}
@@ -461,30 +492,11 @@ function App() {
               viewport={{ once: true }}
             >
               <div className="hero__label-wrapper">
-                <motion.p 
-                  className="hero__label"
-                  initial={{ 
-                    clipPath: 'polygon(24px 0%, 24px 0%, 24px 100%, 24px 100%)',
-                    opacity: 0
-                  }}
-                  animate={{ 
-                    clipPath: 'polygon(24px 0%, 100% 0%, 100% 100%, 24px 100%)',
-                    opacity: 1
-                  }}
-                  transition={{ 
-                    clipPath: { ...springConfig, delay: 0.2 },
-                    opacity: { ...springConfig, delay: 0.3 }
-                  }}
-                >
-                  chauffeur vip
-                </motion.p>
+                <button className="hero__label">TRANSPORT PRIVÉ DEPUIS 2018</button>
               </div>
               <h1 className="hero__title">
-                Transport d'Excellence
+                Profitez d’un confort d’exception avec FleetPrivée, chauffeur VIP à Paris.
               </h1>
-              <p className="hero__subtitle">
-                Service premium de transport avec chauffeur privé. Élégance, discrétion et ponctualité pour tous vos déplacements d'exception.
-              </p>
             </motion.div>
 
             {/* CTA Section */}
@@ -495,15 +507,25 @@ function App() {
               transition={springConfig}
               viewport={{ once: true }}
             >
-              <motion.button 
-                className="hero__cta-button" 
-                onClick={openWizard}
-                whileHover={{ scale: 1.02, y: -2 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                <span className="hero__cta-text">Réserver un Chauffeur</span>
-                <ArrowRight size={20} />
-              </motion.button>
+              <div className="hero__cta-frame">
+                <motion.button 
+                  className="hero__cta-button" 
+                  onClick={openWizard}
+                  whileHover={{ scale: 1.02, y: -2 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <span className="hero__cta-text">Réserver un Chauffeur</span>
+                </motion.button>
+                <motion.button
+                  className="hero__cta-icon-button"
+                  onClick={openWizard}
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  aria-label="Ouvrir la réservation"
+                >
+                  <ArrowRight size={18} />
+                </motion.button>
+              </div>
             </motion.div>
           </div>
         </div>
