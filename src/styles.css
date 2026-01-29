@@ -648,8 +648,10 @@ img {
   align-items: center;
   gap: 12px;
   width: 100%;
-  max-width: 340px;
-  padding: 12px 14px;
+  max-width: 300px;
+  height: 66px;
+  min-height: 66px;
+  padding: 0 14px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -3229,12 +3231,22 @@ img {
 
 /* === RESPONSIVE MOBILE-FIRST === */
 @media (max-width: 767px) {
-  /* Hero Mobile */
+  /* Hero Mobile - respect barre système (PWA/standalone) */
   .hero {
     min-height: 100vh;
+    min-height: 100dvh;
     height: 100vh;
-    padding: 0;
+    height: 100dvh;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    box-sizing: border-box;
     overflow-x: hidden;
+  }
+
+  .hero__top-bar-container {
+    top: calc(env(safe-area-inset-top, 0px) + 20px);
   }
   
   .hero__top-bar {
@@ -3283,8 +3295,9 @@ img {
   }
   
   .hero__container {
-    min-height: 100vh;
-    height: 100vh;
+    flex: 1;
+    min-height: 0;
+    height: 100%;
     padding: 0;
     justify-content: center;
   }
@@ -3300,7 +3313,7 @@ img {
   .hero__app {
     max-width: 100%;
     width: 100%;
-    padding-top: max(calc(var(--spacing-xl) + 60px), env(safe-area-inset-top, 0px) + calc(var(--spacing-xl) + 60px));
+    padding-top: calc(60px + var(--spacing-xl));
     padding-bottom: max(var(--spacing-xl), env(safe-area-inset-bottom, 0px) + var(--spacing-xl));
     padding-left: max(var(--spacing-md), env(safe-area-inset-left, 0px) + var(--spacing-md));
     padding-right: max(var(--spacing-md), env(safe-area-inset-right, 0px) + var(--spacing-md));
@@ -3363,8 +3376,10 @@ img {
   }
 
   .hero__app-cta {
-    max-width: 340px;
-    padding: 12px 14px;
+    max-width: 300px;
+    height: 66px;
+    min-height: 66px;
+    padding: 0 14px;
     gap: 12px;
     margin-top: 4px;
   }
