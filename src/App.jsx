@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { ChevronRight, ChevronLeft, ArrowRight, Play, Pause, X, Plus, Minus, Plane, Star, ChevronDown, Users, Package, Sparkles, Briefcase, Heart, Mail, Phone, MapPin, Instagram, Facebook, Linkedin, Clock, Shield, Award, Home, Car, Calendar } from 'lucide-react'
+import { ChevronRight, ChevronLeft, ArrowRight, Play, Pause, X, Plus, Minus, Plane, Star, ChevronDown, Users, Package, Sparkles, Briefcase, Heart, Mail, Phone, MapPin, Instagram, Facebook, Linkedin, Clock, Shield, Award, Home, Car, Calendar, ArrowLeftRight } from 'lucide-react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import AnimatedCounter from './components/AnimatedCounter'
 import './index.css'
@@ -36,12 +36,15 @@ function App() {
     }
   })
 
-  const [activeFleetSlide, setActiveFleetSlide] = useState({})
-  const [expandedVehicleDetails, setExpandedVehicleDetails] = useState({})
   const [openFAQ, setOpenFAQ] = useState(null)
-  const [testimonialIndex, setTestimonialIndex] = useState(0)
+  const [testimonialV2Index, setTestimonialV2Index] = useState(0)
   const [serviceIndex, setServiceIndex] = useState(0)
   const [menuExpanded, setMenuExpanded] = useState(false)
+  const [heroAddressFrom, setHeroAddressFrom] = useState('')
+  const [heroAddressTo, setHeroAddressTo] = useState('')
+  const [heroPassengers, setHeroPassengers] = useState(1)
+  const [heroLuggage, setHeroLuggage] = useState(0)
+  const [aboutReadMore, setAboutReadMore] = useState(false)
   const heroRef = useRef(null)
   const menuRef = useRef(null)
   const hamburgerRef = useRef(null)
@@ -206,26 +209,6 @@ function App() {
     }))
   }
 
-  const handleFleetSlideChange = (vehicleId, direction) => {
-    const vehicle = vehicles.find(v => v.id === vehicleId)
-    if (!vehicle) return
-    
-    const currentIndex = activeFleetSlide[vehicleId] || 0
-    let newIndex
-    
-    if (direction === 'next') {
-      newIndex = (currentIndex + 1) % vehicle.images.length
-    } else {
-      newIndex = (currentIndex - 1 + vehicle.images.length) % vehicle.images.length
-    }
-    
-    setActiveFleetSlide(prev => ({
-      ...prev,
-      [vehicleId]: newIndex
-    }))
-  }
-
-
   // Auto-rotation partenaires (désactivée pour l'instant, animation CSS gère le scroll)
 
 
@@ -249,6 +232,14 @@ function App() {
       document.removeEventListener('mousedown', handleClickOutside)
     }
   }, [menuExpanded])
+
+  // Défilement automatique des avis v2
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTestimonialV2Index((prev) => (prev + 1) % testimonials.length)
+    }, 5000)
+    return () => clearInterval(interval)
+  }, [testimonials.length])
 
   const scrollToSection = (id) => {
     const element = document.getElementById(id)
@@ -277,7 +268,16 @@ function App() {
   const openWizard = () => {
     setWizardOpen(true)
     setCurrentStep(1)
-    // Ne pas bloquer le scroll - le wizard utilise un backdrop qui permet le scroll
+  }
+
+  const openWizardAtVehicles = () => {
+    setWizardOpen(true)
+    setCurrentStep(1)
+  }
+
+  const swapHeroAddresses = () => {
+    setHeroAddressFrom(heroAddressTo)
+    setHeroAddressTo(heroAddressFrom)
   }
 
   const closeWizard = () => {
@@ -350,7 +350,11 @@ function App() {
             <div className="hero__top-bar-container-inner">
               {/* Logo */}
               <div className="hero__top-bar-logo">
-                <Car size={20} />
+                <img 
+                  src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" 
+                  alt="SafenessTransport Logo" 
+                  className="hero__top-bar-logo-image"
+                />
                 <span>SafenessTransport</span>
               </div>
 
@@ -516,35 +520,112 @@ function App() {
             >
               <p className="hero__app-eyebrow">L’excellence depuis 2018</p>
               <h1 className="hero__app-title">
-                SafenessTransport : chauffeur privé haut de gamme à Paris
+                Transport avec chauffeur à Paris
               </h1>
               <p className="hero__app-subtitle">
                 Paris & Île‑de‑France — transferts aéroport, événements, mise à disposition.
               </p>
             </motion.div>
 
-            <motion.button
-              className="hero__app-cta"
-              onClick={openWizard}
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.98 }}
-              aria-label="Réserver maintenant"
+            <motion.div
+              className="hero__form-card"
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ ...springConfig, delay: 0.12 }}
             >
-              <span className="hero__app-cta-icon" aria-hidden="true">
-                <Car size={18} />
-              </span>
-              <span className="hero__app-cta-text">Réserver un chauffeur</span>
-              <span className="hero__app-cta-arrows" aria-hidden="true">
-                ›››
-              </span>
-            </motion.button>
+              <div className="hero__form-addresses">
+                <div className="hero__form-field">
+                  <label className="hero__form-label" htmlFor="hero-address-from">Départ</label>
+                  <input
+                    id="hero-address-from"
+                    type="text"
+                    className="hero__form-input"
+                    placeholder="Adresse de départ"
+                    value={heroAddressFrom}
+                    onChange={(e) => setHeroAddressFrom(e.target.value)}
+                  />
+                </div>
+                <span
+                  role="button"
+                  tabIndex={0}
+                  className="hero__form-swap-icon"
+                  onClick={swapHeroAddresses}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); swapHeroAddresses(); } }}
+                  aria-label="Échanger les adresses"
+                >
+                  <ArrowLeftRight size={18} />
+                </span>
+                <div className="hero__form-field">
+                  <label className="hero__form-label" htmlFor="hero-address-to">Arrivée</label>
+                  <input
+                    id="hero-address-to"
+                    type="text"
+                    className="hero__form-input"
+                    placeholder="Adresse d'arrivée"
+                    value={heroAddressTo}
+                    onChange={(e) => setHeroAddressTo(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="hero__form-row">
+                <div className="hero__form-field">
+                  <label className="hero__form-label" htmlFor="hero-passengers">Passagers</label>
+                  <input
+                    id="hero-passengers"
+                    type="number"
+                    min={1}
+                    max={8}
+                    className="hero__form-input"
+                    placeholder="Passagers"
+                    value={heroPassengers || ''}
+                    onChange={(e) => setHeroPassengers(parseInt(e.target.value, 10) || 1)}
+                  />
+                </div>
+                <div className="hero__form-field">
+                  <label className="hero__form-label" htmlFor="hero-luggage">Bagages</label>
+                  <input
+                    id="hero-luggage"
+                    type="number"
+                    min={0}
+                    max={10}
+                    className="hero__form-input"
+                    placeholder="Bagages"
+                    value={heroLuggage === 0 ? '' : heroLuggage}
+                    onChange={(e) => setHeroLuggage(parseInt(e.target.value, 10) || 0)}
+                  />
+                </div>
+              </div>
+              <motion.button
+                type="button"
+                className="hero__app-cta hero__form-cta"
+                onClick={openWizardAtVehicles}
+                whileHover={{ scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
+                aria-label="Réserver un chauffeur"
+              >
+                <span className="hero__app-cta-icon" aria-hidden="true">
+                  <Car size={18} />
+                </span>
+                <span className="hero__app-cta-text">Réserver un chauffeur</span>
+                <span className="hero__app-cta-arrows" aria-hidden="true">
+                  ›››
+                </span>
+              </motion.button>
+            </motion.div>
           </div>
         </div>
 
         </section>
 
       {/* Section Services - Prestations Premium */}
-      <section id="services" className="services">
+      <motion.section
+        id="services"
+        className="services"
+        initial={{ opacity: 0, x: -56 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        viewport={{ once: true, margin: '-100px' }}
+        transition={{ type: 'spring', stiffness: 80, damping: 22 }}
+      >
         <div className="services__header">
           <p className="services__subtitle">L'excellence en mouvement</p>
           <div className="services__header-content">
@@ -667,28 +748,46 @@ function App() {
             </div>
           )}
         </div>
-      </section>
+      </motion.section>
 
       {/* Section À Propos */}
-      <section id="about" className="about">
+      <motion.section
+        id="about"
+        className="about"
+        initial={{ opacity: 0, y: 48 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-100px' }}
+        transition={{ type: 'spring', stiffness: 70, damping: 24 }}
+      >
         <div className="about__header">
           <div className="about__header-content">
             <span className="about__number">02</span>
             <h2 className="about__title">À Propos</h2>
-                </div>
+          </div>
           <p className="about__description">
             Excellence et discrétion depuis 2018
+            {' '}
+            <button
+              type="button"
+              className="about__read-more"
+              onClick={() => setAboutReadMore(!aboutReadMore)}
+              aria-expanded={aboutReadMore}
+            >
+              {aboutReadMore ? 'Lire moins' : 'Lire plus'}
+            </button>
           </p>
-                    </div>
+          {aboutReadMore && (
+            <p className="about__paragraph about__paragraph--expandable">
+              SafenessTransport est votre partenaire de confiance pour tous vos déplacements d'exception.
+              {' '}
+              Depuis 2018, nous avons perfectionné l'art du transport privé avec chauffeur,
+              offrant une expérience sur-mesure qui allie élégance, ponctualité et discrétion absolue.
+            </p>
+          )}
+        </div>
 
         <div className="about__content">
           <div className="about__text">
-            <p className="about__paragraph">
-              SafenessTransport est votre partenaire de confiance pour tous vos déplacements d'exception. 
-              Depuis 2018, nous avons perfectionné l'art du transport privé avec chauffeur, 
-              offrant une expérience sur-mesure qui allie élégance, ponctualité et discrétion absolue.
-            </p>
-            
             <div className="about__qualities">
               <div className="about__quality">
                 <div className="about__quality-icon">
@@ -696,37 +795,22 @@ function App() {
                 </div>
                 <div className="about__quality-text">
                   <h3 className="about__quality-title">Excellence</h3>
-                  <p className="about__quality-description">Service premium de qualité</p>
+                  <p className="about__quality-description">
+                    Véhicules premium entretenus, chauffeurs formés et accueil soigné : 
+                    nous visons la perfection à chaque trajet pour vous offrir une expérience digne de vos attentes.
+                  </p>
                 </div>
               </div>
-              
-              <div className="about__quality">
-                <div className="about__quality-icon">
-                  <Clock size={24} />
-                </div>
-                <div className="about__quality-text">
-                  <h3 className="about__quality-title">Ponctualité</h3>
-                  <p className="about__quality-description">Respect des horaires garantis</p>
-                </div>
-              </div>
-              
               <div className="about__quality">
                 <div className="about__quality-icon">
                   <Shield size={24} />
                 </div>
                 <div className="about__quality-text">
                   <h3 className="about__quality-title">Discrétion</h3>
-                  <p className="about__quality-description">Confidentialité absolue</p>
-                </div>
-              </div>
-              
-              <div className="about__quality">
-                <div className="about__quality-icon">
-                  <Award size={24} />
-                </div>
-                <div className="about__quality-text">
-                  <h3 className="about__quality-title">Prestige</h3>
-                  <p className="about__quality-description">Expérience haut de gamme</p>
+                  <p className="about__quality-description">
+                    Confidentialité totale et respect de votre vie privée. 
+                    Que ce soit pour un déplacement professionnel ou personnel, votre trajet reste strictement confidentiel.
+                  </p>
                 </div>
               </div>
             </div>
@@ -742,320 +826,221 @@ function App() {
           </div>
 
           <div className="about__stats">
-            <motion.div 
-              className="about__stat"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ ...springConfig, delay: 0.1 }}
-            >
-              <div className="about__stat-number">
-                <AnimatedCounter value={6} suffix="+" />
-                </div>
-              <div className="about__stat-label">Années d'excellence</div>
-            </motion.div>
-            <motion.div 
-              className="about__stat"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={springConfig}
-            >
-              <div className="about__stat-number">
-                <AnimatedCounter value={2500} suffix="+" />
-                    </div>
-              <div className="about__stat-label">Clients fidèles</div>
-            </motion.div>
-            <motion.div 
-              className="about__stat"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={springConfig}
-            >
-              <div className="about__stat-number">24/7</div>
-              <div className="about__stat-label">Service disponible</div>
-            </motion.div>
-            <motion.div 
-              className="about__stat"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={springConfig}
-            >
-              <div className="about__stat-number">
-                <AnimatedCounter value={98} suffix="%" />
-                  </div>
-              <div className="about__stat-label">Taux de satisfaction</div>
-            </motion.div>
-                </div>
-              </div>
-      </section>
-
-      {/* Section Flotte - Style Rimac Automobili */}
-      <section id="fleet" className="fleet">
-        <div className="fleet__header">
-          <div className="fleet__header-content">
-            <span className="fleet__number">03</span>
-            <h2 className="fleet__title">Notre Flotte</h2>
-                </div>
-          <p className="fleet__description">
-            Découvrez notre collection exclusive de véhicules premium, chacun sélectionné pour répondre à vos besoins spécifiques. De la berline d'affaires à la limousine de prestige, chaque modèle incarne l'excellence du transport privé.
-          </p>
-                    </div>
-
-        <div className="fleet__grid">
-          {vehicles.map((vehicle, index) => {
-            const currentSlide = activeFleetSlide[vehicle.id] || 0
-            
-            return (
-              <motion.div 
-                key={vehicle.id}
-                className="fleet__card"
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: '-100px' }}
-                transition={{ ...springConfig, delay: index * 0.05 }}
-                whileHover={{ y: -8 }}
+            {[
+              { value: 6, suffix: '+', label: "Années d'excellence", isNum: true },
+              { value: 2500, suffix: '+', label: 'Clients fidèles', isNum: true },
+              { value: '24/7', suffix: '', label: 'Service disponible', isNum: false },
+              { value: 98, suffix: '%', label: 'Taux de satisfaction', isNum: true }
+            ].map((stat, index) => (
+              <motion.div
+                key={stat.label}
+                className="about__stat"
+                initial={{ opacity: 0, x: index % 2 === 0 ? -28 : 28, y: 12 }}
+                whileInView={{ opacity: 1, x: 0, y: 0 }}
+                viewport={{ once: true, margin: '-30px' }}
+                transition={{ ...springConfig, delay: index * 0.08 }}
               >
-                {/* Zone image avec slider */}
-                <div className="fleet__card-image-wrapper">
-                  <div className="fleet__card-image-container">
-                    {vehicle.images.map((img, imgIndex) => (
-                      <div
-                        key={imgIndex}
-                        className={`fleet__card-image ${imgIndex === currentSlide ? 'is-active' : ''}`}
-                        style={{ backgroundImage: `url(${img})` }}
-                      />
-                    ))}
-                    
-                    {/* Flèches de navigation */}
-                    {vehicle.images.length > 1 && (
-                      <>
-                        <button
-                          className="fleet__card-nav fleet__card-nav--prev"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setActiveFleetSlide(prev => ({
-                              ...prev,
-                              [vehicle.id]: (currentSlide - 1 + vehicle.images.length) % vehicle.images.length
-                            }))
-                          }}
-                          aria-label="Image précédente"
-                        >
-                          <ChevronLeft size={20} />
-                        </button>
-                        <button
-                          className="fleet__card-nav fleet__card-nav--next"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setActiveFleetSlide(prev => ({
-                              ...prev,
-                              [vehicle.id]: (currentSlide + 1) % vehicle.images.length
-                            }))
-                          }}
-                          aria-label="Image suivante"
-                        >
-                          <ChevronRight size={20} />
-                        </button>
-                      </>
-                    )}
-                    
-                    {/* Indicateurs */}
-                    {vehicle.images.length > 1 && (
-                      <div className="fleet__card-dots">
-                        {vehicle.images.map((_, dotIndex) => (
-                          <button
-                            key={dotIndex}
-                            className={`fleet__card-dot ${dotIndex === currentSlide ? 'is-active' : ''}`}
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              setActiveFleetSlide(prev => ({
-                                ...prev,
-                                [vehicle.id]: dotIndex
-                              }))
-                            }}
-                            aria-label={`Image ${dotIndex + 1}`}
-                          />
-                        ))}
-                  </div>
-                    )}
+                <div className="about__stat-number">
+                  {stat.isNum ? <AnimatedCounter value={stat.value} suffix={stat.suffix} /> : stat.value}
                 </div>
-              </div>
-
-                {/* Contenu de la carte */}
-                <div className="fleet__card-body">
-                  <div className="fleet__card-header">
-                    <h3 className="fleet__card-title">{vehicle.name}</h3>
-                    <p className="fleet__card-subtitle">{vehicle.description}</p>
-                </div>
-                  
-                  <div className="fleet__card-footer">
-                    <div className="fleet__card-specs">
-                      <div className="fleet__card-spec">
-                        <Users size={14} />
-                        <span>{vehicle.specs.passengers}</span>
-                    </div>
-                      <div className="fleet__card-spec">
-                        <Package size={14} />
-                        <span>{vehicle.specs.luggage}</span>
-                  </div>
-                </div>
-                    
-                    <button 
-                      className="fleet__card-info-btn"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        setExpandedVehicleDetails(prev => ({
-                          ...prev,
-                          [vehicle.id]: !prev[vehicle.id]
-                        }))
-                      }}
-                    >
-                      +info
-                      </button>
-                    
-                    {expandedVehicleDetails[vehicle.id] && (
-                      <div className="fleet__card-details">
-                        <div className="fleet__card-details-grid">
-                          <div className="fleet__card-details-item">
-                            <span className="fleet__card-details-label">Puissance</span>
-                            <span className="fleet__card-details-value">{vehicle.specs.power}</span>
-                    </div>
-                          <div className="fleet__card-details-item">
-                            <span className="fleet__card-details-label">Chevaux</span>
-                            <span className="fleet__card-details-value">{vehicle.specs.horsepower} ch</span>
-                  </div>
-                          <div className="fleet__card-details-item">
-                            <span className="fleet__card-details-label">Vitesse max</span>
-                            <span className="fleet__card-details-value">{vehicle.specs.speed}</span>
-                      </div>
-                      </div>
-                      </div>
-                    )}
-                    
-                    <button 
-                      className="fleet__card-cta"
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        updateBookingData('vehicle', vehicle)
-                        openWizard()
-                      }}
-                    >
-                      Choisir ce véhicule
-                      <ArrowRight size={18} />
-                    </button>
-                      </div>
-                      </div>
+                <div className="about__stat-label">{stat.label}</div>
               </motion.div>
-            )
-          })}
-                      </div>
-      </section>
-
-      {/* Section Transferts Aéroport */}
-      <section id="airports" className="airports">
-        <div className="airports__header">
-          <div className="airports__header-content">
-            <span className="airports__number">04</span>
-            <h2 className="airports__title">Transferts Aéroport</h2>
-                    </div>
-          <p className="airports__description">
-            Transferts aéroport haut de gamme vers CDG, Orly et Le Bourget. Accueil personnalisé, suivi en temps réel et service VIP pour un voyage sans stress.
-          </p>
-                </div>
-
-          <div className="airports__grid">
-           {airports.map((airport, index) => (
-               <motion.div 
-                 key={airport.id}
-                 className="airports__card"
-                 initial={{ opacity: 0, y: 50 }}
-                 whileInView={{ opacity: 1, y: 0 }}
-                 viewport={{ once: true, margin: '-100px' }}
-                 transition={{ ...springConfig, delay: index * 0.05 }}
-                 whileHover={{ y: -8 }}
-                  onClick={() => {
-                   openWizard()
-                 }}
-               >
-                 <div className="airports__card-image-wrapper">
-                   <div className="airports__card-image-container">
-                     <div className="airports__card-image" style={{ backgroundImage: `url('https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg')` }}></div>
-                     <div className="airports__icon">
-                       <Plane size={40} />
-                          </div>
-                        </div>
-                      </div>
-                 
-                 <div className="airports__card-body">
-                   <div className="airports__card-header">
-                     <h3 className="airports__card-title">{airport.name}</h3>
-                     <p className="airports__card-code">{airport.code}</p>
-                    </div>
-                   
-                   <div className="airports__card-footer">
-                     <div className="airports__card-duration">
-                       <span>{airport.duration}</span>
-                  </div>
-                     <button className="airports__card-cta">
-                       Réserver
-                       <ArrowRight size={18} />
-                     </button>
-                      </div>
-                      </div>
-               </motion.div>
-           ))}
-                      </div>
-      </section>
-
-      {/* Section Avis Clients */}
-      <section id="testimonials" className="testimonials">
-        <div className="testimonials__header">
-          <div className="testimonials__header-content">
-            <span className="testimonials__number">05</span>
-            <h2 className="testimonials__title">Avis Clients</h2>
-                      </div>
-          <p className="testimonials__description">
-            La satisfaction de nos clients est notre priorité. Découvrez les témoignages de ceux qui nous font confiance pour leurs déplacements d'exception.
-          </p>
-                </div>
-
-        <div className="testimonials__container">
-          <div className="testimonials__slider">
-            {testimonials.map((testimonial, index) => (
-              <div
-                key={testimonial.id}
-                className={`testimonial__card ${index === testimonialIndex ? 'is-active' : ''}`}
-              >
-                <div className="testimonial__rating">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} size={16} fill="currentColor" />
-                  ))}
-                          </div>
-                <p className="testimonial__text">"{testimonial.text}"</p>
-                <div className="testimonial__author">
-                  <div className="testimonial__name">{testimonial.name}</div>
-                  <div className="testimonial__role">{testimonial.role}</div>
-                        </div>
-                      </div>
             ))}
+                </div>
+              </div>
+      </motion.section>
+
+      {/* Section Flotte - Cartes optimisées conversion & mobile */}
+      <motion.section
+        id="fleet"
+        className="fleet-v2"
+        initial={{ opacity: 0, scale: 0.97 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true, margin: '-100px' }}
+        transition={{ type: 'spring', stiffness: 90, damping: 20 }}
+      >
+        <div className="fleet-v2__header">
+          <span className="fleet-v2__number">03</span>
+          <h2 className="fleet-v2__title">Notre Flotte</h2>
+          <p className="fleet-v2__description">
+            Véhicules premium avec chauffeur. Choisissez le vôtre et réservez en quelques secondes.
+          </p>
+        </div>
+        <div className="fleet-v2__list">
+          {vehicles.map((vehicle, index) => (
+            <motion.article
+              key={vehicle.id}
+              className="fleet-v2__card"
+              initial={{ opacity: 0, y: 20, x: index % 2 === 0 ? -16 : 16 }}
+              whileInView={{ opacity: 1, y: 0, x: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ ...springConfig, delay: index * 0.07 }}
+            >
+              <div className="fleet-v2__card-image-wrap">
+                <div
+                  className="fleet-v2__card-image"
+                  style={{ backgroundImage: `url(${vehicle.images[0]})` }}
+                  aria-hidden="true"
+                />
+                <div className="fleet-v2__card-image-overlay" />
+                <span className="fleet-v2__card-badge">{vehicle.vehicleClass}</span>
+              </div>
+              <div className="fleet-v2__card-body">
+                <h3 className="fleet-v2__card-title">{vehicle.name}</h3>
+                <p className="fleet-v2__card-desc">{vehicle.description}</p>
+                <div className="fleet-v2__card-specs">
+                  <span className="fleet-v2__card-spec">
+                    <Users size={18} aria-hidden="true" />
+                    {vehicle.specs.passengers} passagers
+                  </span>
+                  <span className="fleet-v2__card-spec">
+                    <Package size={18} aria-hidden="true" />
+                    {vehicle.specs.luggage} bagages
+                  </span>
+                </div>
+                <div className="fleet-v2__card-footer">
+                  <span className="fleet-v2__card-price">{vehicle.price}</span>
+                  <motion.button
+                    type="button"
+                    className="fleet-v2__card-cta"
+                    onClick={() => {
+                      updateBookingData('vehicle', vehicle)
+                      openWizard()
+                    }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    Réserver
+                    <ArrowRight size={20} aria-hidden="true" />
+                  </motion.button>
+                </div>
+              </div>
+            </motion.article>
+          ))}
+        </div>
+      </motion.section>
+
+      {/* Section Transferts Aéroport v2 - Optimisé conversion & mobile */}
+      <motion.section
+        id="airports"
+        className="airports-v2"
+        initial={{ opacity: 0, x: 56 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        viewport={{ once: true, margin: '-100px' }}
+        transition={{ type: 'spring', stiffness: 80, damping: 22 }}
+      >
+        <div className="airports-v2__header">
+          <span className="airports-v2__number">04</span>
+          <h2 className="airports-v2__title">Transferts Aéroport</h2>
+          <p className="airports-v2__description">
+            CDG, Orly, Le Bourget — accueil personnalisé et véhicule premium. Réservez en quelques secondes.
+          </p>
+        </div>
+        <div className="airports-v2__list">
+          {airports.map((airport, index) => (
+            <motion.article
+              key={airport.id}
+              className="airports-v2__card"
+              initial={{ opacity: 0, y: 16, scale: 0.98 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ ...springConfig, delay: index * 0.08 }}
+            >
+              <div className="airports-v2__card-icon" aria-hidden="true">
+                <Plane size={28} />
+              </div>
+              <div className="airports-v2__card-body">
+                <div className="airports-v2__card-main">
+                  <h3 className="airports-v2__card-title">{airport.name}</h3>
+                  <span className="airports-v2__card-code">{airport.code}</span>
+                </div>
+                <span className="airports-v2__card-duration">~{airport.duration} depuis Paris</span>
+                <motion.button
+                  type="button"
+                  className="airports-v2__card-cta"
+                  onClick={() => openWizard()}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  Réserver
+                  <ArrowRight size={20} aria-hidden="true" />
+                </motion.button>
+              </div>
+            </motion.article>
+          ))}
+        </div>
+      </motion.section>
+
+      {/* Section Avis - Diaporama auto */}
+      <motion.section
+        id="testimonials"
+        className="testimonials-v2"
+        initial={{ opacity: 0, y: 36 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-100px' }}
+        transition={{ type: 'spring', stiffness: 75, damping: 23 }}
+      >
+        <div className="testimonials-v2__header">
+          <span className="testimonials-v2__number">05</span>
+          <h2 className="testimonials-v2__title">Ils nous font confiance</h2>
+          <p className="testimonials-v2__description">
+            Témoignages de clients satisfaits par notre service de transport premium.
+          </p>
+        </div>
+        <div className="testimonials-v2__slider">
+          <div className="testimonials-v2__track">
+            <AnimatePresence mode="wait" initial={false}>
+              {(() => {
+                const testimonial = testimonials[testimonialV2Index]
+                if (!testimonial) return null
+                return (
+                  <motion.article
+                    key={testimonial.id}
+                    className="testimonials-v2__card"
+                    initial={{ opacity: 0, x: 24 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -24 }}
+                    transition={springConfig}
+                  >
+                    <div className="testimonials-v2__card-rating" aria-label={`${testimonial.rating} étoiles`}>
+                      {[...Array(testimonial.rating)].map((_, i) => (
+                        <Star key={i} size={18} fill="currentColor" aria-hidden="true" />
+                      ))}
                     </div>
-          <div className="testimonials__nav">
+                    <blockquote className="testimonials-v2__card-text">"{testimonial.text}"</blockquote>
+                    <footer className="testimonials-v2__card-author">
+                      <span className="testimonials-v2__card-name">{testimonial.name}</span>
+                      <span className="testimonials-v2__card-role">{testimonial.role}</span>
+                    </footer>
+                  </motion.article>
+                )
+              })()}
+            </AnimatePresence>
+          </div>
+          <div className="testimonials-v2__dots">
             {testimonials.map((_, index) => (
               <button
                 key={index}
-                className={`testimonials__nav-dot ${index === testimonialIndex ? 'is-active' : ''}`}
-                onClick={() => setTestimonialIndex(index)}
+                type="button"
+                className={`testimonials-v2__dot ${index === testimonialV2Index ? 'is-active' : ''}`}
+                onClick={() => setTestimonialV2Index(index)}
                 aria-label={`Avis ${index + 1}`}
+                aria-current={index === testimonialV2Index ? 'true' : undefined}
               />
             ))}
-                  </div>
-                      </div>
-      </section>
+          </div>
+        </div>
+      </motion.section>
 
       {/* Section FAQ */}
-      <section id="faq" className="faq">
+      <motion.section
+        id="faq"
+        className="faq"
+        initial={{ opacity: 0, y: 28 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-100px' }}
+        transition={{ type: 'spring', stiffness: 85, damping: 21 }}
+      >
         <div className="faq__header">
           <div className="faq__header-content">
             <span className="faq__number">06</span>
@@ -1105,7 +1090,7 @@ function App() {
             </motion.div>
           ))}
         </div>
-      </section>
+      </motion.section>
 
       {/* Panier Flottant Minimaliste */}
       {cart.vehicle && (
