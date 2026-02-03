@@ -1,0 +1,423 @@
+{
+  "common": {
+    "back": "Revenir"
+  },
+  "whatsapp": {
+    "contactButton": "Contact WhatsApp",
+    "ariaLabel": "Contacter par WhatsApp pour questions et confirmations"
+  },
+  "nav": {
+    "brand": "Safeness Transport",
+    "home": "Accueil",
+    "about": "À Propos",
+    "services": "Services",
+    "fleet": "Flotte",
+    "fleets": "Flottes",
+    "airports": "Aéroports",
+    "contact": "Contact",
+    "book": "Réserver",
+    "ariaCall": "Appeler",
+    "ariaMenu": "Menu",
+    "testimonials": "Avis Clients",
+    "blog": "Actualités",
+    "faq": "FAQ"
+  },
+  "section": {
+    "reserve": "Réserver",
+    "quote": "Obtenir un devis personnalisé",
+    "quoteMessage": "Bonjour, je souhaite obtenir un devis personnalisé."
+  },
+  "partners": {
+    "title": "Ils nous font confiance",
+    "placeholder": "[À REMPLIR - logos partenaires]",
+    "list": [
+      { "name": "[À REMPLIR - Partenaire 1]", "logo": "", "url": "" },
+      { "name": "[À REMPLIR - Partenaire 2]", "logo": "", "url": "" }
+    ]
+  },
+  "hero": {
+    "chip": "Chauffeur VIP",
+    "eyebrow": "L'excellence depuis 2018",
+    "title": "Transport avec chauffeur à Paris",
+    "subtitle": "Paris & Île‑de‑France — transferts aéroport, événements, mise à disposition.",
+    "form": {
+      "from": "Départ",
+      "to": "Arrivée",
+      "fromPlaceholder": "Adresse de départ",
+      "toPlaceholder": "Adresse d'arrivée",
+      "passengers": "Passagers",
+      "passengersPlaceholder": "Passagers",
+      "luggage": "Bagages",
+      "luggagePlaceholder": "Bagages"
+    },
+    "ariaSwap": "Échanger les adresses",
+    "cta": "Réserver un chauffeur",
+    "ariaCta": "Réserver un chauffeur"
+  },
+  "services": {
+    "subtitle": "L'excellence en mouvement",
+    "number": "01",
+    "title": "Nos Services",
+    "description": "Découvrez notre gamme complète de services premium, conçus pour répondre à tous vos besoins de transport avec chauffeur privé.",
+    "cta": "Réserver",
+    "ariaPrev": "Service précédent",
+    "ariaNext": "Service suivant",
+    "ariaService": "Service {{index}}",
+    "info": "En savoir plus",
+    "ariaInfo": "Ouvrir les détails du service",
+    "list": {
+      "transfert-aeroport": {
+        "name": "Transfert Aéroport",
+        "description": "Service premium de transfert vers tous les aéroports parisiens avec accueil personnalisé et suivi en temps réel.",
+        "content": "Nos transferts aéroport couvrent CDG, Orly et Le Bourget, 24h/24 et 7j/7. À l'arrivée, votre chauffeur vous attend à la sortie du hall avec une pancarte nominative (sur demande) et suit votre vol en temps réel pour s'adapter aux retards. Nous incluons 30 minutes d'attente gratuite après l'atterrissage ; au-delà, un supplément peut s'appliquer. À l'aller, nous vous déposons au terminal de votre choix avec aide aux bagages si besoin.\n\nConseil : indiquez toujours votre numéro de vol lors de la réservation pour un suivi optimal. Pour les vols tôt le matin ou tard le soir, prévoyez une marge (trafic, contrôles). Nous proposons des véhicules de la Classe E à la V selon le nombre de passagers et de bagages.",
+        "features": [
+          "Accueil avec pancarte",
+          "Attente gratuite 30min",
+          "Rafraîchissements",
+          "Suivi GPS"
+        ]
+      },
+      "evenement-corporate": {
+        "name": "Événement Corporate",
+        "description": "Transport VIP pour vos événements d'affaires, conférences et rendez-vous professionnels avec chauffeur dédié.",
+        "content": "Nous assurons les transferts et navettes pour vos séminaires, salons (Viva Technology, Fashion Week, etc.), conventions et déplacements d'équipes. Véhicules premium (berlines et V classe), chauffeur en tenue professionnelle, horaires sur mesure. Possibilité de réservation groupée avec un interlocuteur dédié et facturation entreprise (devis, facture, paiement à 30 jours selon accord).\n\nNous pouvons organiser des navettes avec plusieurs points de prise en charge (hôtels, gares, aéroports) et des allers-retours sur la journée. Précisez-nous le nombre de participants, les créneaux et les lieux pour recevoir une proposition sous 24h.",
+        "features": [
+          "Chauffeur professionnel",
+          "WiFi haut débit",
+          "Espace de travail",
+          "Service discret"
+        ]
+      },
+      "mariage-prestige": {
+        "name": "Mariage & Prestige",
+        "description": "Service de luxe pour vos moments les plus importants : mariages, galas et événements prestigieux.",
+        "content": "Pour votre mariage, gala ou événement d'exception, nous mettons à disposition des berlines et véhicules prestige (Mercedes Classe S, V classe pour les invités). Décoration discrète (rubans, fleurs sur demande), champagne ou boissons à bord, prise en charge des mariés et des invités à plusieurs adresses. Service 24/7 pour les soirées tardives.\n\nNous recommandons de réserver plusieurs semaines à l'avance et de confirmer l'heure de cérémonie, le lieu de la mairie ou du lieu de réception, et le nombre de passagers. Devis sur mesure selon le programme (mariés seuls, cortège, navette invités). Option photographe ou second véhicule possible.",
+        "features": [
+          "Décoration personnalisée",
+          "Champagne offert",
+          "Service 24/7",
+          "Photographe optionnel"
+        ]
+      },
+      "zones-desservies": {
+        "name": "Zones desservies",
+        "description": "Paris, Île-de-France, France et Europe. Nous intervenons partout où vous en avez besoin.",
+        "content": "Safeness Transport dessert Paris et sa région (Versailles, La Défense, Saint-Denis, Boulogne-Billancourt, Neuilly-sur-Seine…), les grandes villes de France (Lyon, Marseille, Nice, Cannes, Bordeaux, Toulouse, Lille, Nantes, Strasbourg) et les destinations internationales (Monaco, Genève, Bruxelles, Londres).\n\nTransferts aéroport (CDG, Orly, Le Bourget), trajets en ville, événements et déplacements longue distance : nous nous adaptons à votre destination. Pour les trajets hors Île-de-France ou à l’étranger, contactez-nous pour un devis sur mesure et une organisation adaptée.",
+        "features": [
+          "Paris & Île-de-France",
+          "Grandes villes France",
+          "Europe (Monaco, Genève, Bruxelles, Londres)",
+          "Devis sur mesure"
+        ]
+      }
+    }
+  },
+  "about": {
+    "number": "02",
+    "title": "À Propos",
+    "tagline": "Excellence et discrétion depuis 2018",
+    "readMore": "Lire plus",
+    "readLess": "Lire moins",
+    "paragraph": "Safeness Transport est votre partenaire de confiance pour tous vos déplacements d'exception. Depuis 2018, nous avons perfectionné l'art du transport privé avec chauffeur à Paris, en France et en Europe. Nous disposons de notre propre flotte (3 véhicules affichés) et pouvons sous-traiter sur toute la France et l'Europe (Milan, Munich, Paris…). Une expérience sur-mesure, chaleureuse et élégante : ponctualité et discrétion au rendez-vous.",
+    "qualities": {
+      "excellence": {
+        "title": "Excellence",
+        "description": "Véhicules premium entretenus, chauffeurs formés et accueil soigné : nous visons la perfection à chaque trajet pour vous offrir une expérience digne de vos attentes."
+      },
+      "discretion": {
+        "title": "Discrétion",
+        "description": "Confidentialité totale et respect de votre vie privée. Que ce soit pour un déplacement professionnel ou personnel, votre trajet reste strictement confidentiel."
+      }
+    },
+    "stats": {
+      "years": "Années d'excellence",
+      "clients": "Clients transportés",
+      "availability": "Disponible 24h/7j",
+      "satisfaction": "Taux de satisfaction"
+    }
+  },
+  "fleet": {
+    "number": "03",
+    "title": "Notre Flotte",
+    "description": "3 véhicules premium (et d'autres sur demande). Paris, France, Europe. Choisissez le vôtre — la réservation renvoie sur WhatsApp.",
+    "cta": "Réserver",
+    "info": "Infos",
+    "vehicles": {
+      "mercedes-e-class": {
+        "name": "Mercedes Classe E",
+        "tagline": "ÉLÉGANCE ET PERFORMANCE",
+        "vehicleClass": "Business",
+        "description": "Notre véhicule le plus demandé. Business — rendez-vous d'affaires, transferts aéroport.",
+        "price": "[À REMPLIR - tarifs]",
+        "content": "Notre véhicule le plus demandé. La Mercedes Classe E incarne l'équilibre parfait entre élégance et performance. Idéale pour les transferts aéroport CDG, Orly ou Le Bourget, ainsi que pour vos déplacements professionnels en région parisienne. L'habitacle spacieux et raffiné, la climatisation indépendante et les équipements de confort vous garantissent un trajet serein. Nos chauffeurs professionnels assurent une prise en charge ponctuelle et discrète, avec accueil personnalisé sur demande (pancarte nominative, aide aux bagages). Capacité : 4 passagers et 2 à 3 grandes valises. Réservation 24/7 avec confirmation immédiate.\n\nÉquipements : prises USB, Bluetooth, climatisation bi-zone, sellerie cuir. Idéal pour un premier rendez-vous client, un déplacement vers une conférence ou un transfert matinal vers l'aéroport. Nous recommandons de préciser l'heure de votre vol et le nombre de bagages lors de la réservation pour un service optimisé."
+      },
+      "mercedes-s680": {
+        "name": "Mercedes Classe S",
+        "tagline": "L'EXCELLENCE ABSOLUE",
+        "vehicleClass": "Prestige",
+        "description": "Prestige — mariages, galas, événements VIP",
+        "price": "[À REMPLIR - tarifs]",
+        "content": "La Mercedes Classe S représente l'excellence absolue en matière de berline de luxe. Réservée à nos clients les plus exigeants : mariages, galas, événements corporate et déplacements VIP. Intérieur cuir, sellerie confort premium, séparation chauffeur-passagers optionnelle et équipements haut de gamme (WiFi, prises, rafraîchissements). Parfaite pour les trajets longue distance (aéroports, province) ou les soirées officielles. Nos chauffeurs en tenue professionnelle assurent un service discret et irréprochable. Capacité : 4 passagers, 3 à 4 bagages. Devis sur mesure pour événements et prestations récurrentes.\n\nEn option : champagne ou boissons à bord, décoration discrète pour mariage, prise en charge à plusieurs adresses. Pour les événements (mariage, gala), nous conseillons de réserver plusieurs semaines à l'avance et de nous communiquer l'heure de cérémonie ou de début d'événement pour garantir la ponctualité."
+      },
+      "van-luxe": {
+        "name": "Mercedes Classe V",
+        "tagline": "CONFORT MAXIMAL POUR GROUPES",
+        "vehicleClass": "Sedan",
+        "description": "Groupes, familles, transferts avec bagages",
+        "price": "[À REMPLIR - tarifs]",
+        "content": "Le Mercedes Classe V offre un confort maximal pour les groupes et les familles. Idéal pour les transferts aéroport avec bagages nombreux, les déplacements en équipe (séminaires, salons) ou les sorties familiales. Espace généreux, sièges confortables, climatisation multizone et grande capacité de chargement. Nous adaptons le véhicule à vos besoins : sièges enfants, équipement handi-accessible sur demande. Capacité : jusqu'à 8 passagers et 6 grands bagages. Idéal pour Paris–CDG, Paris–Orly ou Paris–Le Bourget en groupe. Réservation groupée et tarifs dégressifs possibles pour les trajets récurrents.\n\nParfait pour les familles avec poussettes et bagages de vacances, ou pour les équipes en déplacement professionnel. Nous pouvons organiser des navettes avec plusieurs points de prise en charge. Indiquez-nous le nombre exact de passagers et de bagages pour que nous validions la capacité et vous proposions le meilleur tarif."
+      }
+    },
+    "passengers": "passagers",
+    "luggage": "bagages"
+  },
+  "vehiclePage": {
+    "back": "Retour à la flotte",
+    "book": "Réserver ce véhicule"
+  },
+  "airports": {
+    "number": "04",
+    "title": "Transferts Aéroport",
+    "description": "CDG, Orly, Le Bourget — accueil personnalisé et véhicule premium. Réservez en quelques secondes.",
+    "cta": "Réserver",
+    "durationFrom": "~{{duration}} depuis Paris",
+    "list": {
+      "cdg": {
+        "name": "CDG",
+        "duration": "45 min",
+        "price": "À partir de 100 €"
+      },
+      "orly": {
+        "name": "Orly",
+        "duration": "30 min",
+        "price": "À partir de 90 €"
+      },
+      "le-bourget": {
+        "name": "Le Bourget",
+        "duration": "25 min",
+        "price": "À partir de 85 €"
+      }
+    }
+  },
+  "testimonials": {
+    "number": "05",
+    "title": "Ils nous font confiance",
+    "description": "Témoignages de clients satisfaits par notre service de transport premium.",
+    "ariaStars": "{{count}} étoiles",
+    "ariaSlide": "Avis {{index}}",
+    "seeAllReviews": "Voir tous les avis",
+    "reviewsUrl": "https://www.google.com/maps/search/?api=1&query=Safeness Transport+Paris",
+    "list": [
+      {
+        "name": "Sophie M.",
+        "role": "CEO, TechCorp",
+        "text": "Service exceptionnel. Ponctualité parfaite et véhicule impeccable. Je recommande sans hésitation."
+      },
+      {
+        "name": "Marc D.",
+        "role": "Investisseur",
+        "text": "Le niveau de service est au-delà de mes attentes. Chauffeur professionnel et discret."
+      },
+      {
+        "name": "Isabelle L.",
+        "role": "Directrice Artistique",
+        "text": "Expérience premium de bout en bout. Un must pour les déplacements professionnels."
+      }
+    ]
+  },
+  "blog": {
+    "number": "06",
+    "title": "Actualités",
+    "description": "Événements à Paris, conseils transferts aéroport et actualités de notre flotte.",
+    "categories": {
+      "events": "Événements Paris",
+      "tips": "Conseils Aéroport",
+      "fleet": "Nouveautés Flotte"
+    },
+    "readMore": "Lire la suite",
+    "list": [
+      {
+        "title": "Paris Fashion Week 2025 : transferts VIP",
+        "excerpt": "Réservez votre chauffeur pour les défilés et événements. Disponibilité 24/7 pendant la Fashion Week.",
+        "date": "2025-01-15",
+        "category": "events",
+        "content": "Pendant la Paris Fashion Week, les déplacements entre les lieux de défilés, les hôtels et les aéroports sont souvent compliqués. Safeness Transport propose un service VIP dédié : véhicules premium, chauffeurs discrets et ponctuels, disponibilité 24h/24. Nous nous adaptons à vos horaires (défilés tôt le matin, soirées tard le soir) et assurons des transferts fluides entre le centre de Paris, La Défense et les aéroports. Réservation à l’avance conseillée pendant les pics d’affluence. Possibilité de réservation groupée pour les équipes et les invités.\n\nNous proposons des créneaux dédiés tôt le matin (6h–9h) et en soirée (18h–minuit) pour correspondre aux horaires des défilés et des after. Indiquez-nous les adresses des lieux (Palais de Tokyo, Carrousel du Louvre, etc.) et le nombre de passagers pour un devis sur mesure. Pour les clients internationaux, prise en charge possible à l'hôtel avec aide aux bagages et suivi des vols si transfert aéroport en fin de séjour."
+      },
+      {
+        "title": "CDG–Paris : horaires et conseils trafic",
+        "excerpt": "Les meilleurs créneaux pour éviter les embouteillages sur l'A1. Prévoir 45 à 60 min selon l'heure.",
+        "date": "2025-01-10",
+        "category": "tips",
+        "content": "Le trajet CDG–Paris (ou Paris–CDG) varie fortement selon l’heure : comptez environ 45 à 50 minutes en fluide, 60 à 90 minutes aux heures de pointe (7h–9h30 et 17h–19h30). Nous recommandons de prévoir une marge pour les vols du matin (départ Paris vers 5h–6h) ou en fin de journée. Notre chauffeur suit votre vol en temps réel en cas de retard et adapte l’heure de prise en charge. L’A1 et le périphérique peuvent être saturés ; nous privilégions, quand c’est possible, des itinéraires alternatifs pour limiter les imprévus.\n\nConseil : pour un vol tôt le matin depuis CDG, partez de Paris au plus tard 3h avant l'heure d'embarquement. Pour une arrivée à CDG en fin d'après-midi, prévoyez 1h à 1h30 selon le jour. Nous incluons 30 minutes d'attente gratuite après l'atterrissage ; au-delà, un supplément peut s'appliquer. Pensez à nous communiquer votre numéro de vol pour un suivi optimal."
+      },
+      {
+        "title": "Nouvelle Mercedes Classe S dans la flotte",
+        "excerpt": "Nous avons enrichi notre flotte avec la Mercedes Classe S pour encore plus de confort et de discrétion.",
+        "date": "2025-01-05",
+        "category": "fleet",
+        "content": "Safeness Transport a enrichi sa flotte avec la Mercedes Classe S, référence des berlines de luxe. Ce véhicule est désormais proposé pour les prestations prestige : mariages, galas, déplacements VIP et événements corporate. Habitacle spacieux, confort acoustique, équipements haut de gamme (climatisation multizone, sièges massants, écrans arrière) et séparation chauffeur-passagers pour une intimité totale. Nos chauffeurs sont formés aux standards de ce modèle pour un service irréprochable. Réservation sur devis pour les prestations longues durées et les événements.\n\nDisponible en réservation 24/7. Options possibles : champagne ou boissons à bord, décoration discrète pour mariage, prise en charge à plusieurs adresses. Pour un événement (mariage, gala), nous conseillons de réserver plusieurs semaines à l'avance et de confirmer l'heure de cérémonie ou de début d'événement pour garantir la ponctualité."
+      },
+      {
+        "title": "Salon Viva Technology : navettes corporate",
+        "excerpt": "Service dédié pour les participants au salon. Réservation groupée et véhicules premium.",
+        "date": "2024-12-20",
+        "category": "events",
+        "content": "Pour le salon Viva Technology et les grands événements parisiens, Safeness Transport propose des navettes corporate et des transferts dédiés. Réservation groupée pour les équipes, véhicules premium (berlines et V classe), horaires sur mesure selon les plénières et les rendez-vous. Nous assurons les trajets hôtel–site–aéroport et les déplacements entre plusieurs sites. Devis sur mesure selon le nombre de personnes, la durée et les créneaux. Idéal pour les délégations et les partenaires internationaux.\n\nUn interlocuteur unique vous est dédié pour coordonner les plannings et les changements de dernière minute. Possibilité de facturation globale et de convention entreprise. Contactez-nous avec les créneaux souhaités et le nombre de participants pour recevoir une proposition sous 24h."
+      },
+      {
+        "title": "Orly de nuit : accès et attente chauffeur",
+        "excerpt": "Vols tardifs ou tôt le matin : comment organiser votre transfert et où vous faire déposer.",
+        "date": "2024-12-12",
+        "category": "tips",
+        "content": "Les vols tardifs (après 23h) ou très tôt le matin (avant 7h) à Orly nécessitent une organisation précise. Safeness Transport assure des transferts 24/7 : nous vous attendons à la sortie du hall avec une pancarte nominative (sur demande) et suivons votre vol en temps réel en cas de retard. Pour les arrivées de nuit, nous vous déposons à l’adresse de votre choix (Paris, banlieue, province). Supplément nuit possible selon la grille en vigueur. Pensez à indiquer le numéro de vol lors de la réservation pour un suivi optimal.\n\nLes terminaux Orly 1, 2, 3 et 4 sont tous accessibles ; précisez votre terminal à la réservation pour que le chauffeur vous attende au bon point de rendez-vous. En cas de vol très retardé, nous restons en contact par téléphone ou WhatsApp pour ajuster l'heure de prise en charge sans stress."
+      }
+    ]
+  },
+  "faq": {
+    "number": "07",
+    "title": "Questions Fréquentes",
+    "description": "Trouvez les réponses aux questions les plus courantes sur nos services de transport premium.",
+    "showMore": "Voir plus de questions",
+    "showLess": "Voir moins",
+    "list": [
+      {
+        "question": "Comment réserver un véhicule ?",
+        "answer": "Utilisez notre formulaire de réservation en ligne. Sélectionnez votre véhicule, votre itinéraire, date et heure, puis complétez vos informations. La confirmation se fait via WhatsApp."
+      },
+      {
+        "question": "Quels sont les modes de paiement acceptés ?",
+        "answer": "Nous acceptons le paiement à bord, par lien de paiement sécurisé, ou par carte bancaire. Tous les détails vous seront communiqués lors de la confirmation."
+      },
+      {
+        "question": "Peut-on modifier ou annuler une réservation ?",
+        "answer": "Oui. Pour modifier : contactez-nous au moins 24h avant le trajet. Annulation gratuite jusqu'à 24h avant le départ ; au-delà, des frais peuvent s'appliquer. En cas de no-show, la course peut être facturée."
+      },
+      {
+        "question": "Combien de bagages puis-je transporter ?",
+        "answer": "Chaque véhicule a une capacité bagages indiquée à la réservation (berline : 2–3 grandes valises, SUV : 3–4, van : 6+). Précisez le nombre de bagages lors de la réservation pour que nous vous proposions le véhicule adapté."
+      },
+      {
+        "question": "Les animaux sont-ils acceptés ?",
+        "answer": "Les animaux de compagnie peuvent être acceptés selon le véhicule et sous réserve d'information préalable. Merci de nous le signaler lors de la réservation (demandes spéciales) pour confirmer la possibilité."
+      },
+      {
+        "question": "Proposez-vous des sièges bébé / enfant ?",
+        "answer": "Oui. Nous pouvons équiper le véhicule d'un siège auto bébé ou rehausseur sur demande. Indiquez l'âge et le nombre d'enfants dans les demandes spéciales lors de la réservation."
+      },
+      {
+        "question": "Que se passe-t-il en cas de retard (vol, réunion) ?",
+        "answer": "Nous suivons votre vol ou nous adaptons à votre planning. Pour les transferts aéroport, une attente gratuite est incluse (ex. 30 min après l'atterrissage). Au-delà, un supplément d'attente peut s'appliquer. En cas de retard de votre part sur un trajet ville, prévenez-nous au plus tôt par téléphone ou WhatsApp."
+      },
+      {
+        "question": "Facturation entreprise : comment ça marche ?",
+        "answer": "Nous proposons la facturation sur devis pour les entreprises : devis sur demande, facture après la prestation, paiement à 30 jours selon accord. Contactez-nous avec votre SIRET et vos coordonnées pour mettre en place la convention."
+      },
+      {
+        "question": "Les véhicules sont-ils disponibles 24/7 ?",
+        "answer": "Oui, notre service est disponible 24h/24 et 7j/7 pour répondre à tous vos besoins de transport premium."
+      }
+    ]
+  },
+  "cart": {
+    "vehicle": "Véhicule",
+    "ariaRemove": "Retirer le véhicule",
+    "cta": "Réserver"
+  },
+  "wizard": {
+    "stepVehicleTitle": "Choisissez votre véhicule",
+    "stepVehicleSubtitle": "Combien de bagages transportez-vous ?",
+    "luggagePlaceholder": "Nombre de bagages",
+    "recommendation": "Recommandation IA : {{type}}",
+    "recommendationTypes": {
+      "berline": "Berline",
+      "suv": "SUV",
+      "van": "Van"
+    },
+    "stepServiceTitle": "Choisissez votre service",
+    "stepServiceSubtitle": "Sélectionnez le service qui correspond à vos besoins",
+    "stepDateTimeTitle": "Date et heure",
+    "stepDateTimeSubtitle": "Quand souhaitez-vous être pris en charge ?",
+    "date": "Date",
+    "time": "Heure",
+    "stepInfoTitle": "Vos informations",
+    "stepInfoSubtitle": "Nous avons besoin de quelques détails pour finaliser votre réservation",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "phone": "Téléphone",
+    "email": "Email",
+    "specialRequests": "Demandes spéciales (optionnel)",
+    "firstNamePlaceholder": "Votre prénom",
+    "lastNamePlaceholder": "Votre nom",
+    "phonePlaceholder": "+33 6 12 34 56 78",
+    "emailPlaceholder": "votre@email.com",
+    "specialRequestsPlaceholder": "Siège enfant, champagne, etc.",
+    "stepSummaryTitle": "Récapitulatif",
+    "stepSummarySubtitle": "Vérifiez les détails de votre réservation",
+    "summaryVehicle": "Véhicule",
+    "summaryService": "Service",
+    "summaryDate": "Date",
+    "summaryTime": "Heure",
+    "summaryLuggage": "Bagages",
+    "summaryClient": "Client",
+    "summaryContact": "Contact",
+    "notSelected": "Non sélectionné",
+    "notFilled": "Non renseigné",
+    "prev": "Précédent",
+    "next": "Suivant",
+    "confirm": "Confirmer la réservation",
+    "stepIndicator": "Étape {{current}} sur {{total}}",
+    "badgeIA": "SÉLECTION IA",
+    "whatsappTitle": "RÉSERVATION"
+  },
+  "footer": {
+    "brandName": "Safeness Transport",
+    "brandTagline": "Transport d'excellence depuis 2018",
+    "brandDescription": "Service premium avec chauffeur. Paris, France, Europe. 24h/7j. Élégance, discrétion et ponctualité.",
+    "navTitle": "Navigation",
+    "contactTitle": "Contact",
+    "socialTitle": "Suivez-nous",
+    "cta": "Réserver maintenant",
+    "phoneDisplay": "06 05 99 82 11",
+    "emailDisplay": "[À REMPLIR - email]",
+    "zone": "Paris, France, Europe",
+    "citiesTitle": "Villes desservies",
+    "cities": ["Paris", "Londres", "Bruxelles", "Madrid", "Rome", "Berlin", "Amsterdam", "Luxembourg", "Vienne", "Berne", "Monaco"],
+    "copyright": "© 2026 Safeness Transport. Tous droits réservés.",
+    "legal": "Mentions Légales",
+    "cgv": "Conditions générales de vente",
+    "privacy": "Politique de Confidentialité",
+    "cookies": "Cookies",
+    "placeholderTarifs": "[À REMPLIR - tarifs]",
+    "placeholderAvisGoogle": "[À REMPLIR - avis Google]",
+    "placeholderSolutionsEntreprises": "[À REMPLIR - solutions / réductions entreprises]",
+    "placeholderLogo": "[À REMPLIR - logo]",
+    "placeholderSEO": "[À REMPLIR - SEO]"
+  },
+  "legal": {
+    "title": "Mentions légales",
+    "editorTitle": "Éditeur du site",
+    "editorContent": "Le site www.safenesstransport.com (ou l’adresse en vigueur) est édité par Safeness Transport, société de transport avec chauffeur privé (VTC). Siège : Paris, France. Safeness Transport propose des prestations de transport de personnes avec chauffeur (VTC) : transferts aéroport (CDG, Orly, Le Bourget), trajets en ville, événements (mariages, corporate, salons). Les réservations peuvent être effectuées via le site, par téléphone ou par messagerie (WhatsApp). Le contenu du site (textes, visuels, marques) est protégé par le droit d'auteur et les droits des marques ; toute reproduction non autorisée peut faire l'objet de poursuites. Pour toute question relative au site ou à nos services : [À REMPLIR - email] ou 06 05 99 82 11. La direction de la publication est assurée par le responsable de l’exploitation.",
+    "hostTitle": "Hébergeur",
+    "hostContent": "Le site est hébergé par un prestataire d’hébergement web. Pour toute réclamation relative au contenu publié ou à l’hébergement (notamment en cas de contenu illicite), vous pouvez nous contacter à l’adresse indiquée ci-dessus. Conformément à la loi, nous pourrons vous communiquer les coordonnées de l’hébergeur sur demande. L'hébergeur est tenu de conserver les données permettant d'identifier toute personne ayant contribué à la création du contenu mis en ligne. En cas de signalement d'un contenu illicite, les autorités compétentes et les personnes concernées peuvent solliciter la communication de ces informations dans le cadre prévu par la loi.",
+    "dpoTitle": "Responsable du traitement des données",
+    "dpoContent": "Les données personnelles collectées (nom, prénom, téléphone, email, adresses de prise en charge et de destination, demandes particulières) sont traitées par Safeness Transport pour la gestion des réservations, la relation client et le suivi des prestations. Conformément au Règlement général sur la protection des données (RGPD) et à la loi « informatique et libertés », vous disposez d’un droit d’accès, de rectification, d’effacement, de portabilité et d’opposition, ainsi que du droit de définir des directives relatives au sort de vos données après votre décès. Pour exercer ces droits ou pour toute question : [À REMPLIR - email]. Vous pouvez également introduire une réclamation auprès de la CNIL. La base légale du traitement est l'exécution du contrat (réservation et prestation de transport) et, le cas échéant, votre consentement pour les communications commerciales. Les données sont conservées pendant la durée de la relation contractuelle et conformément aux obligations légales (comptabilité, prescription). Les destinataires des données sont les services internes en charge de l'exploitation et, le cas échéant, les prestataires techniques (hébergement, messagerie) dans le cadre de garanties appropriées.",
+    "privacyTitle": "Politique de confidentialité",
+    "privacyContent": "Les informations que vous fournissez lors de la réservation (formulaire en ligne, téléphone, WhatsApp) sont utilisées uniquement pour exécuter la prestation de transport, vous recontacter en cas de besoin (modification, retard, annulation) et, le cas échéant, vous envoyer des informations relatives à nos services si vous y avez consenti. Elles ne sont pas vendues ni cédées à des tiers à des fins commerciales. Nous conservons les données le temps nécessaire à la relation contractuelle, au respect de nos obligations légales (comptabilité, litiges) et, le cas échéant, à la durée de votre consentement pour les communications commerciales.\n\nNous mettons en œuvre des mesures techniques et organisationnelles appropriées pour protéger vos données contre l'accès non autorisé, la perte ou l'altération. Les échanges par messagerie (WhatsApp, email) transitent via des services tiers ; nous recommandons de ne pas y communiquer de données sensibles au-delà de ce qui est nécessaire à la réservation. Pour toute question sur le traitement de vos données, contactez-nous à [À REMPLIR - email].",
+    "cookiesTitle": "Cookies",
+    "cookiesContent": "Le site peut utiliser des cookies techniques strictement nécessaires au fonctionnement (gestion de session, mémorisation de vos préférences, sécurité). Aucun cookie publicitaire ou de traçage tiers n’est déposé sans votre consentement. Vous pouvez configurer votre navigateur pour refuser les cookies non essentiels ; l’utilisation de certaines fonctionnalités du site pourrait en être affectée. Durée de conservation : les cookies de session sont supprimés à la fermeture du navigateur ; les cookies de préférence (par exemple langue du site) peuvent être conservés pendant une durée limitée pour améliorer votre expérience. Pour gérer ou supprimer les cookies, consultez les paramètres de votre navigateur (souvent dans « Confidentialité » ou « Sécurité »). Le refus de certains cookies peut limiter l'accès à certaines options du site."
+  },
+  "cgv": {
+    "title": "Conditions générales de vente",
+    "intro": "Les présentes conditions générales de vente (CGV) s’appliquent à toute réservation de transport de personnes avec chauffeur privé (VTC) effectuée via Safeness Transport, que la commande soit passée en ligne, par téléphone ou par messagerie (WhatsApp, etc.). En réservant, le client accepte sans réserve les présentes CGV. Elles définissent les droits et obligations des parties dans le cadre des prestations de transport avec chauffeur (transferts aéroport, trajets ville, événements). En cas de contradiction entre les CGV et un devis ou une convention particulière, les dispositions du devis ou de la convention prévaudront pour les points concernés.",
+    "scope": "Champ d'application",
+    "scopeContent": "Les présentes CGV régissent les prestations de transport de personnes avec chauffeur (VTC) proposées par Safeness Transport : transferts aéroport (CDG, Orly, Le Bourget), trajets ville, événements (mariages, corporate, salons), et toute prestation sur devis. La réservation en ligne ou par téléphone/WhatsApp, une fois confirmée par Safeness Transport, vaut conclusion du contrat et acceptation des présentes conditions. Les conditions particulières (devis, conventions) peuvent compléter les CGV pour les prestations sur mesure.\n\nLe client s'engage à fournir des informations exactes (lieux, horaires, nombre de passagers et de bagages). Toute fausse déclaration pouvant entraîner un surcoût ou une impossibilité de réaliser la prestation pourra être facturée ou donner lieu à l'annulation de la réservation sans indemnité.",
+    "price": "Tarifs et paiement",
+    "priceContent": "Les tarifs sont communiqués avant confirmation de la réservation (devis, récapitulatif en ligne ou par message). Ils peuvent être forfaitaires (trajet fixe) ou sur base horaire selon la prestation. Le paiement peut être effectué à bord (espèces, carte), par lien de paiement sécurisé envoyé après réservation, ou par facturation entreprise (sous réserve d’accord préalable). Les prix comprennent en général le trajet convenu, les péages et l’attente réglementaire ; les suppléments (heures supplémentaires, prise en charge nuit, options) sont indiqués à la réservation. Toute modification du trajet ou du programme pouvant impacter le prix doit être signalée et pourra donner lieu à un avenant tarifaire. Les tarifs indiqués « à partir de » sont des prix de base ; le montant final dépend des lieux, horaires et options. En cas de facturation entreprise, un délai de paiement peut être accordé (par exemple 30 jours) après signature d'une convention. Les factures sont envoyées par email après la prestation. En cas de retard de paiement, des pénalités et une indemnité forfaitaire pour frais de recouvrement pourront être appliquées conformément à la loi.",
+    "cancel": "Annulation",
+    "cancelContent": "Annulation gratuite jusqu’à 24 heures avant l’heure de prise en charge prévue. Au-delà, des frais d’annulation peuvent être appliqués selon le type de prestation (forfait, longue distance, événement). En cas de non-présentation du client (no-show) à l’heure et au lieu convenus, la course peut être facturée en totalité ou en partie. Toute annulation doit être notifiée par écrit (email, WhatsApp) pour être prise en compte. Pour les prestations événementielles (mariage, gala, convention), des conditions d'annulation spécifiques peuvent être précisées sur le devis (par exemple annulation gratuite jusqu'à 7 jours avant, puis pourcentage du montant). En cas d'annulation par Safeness Transport (force majeure, indisponibilité), le client sera intégralement remboursé des sommes versées. Aucun remboursement ne sera effectué en cas de no-show sans notification préalable.",
+    "responsibility": "Responsabilité",
+    "responsibilityContent": "Safeness Transport s’engage sur la ponctualité, la qualité du véhicule et du chauffeur, et le respect du trajet convenu. En cas de retard ou de manquement imputable à notre service, nous mettons tout en œuvre pour limiter le préjudice (trajet alternatif, dédommagement partiel selon les cas). Les réclamations doivent être adressées par écrit sous 48 heures après la prestation. Notre responsabilité est limitée au montant de la course pour les dommages directs constatés. Le client est responsable des objets et bagages qu'il transporte ; nous recommandons de ne pas laisser d'objets de valeur sans surveillance. En cas de retard du client (vol, réunion), l'attente au-delà du temps inclus peut être facturée. Safeness Transport décline toute responsabilité en cas de retard dû à des circonstances indépendantes de sa volonté (trafic exceptionnel, conditions météo, force majeure), tout en s'efforçant d'informer le client et de proposer des solutions.",
+    "disputes": "Litiges",
+    "disputesContent": "En cas de litige, le client peut recourir à la médiation de la consommation (médiateur compétent selon notre adhésion). Droit applicable : droit français. Tribunal compétent : tribunaux français. Pour toute question préalable, nous vous invitons à nous contacter ; nous nous efforçons de trouver une solution amiable.\n\nConformément aux dispositions du Code de la consommation, le client peut utiliser la plateforme de médiation en ligne de l'Union européenne (ODR) pour les litiges transfrontaliers. L'acceptation des présentes CGV ne prive pas le client de son droit de saisir un médiateur dans les conditions prévues par la loi."
+  }
+}

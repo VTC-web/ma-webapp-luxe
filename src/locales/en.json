@@ -1,0 +1,391 @@
+{
+  "common": {
+    "back": "Back"
+  },
+  "whatsapp": {
+    "contactButton": "Contact WhatsApp",
+    "ariaLabel": "Contact via WhatsApp for quick questions and confirmations"
+  },
+  "nav": {
+    "brand": "Safeness Transport",
+    "home": "Home",
+    "about": "About",
+    "services": "Services",
+    "fleet": "Fleet",
+    "fleets": "Fleet",
+    "airports": "Airports",
+    "contact": "Contact",
+    "book": "Book",
+    "ariaCall": "Call",
+    "ariaMenu": "Menu",
+    "testimonials": "Testimonials",
+    "blog": "News",
+    "faq": "FAQ"
+  },
+  "section": {
+    "reserve": "Book",
+    "quote": "Get a personalized quote",
+    "quoteMessage": "Hello, I would like to get a personalized quote."
+  },
+  "partners": {
+    "title": "They trust us",
+    "placeholder": "[TO FILL - partner logos]",
+    "list": [
+      { "name": "[TO FILL - Partner 1]", "logo": "", "url": "" },
+      { "name": "[TO FILL - Partner 2]", "logo": "", "url": "" }
+    ]
+  },
+  "hero": {
+    "chip": "VIP Chauffeur",
+    "eyebrow": "Excellence since 2018",
+    "title": "Chauffeur transport in Paris",
+    "subtitle": "Paris & Île‑de‑France — airport transfers, events, chauffeur hire.",
+    "form": {
+      "from": "Pick-up",
+      "to": "Drop-off",
+      "fromPlaceholder": "Pick-up address",
+      "toPlaceholder": "Drop-off address",
+      "passengers": "Passengers",
+      "passengersPlaceholder": "Passengers",
+      "luggage": "Luggage",
+      "luggagePlaceholder": "Luggage"
+    },
+    "ariaSwap": "Swap addresses",
+    "cta": "Book a chauffeur",
+    "ariaCta": "Book a chauffeur"
+  },
+  "services": {
+    "subtitle": "Excellence in motion",
+    "number": "01",
+    "title": "Our Services",
+    "description": "Discover our full range of premium services, designed to meet all your chauffeured transport needs.",
+    "cta": "Book",
+    "ariaPrev": "Previous service",
+    "ariaNext": "Next service",
+    "ariaService": "Service {{index}}",
+    "info": "Find out more",
+    "ariaInfo": "Open service details",
+    "list": {
+      "transfert-aeroport": {
+        "name": "Airport Transfer",
+        "description": "Premium transfer service to all Paris airports with personalised welcome and real-time tracking.",
+        "content": "Our airport transfers cover CDG, Orly and Le Bourget, 24/7. On arrival, your chauffeur meets you at the hall exit with a name sign (on request) and tracks your flight in real time to adapt to delays. We include 30 minutes' free waiting after landing; beyond that, a supplement may apply. For departures, we drop you at your chosen terminal with luggage assistance if needed.\n\nTip: always provide your flight number when booking for optimal tracking. For early morning or late evening flights, allow extra time (traffic, security). We offer vehicles from E-Class to V-Class depending on passengers and luggage.",
+        "features": ["Meet & greet with sign", "30 min free wait", "Refreshments", "GPS tracking"]
+      },
+      "evenement-corporate": {
+        "name": "Corporate Events",
+        "description": "VIP transport for your business events, conferences and professional meetings with dedicated chauffeur.",
+        "content": "We provide transfers and shuttles for seminars, trade shows (Viva Technology, Fashion Week, etc.), conventions and team travel. Premium vehicles (saloons and V-Class), chauffeur in professional attire, custom schedules. Group booking with a dedicated contact and corporate billing (quote, invoice, 30-day payment by agreement).\n\nWe can organise shuttles with multiple pick-up points (hotels, stations, airports) and round trips throughout the day. Tell us the number of participants, time slots and locations to receive a proposal within 24 hours.",
+        "features": ["Professional chauffeur", "High-speed WiFi", "Work space", "Discreet service"]
+      },
+      "mariage-prestige": {
+        "name": "Wedding & Prestige",
+        "description": "Luxury service for your most important moments: weddings, galas and prestigious events.",
+        "content": "For your wedding, gala or special event, we provide saloons and prestige vehicles (Mercedes S-Class, V-Class for guests). Subtle decoration (ribbons, flowers on request), champagne or drinks on board, pick-up of the couple and guests at multiple addresses. 24/7 service for late-night events.\n\nWe recommend booking several weeks in advance and confirming the ceremony time, town hall or venue address, and number of passengers. Custom quote based on the programme (couple only, cortege, guest shuttle). Optional photographer or second vehicle available.",
+        "features": ["Custom decoration", "Champagne on board", "24/7 service", "Optional photographer"]
+      },
+      "zones-desservies": {
+        "name": "Areas we serve",
+        "description": "Paris, Île-de-France, France and Europe. We operate wherever you need us.",
+        "content": "Safeness Transport serves Paris and the greater Paris region (Versailles, La Défense, Saint-Denis, Boulogne-Billancourt, Neuilly-sur-Seine…), major French cities (Lyon, Marseille, Nice, Cannes, Bordeaux, Toulouse, Lille, Nantes, Strasbourg) and international destinations (Monaco, Geneva, Brussels, London).\n\nAirport transfers (CDG, Orly, Le Bourget), city trips, events and long-distance travel: we adapt to your destination. For trips outside Île-de-France or abroad, contact us for a custom quote and tailored organisation.",
+        "features": ["Paris & Île-de-France", "Major cities in France", "Europe (Monaco, Geneva, Brussels, London)", "Custom quote"]
+      }
+    }
+  },
+  "about": {
+    "number": "02",
+    "title": "About",
+    "tagline": "Excellence and discretion since 2018",
+    "readMore": "Read more",
+    "readLess": "Read less",
+    "paragraph": "Safeness Transport is your trusted partner for all your exceptional travel needs. Since 2018, we have perfected the art of private chauffeured transport in Paris, France and Europe. We have our own fleet (3 vehicles shown) and can subcontract across France and Europe (Milan, Munich, Paris…). A warm, elegant and tailor-made experience: punctuality and discretion guaranteed.",
+    "qualities": {
+      "excellence": {
+        "title": "Excellence",
+        "description": "Premium vehicles, trained chauffeurs and attentive service: we aim for perfection on every journey to deliver an experience worthy of your expectations."
+      },
+      "discretion": {
+        "title": "Discretion",
+        "description": "Total confidentiality and respect for your privacy. Whether for business or personal travel, your journey remains strictly confidential."
+      }
+    },
+    "stats": {
+      "years": "Years of excellence",
+      "clients": "Clients transported",
+      "availability": "24h/7 days",
+      "satisfaction": "Satisfaction rate"
+    }
+  },
+  "fleet": {
+    "number": "03",
+    "title": "Our Fleet",
+    "description": "3 premium vehicles (and others on request). Paris, France, Europe. Choose yours — booking redirects to WhatsApp.",
+    "cta": "Book",
+    "info": "Info",
+    "vehicles": {
+      "mercedes-e-class": {
+        "name": "Mercedes E-Class",
+        "tagline": "ELEGANCE AND PERFORMANCE",
+        "vehicleClass": "Business",
+        "description": "Our most requested vehicle. Business — meetings, airport transfers.",
+        "price": "[TO FILL - rates]",
+        "content": "Our most requested vehicle. The Mercedes E-Class embodies the perfect balance of elegance and performance. Ideal for airport transfers to CDG, Orly or Le Bourget, as well as for your business travel in the Paris region. The spacious, refined cabin, independent climate control and comfort features ensure a smooth journey. Our professional chauffeurs provide punctual, discreet pick-up and personalised welcome on request (name sign, luggage assistance). Capacity: 4 passengers and 2 to 3 large suitcases. 24/7 booking with immediate confirmation.\n\nFeatures: USB ports, Bluetooth, dual-zone climate control, leather upholstery. Ideal for a first client meeting, a trip to a conference or an early-morning airport transfer. We recommend specifying your flight time and number of bags when booking for an optimised service."
+      },
+      "mercedes-s680": {
+        "name": "Mercedes S-Class",
+        "tagline": "ABSOLUTE EXCELLENCE",
+        "vehicleClass": "Prestige",
+        "description": "Prestige — weddings, galas, VIP events",
+        "price": "[TO FILL - rates]",
+        "content": "The Mercedes S-Class represents the pinnacle of luxury saloon excellence. Reserved for our most demanding clients: weddings, galas, corporate events and VIP travel. Leather interior, premium comfort seating, optional driver-passenger partition and high-end features (WiFi, power outlets, refreshments). Perfect for long-distance trips (airports, out of town) or official events. Our chauffeurs in professional attire provide discreet, flawless service. Capacity: 4 passengers, 3 to 4 bags. Custom quote for events and recurring services.\n\nOptional: champagne or drinks on board, subtle wedding decoration, multi-stop pick-up. For events (wedding, gala), we recommend booking several weeks in advance and confirming the ceremony or event start time to guarantee punctuality."
+      },
+      "van-luxe": {
+        "name": "Mercedes V-Class",
+        "tagline": "MAXIMUM COMFORT FOR GROUPS",
+        "vehicleClass": "Sedan",
+        "description": "Groups, families, transfers with luggage",
+        "price": "[TO FILL - rates]",
+        "content": "The Mercedes V-Class offers maximum comfort for groups and families. Ideal for airport transfers with lots of luggage, team travel (seminars, trade shows) or family outings. Generous space, comfortable seats, multi-zone climate control and large load capacity. We adapt the vehicle to your needs: child seats, accessible equipment on request. Capacity: up to 8 passengers and 6 large bags. Ideal for Paris–CDG, Paris–Orly or Paris–Le Bourget in a group. Group booking and volume discounts available for recurring trips.\n\nPerfect for families with pushchairs and holiday luggage, or for teams on business travel. We can organise shuttles with multiple pick-up points. Tell us the exact number of passengers and bags so we can confirm capacity and offer you the best rate."
+      }
+    },
+    "passengers": "passengers",
+    "luggage": "luggage"
+  },
+  "vehiclePage": {
+    "back": "Back to fleet",
+    "book": "Book this vehicle"
+  },
+  "airports": {
+    "number": "04",
+    "title": "Airport Transfers",
+    "description": "CDG, Orly, Le Bourget — personalised welcome and premium vehicle. Book in seconds.",
+    "cta": "Book",
+    "durationFrom": "~{{duration}} from Paris",
+    "list": {
+      "cdg": { "name": "CDG", "duration": "45 min", "price": "From €100" },
+      "orly": { "name": "Orly", "duration": "30 min", "price": "From €90" },
+      "le-bourget": { "name": "Le Bourget", "duration": "25 min", "price": "From €85" }
+    }
+  },
+  "testimonials": {
+    "number": "05",
+    "title": "They trust us",
+    "description": "Testimonials from clients satisfied with our premium transport service.",
+    "ariaStars": "{{count}} stars",
+    "ariaSlide": "Review {{index}}",
+    "seeAllReviews": "See all reviews",
+    "reviewsUrl": "https://www.google.com/maps/search/?api=1&query=Safeness Transport+Paris",
+    "list": [
+      {
+        "name": "Sophie M.",
+        "role": "CEO, TechCorp",
+        "text": "Exceptional service. Perfect punctuality and impeccable vehicle. I recommend without hesitation."
+      },
+      {
+        "name": "Marc D.",
+        "role": "Investor",
+        "text": "The level of service exceeds my expectations. Professional and discreet chauffeur."
+      },
+      {
+        "name": "Isabelle L.",
+        "role": "Creative Director",
+        "text": "Premium experience from start to finish. A must for business travel."
+      }
+    ]
+  },
+  "blog": {
+    "number": "06",
+    "title": "News & Tips",
+    "description": "Paris events, airport transfer tips and fleet updates.",
+    "categories": {
+      "events": "Paris Events",
+      "tips": "Airport Tips",
+      "fleet": "Fleet News"
+    },
+    "readMore": "Read more",
+    "list": [
+      {
+        "title": "Paris Fashion Week 2025: VIP transfers",
+        "excerpt": "Book your chauffeur for shows and events. 24/7 availability during Fashion Week.",
+        "date": "2025-01-15",
+        "category": "events",
+        "content": "During Paris Fashion Week, travel between show venues, hotels and airports can be challenging. Safeness Transport offers a dedicated VIP service: premium vehicles, discreet and punctual chauffeurs, 24/7 availability. We adapt to your schedule (early morning shows, late-night events) and ensure smooth transfers between central Paris, La Défense and the airports. Advance booking is recommended during peak periods. Group booking available for teams and guests.\n\nWe offer dedicated slots in the early morning (6–9am) and evening (6pm–midnight) to match show and after-party times. Tell us the venue addresses (Palais de Tokyo, Carrousel du Louvre, etc.) and number of passengers for a custom quote. For international clients, hotel pick-up with luggage assistance and flight tracking available for end-of-stay airport transfers."
+      },
+      {
+        "title": "CDG–Paris: traffic and timing tips",
+        "excerpt": "Best time slots to avoid traffic on the A1. Allow 45–60 min depending on time of day.",
+        "date": "2025-01-10",
+        "category": "tips",
+        "content": "The CDG–Paris (or Paris–CDG) journey varies greatly depending on the time: allow about 45–50 minutes in light traffic, 60–90 minutes at peak times (7–9.30am and 5–7.30pm). We recommend building in a buffer for morning flights (leave Paris around 5–6am) or late afternoon. Our chauffeur tracks your flight in real time in case of delay and adjusts the pick-up time. The A1 and ring road can be congested; we use alternative routes when possible to limit surprises.\n\nTip: for an early morning flight from CDG, leave Paris at least 3 hours before boarding. For an afternoon arrival at CDG, allow 1 to 1.5 hours depending on the day. We include 30 minutes' free waiting after landing; beyond that, a supplement may apply. Please share your flight number for optimal tracking."
+      },
+      {
+        "title": "New Mercedes S-Class in our fleet",
+        "excerpt": "We have added the Mercedes S-Class to our fleet for even more comfort and discretion.",
+        "date": "2025-01-05",
+        "category": "fleet",
+        "content": "Safeness Transport has added the Mercedes S-Class to its fleet, the benchmark luxury saloon. This vehicle is now available for prestige services: weddings, galas, VIP travel and corporate events. Spacious cabin, acoustic comfort, high-end features (multi-zone climate, massaging seats, rear screens) and driver-passenger partition for total privacy. Our chauffeurs are trained to the standards of this model for impeccable service. Quote on request for long-haul and event services.\n\nAvailable for 24/7 booking. Options: champagne or drinks on board, subtle wedding decoration, multi-stop pick-up. For an event (wedding, gala), we recommend booking several weeks in advance and confirming the ceremony or event start time to guarantee punctuality."
+      },
+      {
+        "title": "Viva Technology: corporate shuttles",
+        "excerpt": "Dedicated service for summit attendees. Group booking and premium vehicles.",
+        "date": "2024-12-20",
+        "category": "events",
+        "content": "For Viva Technology and other major Paris events, Safeness Transport offers corporate shuttles and dedicated transfers. Group booking for teams, premium vehicles (saloons and V-Class), custom schedules to match your sessions and meetings. We handle hotel–venue–airport runs and multi-site travel. Custom quote based on headcount, duration and time slots. Ideal for delegations and international partners.\n\nA single point of contact is assigned to coordinate schedules and last-minute changes. Global billing and corporate agreements available. Contact us with your preferred time slots and number of participants to receive a proposal within 24 hours."
+      },
+      {
+        "title": "Orly at night: access and chauffeur meet",
+        "excerpt": "Late or early flights: how to organise your transfer and where to get dropped off.",
+        "date": "2024-12-12",
+        "category": "tips",
+        "content": "Late-night flights (after 11pm) or very early morning (before 7am) at Orly require careful planning. Safeness Transport provides 24/7 transfers: we meet you at the hall exit with a name sign (on request) and track your flight in real time in case of delay. For night arrivals, we drop you at your chosen address (Paris, suburbs, elsewhere). Night supplement may apply per our current rates. Please provide your flight number when booking for optimal tracking.\n\nTerminals Orly 1, 2, 3 and 4 are all accessible; specify your terminal when booking so the chauffeur meets you at the right point. If your flight is heavily delayed, we stay in touch by phone or WhatsApp to adjust the pick-up time without stress."
+      }
+    ]
+  },
+  "faq": {
+    "number": "07",
+    "title": "Frequently Asked Questions",
+    "description": "Find answers to the most common questions about our premium transport services.",
+    "showMore": "Show more questions",
+    "showLess": "Show less",
+    "list": [
+      {
+        "question": "How do I book a vehicle?",
+        "answer": "Use our online booking form. Select your vehicle, route, date and time, then complete your details. Confirmation is sent via WhatsApp."
+      },
+      {
+        "question": "What payment methods do you accept?",
+        "answer": "We accept payment on board, by secure payment link, or by credit card. All details will be provided upon confirmation."
+      },
+      {
+        "question": "Can I modify or cancel a booking?",
+        "answer": "Yes. To modify: contact us at least 24 hours before the journey. Free cancellation up to 24 hours before departure; after that, fees may apply. In case of no-show, the trip may be charged."
+      },
+      {
+        "question": "How much luggage can I bring?",
+        "answer": "Each vehicle has a luggage capacity shown at booking (sedan: 2–3 large suitcases, SUV: 3–4, van: 6+). Specify the number of bags when booking so we can suggest the right vehicle."
+      },
+      {
+        "question": "Are pets allowed?",
+        "answer": "Pets may be accepted depending on the vehicle and subject to prior notice. Please mention it when booking (special requests) so we can confirm availability."
+      },
+      {
+        "question": "Do you provide baby or child seats?",
+        "answer": "Yes. We can fit the vehicle with a baby seat or booster on request. Indicate the age and number of children in the special requests when booking."
+      },
+      {
+        "question": "What if I'm delayed (flight, meeting)?",
+        "answer": "We track your flight or adapt to your schedule. For airport transfers, free waiting time is included (e.g. 30 min after landing). Beyond that, a waiting supplement may apply. If you are delayed on a city trip, let us know as soon as possible by phone or WhatsApp."
+      },
+      {
+        "question": "How does corporate billing work?",
+        "answer": "We offer quote-based billing for businesses: quote on request, invoice after the service, payment within 30 days by agreement. Contact us with your company details to set up the arrangement."
+      },
+      {
+        "question": "Are vehicles available 24/7?",
+        "answer": "Yes, our service is available 24/7 to meet all your premium transport needs."
+      }
+    ]
+  },
+  "cart": {
+    "vehicle": "Vehicle",
+    "ariaRemove": "Remove vehicle",
+    "cta": "Book"
+  },
+  "wizard": {
+    "stepVehicleTitle": "Choose your vehicle",
+    "stepVehicleSubtitle": "How many bags are you travelling with?",
+    "luggagePlaceholder": "Number of bags",
+    "recommendation": "AI recommendation: {{type}}",
+    "recommendationTypes": {
+      "berline": "Sedan",
+      "suv": "SUV",
+      "van": "Van"
+    },
+    "stepServiceTitle": "Choose your service",
+    "stepServiceSubtitle": "Select the service that matches your needs",
+    "stepDateTimeTitle": "Date and time",
+    "stepDateTimeSubtitle": "When would you like to be picked up?",
+    "date": "Date",
+    "time": "Time",
+    "stepInfoTitle": "Your details",
+    "stepInfoSubtitle": "We need a few details to finalise your booking",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "phone": "Phone",
+    "email": "Email",
+    "specialRequests": "Special requests (optional)",
+    "firstNamePlaceholder": "Your first name",
+    "lastNamePlaceholder": "Your last name",
+    "phonePlaceholder": "+33 6 12 34 56 78",
+    "emailPlaceholder": "your@email.com",
+    "specialRequestsPlaceholder": "Child seat, champagne, etc.",
+    "stepSummaryTitle": "Summary",
+    "stepSummarySubtitle": "Check your booking details",
+    "summaryVehicle": "Vehicle",
+    "summaryService": "Service",
+    "summaryDate": "Date",
+    "summaryTime": "Time",
+    "summaryLuggage": "Luggage",
+    "summaryClient": "Client",
+    "summaryContact": "Contact",
+    "notSelected": "Not selected",
+    "notFilled": "Not provided",
+    "prev": "Previous",
+    "next": "Next",
+    "confirm": "Confirm booking",
+    "stepIndicator": "Step {{current}} of {{total}}",
+    "badgeIA": "AI PICK",
+    "whatsappTitle": "BOOKING"
+  },
+  "footer": {
+    "brandName": "Safeness Transport",
+    "brandTagline": "Excellence in transport since 2018",
+    "brandDescription": "Premium chauffeured service. Paris, France, Europe. 24/7. Elegance, discretion and punctuality.",
+    "navTitle": "Navigation",
+    "contactTitle": "Contact",
+    "socialTitle": "Follow us",
+    "cta": "Book now",
+    "phoneDisplay": "06 05 99 82 11",
+    "emailDisplay": "[TO FILL - email]",
+    "zone": "Paris, France, Europe",
+    "citiesTitle": "Cities we serve",
+    "cities": ["Paris", "London", "Brussels", "Madrid", "Rome", "Berlin", "Amsterdam", "Luxembourg", "Vienna", "Bern", "Monaco"],
+    "copyright": "© 2026 Safeness Transport. All rights reserved.",
+    "legal": "Legal Notice",
+    "cgv": "Terms and conditions",
+    "privacy": "Privacy Policy",
+    "cookies": "Cookies",
+    "placeholderTarifs": "[TO FILL - rates]",
+    "placeholderAvisGoogle": "[TO FILL - Google reviews]",
+    "placeholderSolutionsEntreprises": "[TO FILL - corporate solutions / discounts]",
+    "placeholderLogo": "[TO FILL - logo]",
+    "placeholderSEO": "[TO FILL - SEO]"
+  },
+  "legal": {
+    "title": "Legal notice",
+    "editorTitle": "Publisher",
+    "editorContent": "The site www.safenesstransport.com (or the current address) is published by Safeness Transport, a private chauffeur transport company (VTC). Registered office: Paris, France. For any questions about the site or our services: [TO FILL - email] or +33 6 05 99 82 11. The publication director is the person responsible for operations.\n\nSafeness Transport provides chauffeur-driven passenger transport (VTC): airport transfers (CDG, Orly, Le Bourget), city trips, events (weddings, corporate, trade shows). Bookings can be made via the site, by phone or by messaging (WhatsApp). Site content (text, images, brands) is protected by copyright and trademark law; any unauthorised reproduction may be subject to legal action.",
+    "hostTitle": "Hosting",
+    "hostContent": "The site is hosted by a web hosting provider. For any complaint regarding published content or hosting (including illegal content), you may contact us at the address above. In accordance with the law, we can provide the host's contact details on request.\n\nThe host is required to retain data enabling the identification of anyone who contributed to content published online. In the event of reported illegal content, the competent authorities and interested parties may request this information within the framework provided by law.",
+    "dpoTitle": "Data controller",
+    "dpoContent": "Personal data collected (name, phone, email, pick-up and drop-off addresses, special requests) is processed by Safeness Transport for booking management, customer relations and service delivery. Under the GDPR and applicable data protection law, you have the right to access, rectify, erase, port and object, and to define directives regarding your data after your death. To exercise these rights or for any question: [TO FILL - email]. You may also lodge a complaint with the supervisory authority.\n\nThe legal basis for processing is performance of the contract (booking and transport service) and, where applicable, your consent for marketing. Data is retained for the duration of the contractual relationship and in accordance with legal obligations (accounting, limitation periods). Recipients are internal operational services and, where relevant, technical providers (hosting, messaging) under appropriate safeguards.",
+    "privacyTitle": "Privacy policy",
+    "privacyContent": "Information you provide when booking (online form, phone, WhatsApp) is used only to perform the transport service, to contact you if needed (changes, delays, cancellation) and, where applicable, to send you information about our services if you have consented. It is not sold or transferred to third parties for commercial purposes. We retain data for as long as necessary for the contractual relationship, legal obligations (accounting, disputes) and, where applicable, the duration of your consent for marketing.\n\nWe implement appropriate technical and organisational measures to protect your data against unauthorised access, loss or alteration. Messaging (WhatsApp, email) is carried over third-party services; we recommend not sharing sensitive data beyond what is needed for the booking. For any question about how we process your data, contact us at [TO FILL - email].",
+    "cookiesTitle": "Cookies",
+    "cookiesContent": "The site may use technical cookies strictly necessary for operation (session management, preference storage, security). No advertising or third-party tracking cookies are placed without your consent. You can set your browser to refuse non-essential cookies; use of some site features may be affected.\n\nRetention: session cookies are removed when you close the browser; preference cookies (e.g. language) may be kept for a limited time to improve your experience. To manage or delete cookies, see your browser settings (often under Privacy or Security). Refusing certain cookies may limit access to some site options."
+  },
+  "cgv": {
+    "title": "Terms and conditions",
+    "intro": "These terms and conditions (T&Cs) apply to any chauffeur-driven passenger transport (VTC) booking made through Safeness Transport, whether the order is placed online, by phone or by messaging (WhatsApp, etc.). By booking, the customer accepts these T&Cs without reservation.\n\nThey define the rights and obligations of the parties in relation to chauffeur-driven transport services (airport transfers, city trips, events). In the event of conflict between these T&Cs and a quote or specific agreement, the quote or agreement shall prevail for the relevant points.",
+    "scope": "Scope",
+    "scopeContent": "These T&Cs govern the chauffeur-driven passenger transport (VTC) services offered by Safeness Transport: airport transfers (CDG, Orly, Le Bourget), city trips, events (weddings, corporate, trade shows), and any custom-quote service. Booking online or by phone/WhatsApp, once confirmed by Safeness Transport, constitutes conclusion of the contract and acceptance of these terms. Specific terms (quotes, agreements) may supplement the T&Cs for custom services.\n\nThe customer undertakes to provide accurate information (locations, times, number of passengers and bags). Any misrepresentation that leads to extra cost or inability to perform the service may be charged or result in cancellation of the booking without compensation.",
+    "price": "Rates and payment",
+    "priceContent": "Rates are communicated before confirmation of the booking (quote, online summary or message). They may be fixed (set route) or hourly depending on the service. Payment may be made on board (cash, card), by secure payment link sent after booking, or by corporate invoice (subject to prior agreement). Prices generally include the agreed journey, tolls and standard waiting time; supplements (extra hours, night pick-up, options) are indicated at booking. Any change to the route or programme that may affect the price must be reported and may result in a price adjustment.\n\nRates shown as \"from\" are base prices; the final amount depends on locations, times and options. For corporate billing, a payment period (e.g. 30 days) may be agreed after signing an agreement. Invoices are sent by email after the service. Late payment may result in penalties and a fixed recovery-fee indemnity in accordance with the law.",
+    "cancel": "Cancellation",
+    "cancelContent": "Free cancellation up to 24 hours before the scheduled pick-up time. After that, cancellation fees may apply depending on the type of service (fixed rate, long distance, event). If the customer does not show up at the agreed time and place (no-show), the trip may be charged in full or in part. Any cancellation must be notified in writing (email, WhatsApp) to be taken into account.\n\nFor event services (wedding, gala, convention), specific cancellation terms may be set out in the quote (e.g. free cancellation up to 7 days before, then a percentage of the amount). If Safeness Transport cancels (force majeure, unavailability), the customer will be fully refunded. No refund will be made in case of no-show without prior notice.",
+    "responsibility": "Liability",
+    "responsibilityContent": "Safeness Transport is committed to punctuality, the quality of the vehicle and chauffeur, and compliance with the agreed route. In the event of delay or shortcoming attributable to our service, we do our utmost to limit any prejudice (alternative route, partial compensation as appropriate). Claims must be submitted in writing within 48 hours of the service. Our liability is limited to the amount of the trip for direct damage.\n\nThe customer is responsible for the items and luggage they carry; we recommend not leaving valuables unattended. If the customer is delayed (flight, meeting), waiting time beyond the included period may be charged. Safeness Transport disclaims liability for delay due to circumstances beyond its control (exceptional traffic, weather, force majeure), while endeavouring to inform the customer and propose solutions.",
+    "disputes": "Disputes",
+    "disputesContent": "In the event of a dispute, the customer may refer to consumer mediation (the relevant mediator depending on our membership). Applicable law: French law. Courts of competent jurisdiction: French courts. For any prior question, we invite you to contact us; we strive to find an amicable solution.\n\nIn accordance with the Consumer Code, the customer may use the EU online dispute resolution (ODR) platform for cross-border disputes. Acceptance of these T&Cs does not deprive the customer of the right to refer to a mediator under the conditions provided by law."
+  }
+}
