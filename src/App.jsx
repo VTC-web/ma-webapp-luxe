@@ -56,6 +56,7 @@ function App() {
   const [menuExpanded, setMenuExpanded] = useState(false)
   const [heroAddressFrom, setHeroAddressFrom] = useState('')
   const [heroAddressTo, setHeroAddressTo] = useState('')
+  const [heroVehicleId, setHeroVehicleId] = useState(VEHICLE_IDS[0] || null)
   const [heroPassengers, setHeroPassengers] = useState(1)
   const [heroLuggage, setHeroLuggage] = useState(0)
   const [aboutReadMore, setAboutReadMore] = useState(false)
@@ -68,6 +69,8 @@ function App() {
   const menuRef = useRef(null)
   const hamburgerRef = useRef(null)
   const serviceViewportRef = useRef(null)
+  const firstScreenRef = useRef(null)
+  const [showBottomNav, setShowBottomNav] = useState(false)
 
   // Données construites depuis les traductions (mise à jour au changement de langue)
   const serviceIcons = { 'transfert-aeroport': '✈️', 'evenement-corporate': '💼', 'mariage-prestige': '💍', 'zones-desservies': 'map' }
@@ -162,6 +165,17 @@ function App() {
 
   // Auto-rotation partenaires (désactivée pour l'instant, animation CSS gère le scroll)
 
+
+  // Afficher la barre du bas quand on sort du hero (scroll)
+  useEffect(() => {
+    const threshold = () => {
+      const vh = window.innerHeight
+      setShowBottomNav(window.scrollY > vh * 0.3)
+    }
+    threshold()
+    window.addEventListener('scroll', threshold, { passive: true })
+    return () => window.removeEventListener('scroll', threshold)
+  }, [])
 
   // Fermer le menu déroulant quand on clique en dehors
   useEffect(() => {
@@ -322,7 +336,8 @@ function App() {
 
   return (
     <div className="app">
-      {/* Hero Section - Design 2026 */}
+      {/* Premier écran: hero + partenaires = 100vh, barre du bas cachée */}
+      <div className="first-screen" ref={firstScreenRef}>
       <section id="hero" className="hero" ref={heroRef}>
         {/* Barre de menu/logo en haut du Hero */}
         <motion.div 
@@ -508,157 +523,86 @@ function App() {
           )}
         </AnimatePresence>
 
+        {/* SCREEN_1: Full-screen hero, image + overlay, content at bottom */}
         <div className="hero__container">
-          {/* Image de fond pleine hauteur */}
           <div className="hero__background-image-wrapper">
-            <img 
-              src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" 
-              alt="Mercedes S-Class" 
+            <img
+              src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg"
+              alt=""
               className="hero__background-image"
             />
-            <div className="hero__background-overlay"></div>
+            <div className="hero__background-overlay" aria-hidden="true" />
           </div>
-          
-          {/* Hero “app-like” */}
-          <div className="hero__app">
-            <motion.div
-              className="hero__app-media"
-              initial={{ opacity: 0, scale: 0.98, y: 14 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              transition={springConfig}
-            >
-              <div className="hero__app-media-bg" aria-hidden="true" />
-              <div className="hero__app-media-badge" aria-hidden="true">
-                <Car size={18} />
-              </div>
-              <img
-                className="hero__app-media-car"
-                src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg"
-                alt="Véhicule premium"
-              />
-              <div className="hero__app-chip">{t('hero.chip')}</div>
-            </motion.div>
-
-            <motion.div
-              className="hero__app-body"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ ...springConfig, delay: 0.08 }}
-            >
-              <p className="hero__app-eyebrow">{t('hero.eyebrow')}</p>
-              <h1 className="hero__app-title">
-                {t('hero.title')}
-              </h1>
-              <p className="hero__app-subtitle">
-                {t('hero.subtitle')}
-              </p>
-            </motion.div>
-
-            <motion.div
-              className="hero__form-card"
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ ...springConfig, delay: 0.12 }}
-            >
-              {/* Trajet : Départ → Arrivée */}
-              <div className="hero__form-group hero__form-group--trajet">
-                <div className="hero__form-field">
-                  <label className="hero__form-label" htmlFor="hero-address-from">{t('hero.form.from')}</label>
-                  <input
-                    id="hero-address-from"
-                    name="address-from"
-                    type="text"
-                    className="hero__form-input hero__form-input--address"
-                    placeholder={t('hero.form.fromPlaceholder')}
-                    value={heroAddressFrom}
-                    onChange={(e) => setHeroAddressFrom(e.target.value)}
-                    autoComplete="section-departure street-address"
-                    aria-autocomplete="list"
-                  />
-                </div>
-                <span
-                  role="button"
-                  tabIndex={0}
-                  className="hero__form-swap-icon"
-                  onClick={swapHeroAddresses}
-                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); swapHeroAddresses(); } }}
-                  aria-label={t('hero.ariaSwap')}
+          {/* Logo top-left: 60px, 24px — spec exacte */}
+          <div className="hero__logo" aria-hidden="true">
+            <img src="https://mercedes-benz-mauritius.com/uploads/vehicles/versions/s-class_Advert-photo.jpg" alt="" />
+          </div>
+          {/* Content overlay: padding 0 24px, headline bottom 180px, subheadline + CTA bottom 120px */}
+          <div className="hero__content-overlay">
+            <h1 className="hero__headline">
+              {t('hero.titleBefore')}
+              <span className="hero__headline-accent">{t('hero.titleAccent')}</span>
+              {t('hero.titleAfter')}
+            </h1>
+            <p className="hero__subheadline">{t('hero.subtitle')}</p>
+            <div className="hero__form-mini" role="group" aria-label={t('hero.form.ariaReserve')}>
+              <div className="hero__form-mini-fields">
+                <input
+                  id="hero-mini-from"
+                  type="text"
+                  className="hero__form-mini-input"
+                  placeholder={t('hero.form.fromPlaceholder')}
+                  value={heroAddressFrom}
+                  onChange={(e) => setHeroAddressFrom(e.target.value)}
+                  autoComplete="section-departure street-address"
+                  aria-label={t('hero.form.from')}
+                />
+                <span className="hero__form-mini-sep" aria-hidden="true">→</span>
+                <input
+                  id="hero-mini-to"
+                  type="text"
+                  className="hero__form-mini-input"
+                  placeholder={t('hero.form.toPlaceholder')}
+                  value={heroAddressTo}
+                  onChange={(e) => setHeroAddressTo(e.target.value)}
+                  autoComplete="section-arrival street-address"
+                  aria-label={t('hero.form.to')}
+                />
+                <select
+                  id="hero-mini-vehicle"
+                  className="hero__form-mini-select"
+                  value={heroVehicleId || ''}
+                  onChange={(e) => setHeroVehicleId(e.target.value || null)}
+                  aria-label={t('hero.form.vehicle')}
                 >
-                  <ArrowLeftRight size={18} />
-                </span>
-                <div className="hero__form-field">
-                  <label className="hero__form-label" htmlFor="hero-address-to">{t('hero.form.to')}</label>
-                  <input
-                    id="hero-address-to"
-                    name="address-to"
-                    type="text"
-                    className="hero__form-input hero__form-input--address"
-                    placeholder={t('hero.form.toPlaceholder')}
-                    value={heroAddressTo}
-                    onChange={(e) => setHeroAddressTo(e.target.value)}
-                    autoComplete="section-arrival street-address"
-                    aria-autocomplete="list"
-                  />
-                </div>
+                  {vehicles.map((v) => (
+                    <option key={v.id} value={v.id}>{v.name}</option>
+                  ))}
+                </select>
               </div>
-
-              {/* Passagers & Bagages */}
-              <div className="hero__form-group hero__form-group--options">
-                <div className="hero__form-row">
-                  <div className="hero__form-field">
-                    <label className="hero__form-label" htmlFor="hero-passengers">{t('hero.form.passengers')}</label>
-                    <input
-                      id="hero-passengers"
-                      type="number"
-                      min={1}
-                      max={8}
-                      className="hero__form-input"
-                      placeholder={t('hero.form.passengersPlaceholder')}
-                      value={heroPassengers || ''}
-                      onChange={(e) => setHeroPassengers(parseInt(e.target.value, 10) || 1)}
-                    />
-                  </div>
-                  <div className="hero__form-field">
-                    <label className="hero__form-label" htmlFor="hero-luggage">{t('hero.form.luggage')}</label>
-                    <input
-                      id="hero-luggage"
-                      type="number"
-                      min={0}
-                      max={10}
-                      className="hero__form-input"
-                      placeholder={t('hero.form.luggagePlaceholder')}
-                      value={heroLuggage === 0 ? '' : heroLuggage}
-                      onChange={(e) => setHeroLuggage(parseInt(e.target.value, 10) || 0)}
-                    />
-                  </div>
-                </div>
-              </div>
-
               <motion.button
                 type="button"
-                className="hero__app-cta hero__form-cta"
-                onClick={openWizardAtVehicles}
-                whileHover={{ scale: 1.01 }}
+                className="hero__form-mini-cta"
+                onClick={() => {
+                  const v = vehicles.find((x) => x.id === heroVehicleId)
+                  if (v) updateBookingData('vehicle', v)
+                  openWizardAtVehicles()
+                }}
+                whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 aria-label={t('hero.ariaCta')}
               >
-                <span className="hero__app-cta-icon" aria-hidden="true">
-                  <Car size={18} />
-                </span>
-                <span className="hero__app-cta-text">{t('hero.cta')}</span>
-                <span className="hero__app-cta-arrows" aria-hidden="true">
-                  ›››
-                </span>
+                <span>{t('section.reserve')}</span>
+                <ArrowRight size={20} strokeWidth={2.5} aria-hidden="true" />
               </motion.button>
-            </motion.div>
+            </div>
           </div>
         </div>
 
         </section>
 
-      {/* Mini-section Ils nous font confiance - Partenaires (défilement) */}
-      <section className="partners" aria-labelledby="partners-title">
-        <p id="partners-title" className="partners__title">{t('partners.title')}</p>
+      {/* Partenaires — dans le premier écran avec le hero */}
+      <section className="partners" aria-label={t('partners.title')}>
         <div className="partners__marquee">
           <div className="partners__track" aria-hidden="true">
             {[1, 2].map((copy) => (
@@ -683,6 +627,126 @@ function App() {
             ))}
           </div>
         </div>
+      </section>
+      </div>
+
+      {/* Barre du bas — champs adresse + CTA vers wizard (visible après scroll) */}
+      <aside className={`bottom-bar ${!showBottomNav ? 'bottom-bar--hidden' : ''}`} aria-label={t('nav.ariaMenu')}>
+        <div className="bottom-bar__inner">
+          <div className="bottom-bar__fields">
+            <label className="bottom-bar__label" htmlFor="bottom-address-from">
+              <MapPin size={14} aria-hidden="true" />
+              {t('hero.form.from')}
+            </label>
+            <input
+              id="bottom-address-from"
+              type="text"
+              className="bottom-bar__input"
+              placeholder={t('hero.form.fromPlaceholder')}
+              value={heroAddressFrom}
+              onChange={(e) => setHeroAddressFrom(e.target.value)}
+              autoComplete="section-departure street-address"
+            />
+          </div>
+          <div className="bottom-bar__fields">
+            <label className="bottom-bar__label" htmlFor="bottom-address-to">
+              <MapPin size={14} aria-hidden="true" />
+              {t('hero.form.to')}
+            </label>
+            <input
+              id="bottom-address-to"
+              type="text"
+              className="bottom-bar__input"
+              placeholder={t('hero.form.toPlaceholder')}
+              value={heroAddressTo}
+              onChange={(e) => setHeroAddressTo(e.target.value)}
+              autoComplete="section-arrival street-address"
+            />
+          </div>
+          <motion.button
+            type="button"
+            className="bottom-bar__cta"
+            onClick={openWizard}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            aria-label={t('nav.book')}
+          >
+            <ArrowRight size={20} strokeWidth={2.5} aria-hidden="true" />
+            <span>{t('section.reserve')}</span>
+          </motion.button>
+        </div>
+      </aside>
+
+      {/* Section Flotte — juste sous hero + partenaires */}
+      <section id="fleet" className="listing">
+        <div className="listing__header">
+          <h2 className="listing__title">{t('fleet.title')}</h2>
+          <button type="button" className="listing__see-all" onClick={openWizard}>{t('fleet.seeAll')}</button>
+        </div>
+        <div className="listing__filters">
+          <button type="button" className="listing__filter is-active">{t('fleet.filterAll')}</button>
+          {vehicles.map((v) => (
+            <button key={v.id} type="button" className="listing__filter">{v.vehicleClass}</button>
+          ))}
+        </div>
+        <motion.div className="listing__list" {...blockAnim}>
+          {vehicles.map((vehicle, index) => (
+            <motion.article
+              key={vehicle.id}
+              className="listing-card"
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-30px' }}
+              transition={{ ...springConfig, delay: index * 0.06 }}
+            >
+              <div
+                className="listing-card__image"
+                style={{ backgroundImage: `url(${vehicle.images[0]})` }}
+                aria-hidden="true"
+              />
+              <div className="listing-card__overlay" aria-hidden="true" />
+              <div className="listing-card__badge" aria-hidden="true">
+                <Car size={16} />
+              </div>
+              <div className="listing-card__rating">
+                <Star size={14} fill="currentColor" className="listing-card__star" />
+                <span>4.9</span>
+              </div>
+              <div className="listing-card__content">
+                <span className="listing-card__brand">{t('nav.brand')}</span>
+                <h3 className="listing-card__model">{vehicle.name}</h3>
+                <div className="listing-card__bottom">
+                  <div className="listing-card__price-wrap">
+                    <span className="listing-card__price">{vehicle.price}</span>
+                    <span className="listing-card__period">/ {t('fleet.perDay')}</span>
+                  </div>
+                  <div className="listing-card__actions">
+                    <button
+                      type="button"
+                      className="listing-card__info"
+                      onClick={(e) => { e.stopPropagation(); setVehicleModalId(vehicle.id); setVehicleModalPhotoIndex(0); }}
+                      aria-label={t('fleet.info')}
+                    >
+                      <Info size={18} strokeWidth={2.5} />
+                      <span>{t('fleet.info')}</span>
+                    </button>
+                    <motion.button
+                      type="button"
+                      className="listing-card__cta"
+                      onClick={() => { updateBookingData('vehicle', vehicle); openWizard(); }}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.98 }}
+                      aria-label={t('fleet.cta')}
+                    >
+                      <ArrowRight size={20} strokeWidth={2.5} />
+                    </motion.button>
+                  </div>
+                </div>
+              </div>
+            </motion.article>
+          ))}
+        </motion.div>
+        <motion.div className="listing__cta" {...blockAnim}>{sectionCTA}</motion.div>
       </section>
 
       {/* Section Services - Prestations Premium */}
@@ -916,83 +980,6 @@ function App() {
         <motion.div className="about__cta" {...blockAnim}>{sectionCTA}</motion.div>
       </section>
 
-      {/* Section Flotte - Cartes optimisées conversion & mobile */}
-      <section id="fleet" className="fleet-v2">
-        <motion.div className="fleet-v2__header" {...blockAnim}>
-          <span className="fleet-v2__number">{t('fleet.number')}</span>
-          <h2 className="fleet-v2__title">{t('fleet.title')}</h2>
-          <p className="fleet-v2__description">
-            {t('fleet.description')}
-          </p>
-        </motion.div>
-        <motion.div className="fleet-v2__list" {...blockAnim}>
-          {vehicles.map((vehicle, index) => (
-            <motion.article
-              key={vehicle.id}
-              className="fleet-v2__card"
-              initial={{ opacity: 0, y: 20, x: index % 2 === 0 ? -16 : 16 }}
-              whileInView={{ opacity: 1, y: 0, x: 0 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ ...springConfig, delay: index * 0.07 }}
-            >
-              <div className="fleet-v2__card-image-wrap">
-                <div
-                  className="fleet-v2__card-image"
-                  style={{ backgroundImage: `url(${vehicle.images[0]})` }}
-                  aria-hidden="true"
-                />
-                <div className="fleet-v2__card-image-overlay" />
-                <span className="fleet-v2__card-badge">{vehicle.vehicleClass}</span>
-              </div>
-              <div className="fleet-v2__card-body">
-                <h3 className="fleet-v2__card-title">{vehicle.name}</h3>
-                <p className="fleet-v2__card-desc">{vehicle.description}</p>
-                <div className="fleet-v2__card-specs">
-                  <span className="fleet-v2__card-spec">
-                    <Users size={18} aria-hidden="true" />
-                    {vehicle.specs.passengers} passagers
-                  </span>
-                  <span className="fleet-v2__card-spec">
-                    <Package size={18} aria-hidden="true" />
-                    {vehicle.specs.luggage} bagages
-                  </span>
-                </div>
-                <div className="fleet-v2__card-footer">
-                  <div className="fleet-v2__card-actions">
-                    <button
-                      type="button"
-                      className="fleet-v2__card-info"
-                      onClick={() => {
-                        setVehicleModalId(vehicle.id)
-                        setVehicleModalPhotoIndex(0)
-                      }}
-                      aria-label={t('fleet.info')}
-                    >
-                      <Info size={20} aria-hidden="true" />
-                      {t('fleet.info')}
-                    </button>
-                    <motion.button
-                      type="button"
-                      className="fleet-v2__card-cta"
-                      onClick={() => {
-                        updateBookingData('vehicle', vehicle)
-                        openWizard()
-                      }}
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      {t('fleet.cta')}
-                      <ArrowRight size={20} aria-hidden="true" />
-                    </motion.button>
-                  </div>
-                </div>
-              </div>
-            </motion.article>
-          ))}
-        </motion.div>
-        <motion.div className="fleet-v2__cta" {...blockAnim}>{sectionCTA}</motion.div>
-      </section>
-
       {/* Section Transferts Aéroport v2 - Optimisé conversion & mobile */}
       <section id="airports" className="airports-v2">
         <motion.div className="airports-v2__header" {...blockAnim}>
@@ -1224,97 +1211,98 @@ function App() {
           </div>
       )}
 
-      {/* Modal détail véhicule (tout sur la même page, comme le wizard) */}
+      {/* Page détail véhicule — design SCREEN_3 (hero 55%, contenu chevauchant, specs grid, CTA fixe) */}
       <AnimatePresence>
         {vehicleModal && (
           <motion.div
-            className="vehicle-modal vehicle-modal--fullscreen"
+            className="vehicle-detail"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={springConfig}
           >
-            <motion.div
-              className="vehicle-modal__content"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={springConfig}
-            >
+            <div className="vehicle-detail__hero">
               <button
                 type="button"
-                className="vehicle-modal__back"
+                className="vehicle-detail__back"
                 onClick={() => setVehicleModalId(null)}
                 aria-label={t('common.back')}
               >
-                <ArrowLeft size={22} aria-hidden="true" />
-                <span>{t('common.back')}</span>
+                <ArrowLeft size={20} />
               </button>
-              <span className="vehicle-modal__badge">{vehicleModal.vehicleClass}</span>
-              <h2 className="vehicle-modal__title">{vehicleModal.name}</h2>
-              <p className="vehicle-modal__tagline">{vehicleModal.tagline}</p>
-              <div className="vehicle-modal__gallery">
-                <div className="vehicle-modal__gallery-main">
+              <button type="button" className="vehicle-detail__favorite" aria-label="Favoris">
+                <Star size={20} fill="currentColor" />
+              </button>
+              <div className="vehicle-detail__hero-badge" aria-hidden="true">
+                <Car size={24} />
+              </div>
+              <div className="vehicle-detail__hero-image-wrap">
+                <AnimatePresence mode="wait">
+                  <motion.img
+                    key={vehicleModalPhotoIndex}
+                    src={vehicleModal.images[vehicleModalPhotoIndex]}
+                    alt=""
+                    className="vehicle-detail__hero-image"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                  />
+                </AnimatePresence>
+              </div>
+              <div className="vehicle-detail__dots">
+                {vehicleModal.images.map((_, index) => (
                   <button
+                    key={index}
                     type="button"
-                    className="vehicle-modal__gallery-nav vehicle-modal__gallery-nav--prev"
-                    onClick={() => setVehicleModalPhotoIndex((i) => (i === 0 ? vehicleModal.images.length - 1 : i - 1))}
-                    aria-label="Photo précédente"
-                  >
-                    <ChevronLeft size={28} />
-                  </button>
-                  <AnimatePresence mode="wait">
-                    <motion.img
-                      key={vehicleModalPhotoIndex}
-                      src={vehicleModal.images[vehicleModalPhotoIndex]}
-                      alt=""
-                      className="vehicle-modal__gallery-image"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                    />
-                  </AnimatePresence>
-                  <button
-                    type="button"
-                    className="vehicle-modal__gallery-nav vehicle-modal__gallery-nav--next"
-                    onClick={() => setVehicleModalPhotoIndex((i) => (i === vehicleModal.images.length - 1 ? 0 : i + 1))}
-                    aria-label="Photo suivante"
-                  >
-                    <ChevronRight size={28} />
-                  </button>
+                    className={`vehicle-detail__dot ${index === vehicleModalPhotoIndex ? 'is-active' : ''}`}
+                    onClick={() => setVehicleModalPhotoIndex(index)}
+                    aria-label={`Photo ${index + 1}`}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="vehicle-detail__content">
+              <h1 className="vehicle-detail__title">{vehicleModal.name}</h1>
+              <div className="vehicle-detail__rating">
+                <Star size={14} fill="currentColor" className="vehicle-detail__star" />
+                <span>4.9</span>
+              </div>
+              <div className="vehicle-detail__specs">
+                <div className="vehicle-detail__spec">
+                  <Users size={24} aria-hidden="true" />
+                  <span className="vehicle-detail__spec-value">{vehicleModal.specs.passengers}</span>
+                  <span className="vehicle-detail__spec-label">{t('fleet.passengers')}</span>
                 </div>
-                <div className="vehicle-modal__gallery-thumbs">
-                  {vehicleModal.images.map((src, index) => (
-                    <button
-                      key={index}
-                      type="button"
-                      className={`vehicle-modal__thumb ${index === vehicleModalPhotoIndex ? 'is-active' : ''}`}
-                      onClick={() => setVehicleModalPhotoIndex(index)}
-                      aria-label={`Voir photo ${index + 1}`}
-                    >
-                      <img src={src} alt="" />
-                    </button>
-                  ))}
+                <div className="vehicle-detail__spec">
+                  <Package size={24} aria-hidden="true" />
+                  <span className="vehicle-detail__spec-value">{vehicleModal.specs.luggage}</span>
+                  <span className="vehicle-detail__spec-label">{t('fleet.luggage')}</span>
+                </div>
+                <div className="vehicle-detail__spec">
+                  <Award size={24} aria-hidden="true" />
+                  <span className="vehicle-detail__spec-value">{vehicleModal.vehicleClass}</span>
+                  <span className="vehicle-detail__spec-label">{t('fleet.category')}</span>
                 </div>
               </div>
-              <div className="vehicle-modal__specs">
-                <span className="vehicle-modal__spec">
-                  <Users size={22} aria-hidden="true" />
-                  {vehicleModal.specs.passengers} {t('fleet.passengers')}
-                </span>
-                <span className="vehicle-modal__spec">
-                  <Package size={22} aria-hidden="true" />
-                  {vehicleModal.specs.luggage} {t('fleet.luggage')}
-                </span>
-              </div>
-              <p className="vehicle-modal__description">{vehicleModal.description}</p>
+              <p className="vehicle-detail__description">{vehicleModal.description}</p>
               {vehicleModal.content && (
-                <div className="vehicle-modal__body">{vehicleModal.content}</div>
+                <div className="vehicle-detail__body">{vehicleModal.content}</div>
               )}
+              <div className="vehicle-detail__price-block">
+                <span className="vehicle-detail__price-label">{t('vehiclePage.rentPrice')}</span>
+                <div className="vehicle-detail__price-row">
+                  <span className="vehicle-detail__price">{vehicleModal.price}</span>
+                  <span className="vehicle-detail__period">/ 1 {t('fleet.perDay')}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="vehicle-detail__cta-wrap">
               <motion.button
                 type="button"
-                className="vehicle-modal__cta"
+                className="vehicle-detail__cta"
                 onClick={() => {
                   updateBookingData('vehicle', vehicleModal)
                   setVehicleModalId(null)
@@ -1323,10 +1311,9 @@ function App() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
-                <Car size={20} aria-hidden="true" />
                 {t('vehiclePage.book')}
               </motion.button>
-            </motion.div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

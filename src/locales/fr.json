@@ -39,12 +39,17 @@
     "chip": "Chauffeur VIP",
     "eyebrow": "L'excellence depuis 2018",
     "title": "Transport avec chauffeur à Paris",
+    "titleBefore": "Transport avec ",
+    "titleAccent": "chauffeur",
+    "titleAfter": " à Paris",
     "subtitle": "Paris & Île‑de‑France — transferts aéroport, événements, mise à disposition.",
     "form": {
       "from": "Départ",
       "to": "Arrivée",
-      "fromPlaceholder": "Adresse de départ",
-      "toPlaceholder": "Adresse d'arrivée",
+      "vehicle": "Véhicule",
+      "fromPlaceholder": "Départ",
+      "toPlaceholder": "Arrivée",
+      "ariaReserve": "Réserver un chauffeur",
       "passengers": "Passagers",
       "passengersPlaceholder": "Passagers",
       "luggage": "Bagages",
@@ -140,6 +145,10 @@
     "number": "03",
     "title": "Notre Flotte",
     "description": "3 véhicules premium (et d'autres sur demande). Paris, France, Europe. Choisissez le vôtre — la réservation renvoie sur WhatsApp.",
+    "seeAll": "Voir tout",
+    "filterAll": "Tous",
+    "perDay": "jour",
+    "category": "Catégorie",
     "cta": "Réserver",
     "info": "Infos",
     "vehicles": {
@@ -173,7 +182,8 @@
   },
   "vehiclePage": {
     "back": "Retour à la flotte",
-    "book": "Réserver ce véhicule"
+    "book": "Réserver",
+    "rentPrice": "Tarif location"
   },
   "airports": {
     "number": "04",

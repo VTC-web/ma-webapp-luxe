@@ -39,12 +39,17 @@
     "chip": "VIP Chauffeur",
     "eyebrow": "Excellence since 2018",
     "title": "Chauffeur transport in Paris",
+    "titleBefore": "Chauffeur ",
+    "titleAccent": "transport",
+    "titleAfter": " in Paris",
     "subtitle": "Paris & Île‑de‑France — airport transfers, events, chauffeur hire.",
     "form": {
       "from": "Pick-up",
       "to": "Drop-off",
-      "fromPlaceholder": "Pick-up address",
-      "toPlaceholder": "Drop-off address",
+      "vehicle": "Vehicle",
+      "fromPlaceholder": "From",
+      "toPlaceholder": "To",
+      "ariaReserve": "Book a chauffeur",
       "passengers": "Passengers",
       "passengersPlaceholder": "Passengers",
       "luggage": "Luggage",
@@ -120,6 +125,10 @@
     "number": "03",
     "title": "Our Fleet",
     "description": "3 premium vehicles (and others on request). Paris, France, Europe. Choose yours — booking redirects to WhatsApp.",
+    "seeAll": "See All",
+    "filterAll": "All",
+    "perDay": "day",
+    "category": "Category",
     "cta": "Book",
     "info": "Info",
     "vehicles": {
@@ -153,7 +162,8 @@
   },
   "vehiclePage": {
     "back": "Back to fleet",
-    "book": "Book this vehicle"
+    "book": "Book now",
+    "rentPrice": "Rent price"
   },
   "airports": {
     "number": "04",
